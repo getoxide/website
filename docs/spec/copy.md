@@ -19,7 +19,7 @@ A `⟨…⟩` token is never typed out: the build renders it from the committed 
 | Token | Renders | Source |
 | --- | --- | --- |
 | `⟨definition⟩` | The canonical definition | `site:definition` marker |
-| `⟨platforms⟩` | The supported platforms, e.g. "macOS on Apple Silicon and Windows x64" | Release assets in the snapshot (see Open points) |
+| `⟨platforms⟩` | The supported platforms, e.g. "macOS on Apple Silicon and Windows x64" | Derived from the release assets in the snapshot: an `aarch64.dmg` means macOS on Apple Silicon, an `x64-setup.exe` means Windows x64. Before the first release, from the README Install table. |
 | `⟨requirements⟩` | The Provider table: Provider, command, install link | `site:requirements` marker |
 | `⟨version⟩`, `⟨release-date⟩` | Latest stable version and its date | `latest.json` in the snapshot |
 | `⟨asset-size:macos⟩`, `⟨asset-size:windows⟩` | Installer size | Release metadata in the snapshot |
@@ -32,7 +32,7 @@ A `⟨…⟩` token is never typed out: the build renders it from the committed 
 2. None of the banned phrases from Copy (`copy-lint` rule 2) appears.
 3. "GUI" appears only on `/claude-code-gui`, `/codex-gui` and in the derived `/faq#what-is-oxide`.
 4. Glossary terms are capitalised (Project, Thread, Turn, Provider, Surface, Checkpoint, Verification Dossier, Blind review, Restore, Revert, Line comment, Verification command, Risk signal, Approval, Permission mode). The **first** capitalised mention of one of the nine Concepts terms on a page links to `/docs/concepts#<term>`; that link is the build's job and is not marked below.
-5. Product facts (platforms, requirements, licence, telemetry, API key, version) are tokens or links, never typed out. The footer trust line is the only exception.
+5. Product facts (platforms, requirements, licence, telemetry, API key, version) are tokens or links, never typed out. Two hand-written exceptions: the footer trust line and the unsupported-platform line on `/download`. "Free" and "open-source" come from the canonical definition, so they count as identity and may appear in titles and descriptions; "MIT" is the licence fact and may not.
 6. Oxide drives the agents; the agent writes the code. Never "write code with Oxide".
 
 ## Metadata: every page
@@ -73,14 +73,14 @@ Below the hero, centred: `⟨definition⟩`, then the trust line (fixed by [Page
 
 Section heading: **From prompt to merge**
 
-In positioning order. Each step ends with a link labelled **Learn more** to its `/features` anchor; its accessible name includes the heading ("Learn more about Verification Dossier").
+In the order of the actual flow, from the prompt to the merge, because the visual direction draws them as a four-step path. On the home page this order replaces the positioning order from [Positioning and core message](https://github.com/getoxide/website/issues/8). The positioning *priority* (review is the edge) still holds everywhere else, e.g. the `/features` groups. Each step ends with a link labelled **Learn more** to its `/features` anchor. Its accessible name includes the heading ("Learn more about Verification Dossier").
 
 | # | Heading | Sentence | Link |
 | --- | --- | --- | --- |
-| 1 | Verification Dossier | See which Verification commands actually ran, which are stale and what stayed unverified, computed without an LLM as separate signals, never a single score. | `/features#verification-dossier` |
-| 2 | Blind review | A second Provider reviews the change seeing only the diff and the issue, never the original conversation, and its findings come back as Line comments. | `/features#blind-review` |
-| 3 | Every Turn, reviewable and undoable | See what one Turn changed, send Line comments back to the agent or to GitHub, and Restore the files to how they were before any Turn. | `/features#diff-by-turn` |
-| 4 | One window | Claude Code, Codex and Antigravity CLI side by side, with the editor, terminal, Git, GitHub pull requests and Issues around them. | `/features#multiple-providers` |
+| 1 | One window | Claude Code, Codex and Antigravity CLI side by side, with the editor, terminal, Git, GitHub pull requests and Issues around them. | `/features#multiple-providers` |
+| 2 | Every Turn, reviewable and undoable | See what one Turn changed, send Line comments back to the agent or to GitHub, and Restore the files to how they were before any Turn. | `/features#diff-by-turn` |
+| 3 | Verification Dossier | See which Verification commands actually ran, which are stale and what stayed unverified, computed without an LLM as separate signals, never a single score. | `/features#verification-dossier` |
+| 4 | Blind review | A second Provider reviews the change seeing only the diff and the issue, never the original conversation, and its findings come back as Line comments. | `/features#blind-review` |
 
 ## Closing CTA block *(locked)*
 
@@ -123,12 +123,14 @@ Each platform button carries a sublabel: macOS "Apple Silicon · .dmg · `⟨ass
 **Signing note** (under the buttons)
 
 - **macOS**: macOS blocks the first launch because the build isn't notarized yet. Open it once, then choose **Open Anyway** in System Settings → Privacy & Security. [Full steps](README#opening-an-unsigned-build)
+  - True only until notarization ([oxide#417](https://github.com/getoxide/oxide/issues/417)). When it lands, this line and the `#macos-cant-be-opened` FAQ answer change in the same PR. No snapshot flag.
 - **Windows**: SmartScreen may warn on first run. Choose **More info → Run anyway** after verifying the file. [Full steps](README#opening-an-unsigned-build)
 - **Verify link**: [Verify your download](README#verifying-a-download) with `SHA256SUMS.txt` and the build attestation.
 
 **Unsupported platforms** (one quiet line)
 
 - Linux, Intel Macs and Windows on ARM aren't packaged yet. [Build from source](README#build-from-source).
+  - Hand-written exception to rule 5: nothing in the snapshot lists what is *not* supported.
 
 ### Page FAQ *(locked)*
 
@@ -286,13 +288,3 @@ Yes. Start a Blind review and pick Claude Code as the reviewer: it sees only the
 | Read the findings | The reviewer's findings arrive as Line comments on the Diff. Keep the ones that hold up, dismiss the rest, and send the kept ones back to the writer as one prompt. |
 | When it's worth it | A Blind review spends usage on a second Provider. Use it where it pays: changes that touch sensitive paths, trigger Risk signals, or lack tests. |
 | Without Oxide | You can do this by hand: give the second agent a fresh session with only the diff and the issue, and paste its findings back. Oxide removes the copying and keeps the reviewer from seeing the conversation. |
-
-## Open points for review
-
-Questions the draft surfaced. Each needs Lorenzo's call before this file is merged.
-
-1. **Where `⟨platforms⟩` comes from.** The README markers are `definition`, `requirements`, `quick-start`, `faq` and `features`; none holds the platform list. Proposal: derive it from the release assets in the snapshot (an `aarch64.dmg` means macOS on Apple Silicon, an `x64-setup.exe` means Windows x64), with the README Install table as the fallback before the first release.
-2. **The unsupported-platform line on `/download` names platforms by hand** ("Linux, Intel Macs and Windows on ARM"), which bends rule 5. It is the wording decided in the download ticket, and nothing in the snapshot lists what is *not* supported. Proposal: accept it as a second hand-written exception, next to the footer trust line.
-3. **The macOS signing line is true only until notarization** ([oxide#417](https://github.com/getoxide/oxide/issues/417)). Proposal: when that lands, changing the line and the `#macos-cant-be-opened` answer is part of the same change, not a snapshot flag.
-4. **"Open-source" and "free" in titles and descriptions.** They come from the canonical definition, so the draft treats them as identity, not as the retyped "MIT licence" fact.
-5. **Proof-point order on a path.** The visual direction draws the proof points as a four-step path, "From prompt to merge", in positioning order (Dossier first). Read as a path, "One window" → "Every Turn" → "Dossier" → "Blind review" would follow the actual flow. The draft keeps positioning order, as decided; say if the path should win.
