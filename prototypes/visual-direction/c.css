@@ -16,7 +16,28 @@
 [data-variant="C"] .c-grain{position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.5;mix-blend-mode:overlay;
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .08 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
 [data-variant="C"] .c-hero__in{display:flex;flex-direction:column;align-items:center;text-align:center}
-[data-variant="C"] .c-mark{width:120px;height:120px;margin-bottom:28px}
+[data-variant="C"] .c-mark{width:120px;height:120px;margin-bottom:28px;overflow:visible}
+/* Eyes: two independent loops of different length (11 s glance, 7 s blink) so the pattern never looks mechanical.
+   Glances are quick saccades (~150 ms) with long holds; blinks close in ~70 ms, one single and one double per loop. */
+[data-variant="C"] .c-eyes{animation:c-glance 11s cubic-bezier(.3,0,.2,1) 1.4s infinite}
+[data-variant="C"] .c-eye{transform-box:fill-box;transform-origin:center;animation:c-blink 7s linear 2.2s infinite}
+@keyframes c-glance{
+  0%,26%{transform:translate(0,0)}
+  27.5%,40%{transform:translate(-26px,0)}
+  41.5%,47%{transform:translate(0,0)}
+  48.5%,63%{transform:translate(26px,-6px)}
+  64.5%,100%{transform:translate(0,0)}
+}
+@keyframes c-blink{
+  0%,100%{transform:scaleY(1)}
+  1%{transform:scaleY(.12)}
+  2.2%{transform:scaleY(1)}
+  58%{transform:scaleY(1)}
+  59%{transform:scaleY(.12)}
+  60.2%{transform:scaleY(1)}
+  61.6%{transform:scaleY(.12)}
+  62.8%{transform:scaleY(1)}
+}
 [data-variant="C"] h1{font-size:clamp(40px,5.3vw,76px);line-height:1.04;max-width:14em;text-wrap:balance;color:var(--bright)}
 [data-variant="C"] .w{display:inline-block;animation:c-word .7s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i)*var(--step) + 150ms)}
 @keyframes c-word{from{opacity:0;filter:blur(8px)}to{opacity:1;filter:blur(0)}}
@@ -76,6 +97,7 @@
 }
 @media (prefers-reduced-motion:reduce){
   [data-variant="C"] .w{animation:c-fade .2s both;animation-delay:0s}
+  [data-variant="C"] .c-eyes,[data-variant="C"] .c-eye{animation:none}
   @keyframes c-fade{from{opacity:0}to{opacity:1}}
   [data-variant="C"] .c-canvas{transition:opacity .2s}
   [data-variant="C"] .c-shot.reveal,[data-variant="C"] .c-node,[data-variant="C"] .c-steps li>:not(.c-node){transition:opacity .2s}
