@@ -20,7 +20,7 @@ float noise(vec2 p){
 float fbm(vec2 p){
   float v = 0.0, a = 0.5;
   mat2 m = mat2(1.6, 1.2, -1.2, 1.6);
-  for (int i = 0; i < 5; i++){ v += a * noise(p); p = m * p; a *= 0.5; }
+  for (int i = 0; i < 4; i++){ v += a * noise(p); p = m * p; a *= 0.5; }
   return v;
 }
 
@@ -58,8 +58,6 @@ void main(){
   col = mix(col, bg, smoothstep(0.30, 0.85, length((uv - 0.5) * vec2(1.0, 0.95))));
   col = mix(col, bg, smoothstep(0.32, 0.0, uv.y));
 
-  // film grain
-  col += (hash(gl_FragCoord.xy + fract(u_time) * 97.0) - 0.5) * 0.028;
   gl_FragColor = vec4(col, 1.0);
 }`;
 
@@ -95,10 +93,18 @@ export function mountShader(canvas, host) {
   let raf = 0, visible = true, destroyed = false, shown = false;
   const t0 = performance.now();
   const STILL_T = 6.0;
+  // Performance: the field is soft, so render well below CSS resolution and let the browser upscale it,
+  // and cap the frame rate (the cycle lasts 20 s, so 30 fps is indistinguishable from 60).
+  const RENDER_SCALE = 0.5;        // internal pixels per CSS pixel, independent of devicePixelRatio
+  const MAX_PIXELS = 360_000;      // hard cap on the drawing buffer (~800x450)
+  const FRAME_MS = 1000 / 30;
+  let last = -Infinity;
 
   function resize() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-    const w = Math.max(1, Math.round(canvas.clientWidth * dpr)), h = Math.max(1, Math.round(canvas.clientHeight * dpr));
+    let k = RENDER_SCALE;
+    const area = canvas.clientWidth * canvas.clientHeight * k * k;
+    if (area > MAX_PIXELS) k *= Math.sqrt(MAX_PIXELS / area);
+    const w = Math.max(1, Math.round(canvas.clientWidth * k)), h = Math.max(1, Math.round(canvas.clientHeight * k));
     if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
     gl.viewport(0, 0, w, h);
   }
@@ -112,7 +118,7 @@ export function mountShader(canvas, host) {
   function frame(now) {
     raf = 0;
     if (destroyed || !visible || document.hidden) return;
-    draw((now - t0) / 1000);
+    if (now - last >= FRAME_MS - 1) { last = now; draw((now - t0) / 1000); }
     raf = requestAnimationFrame(frame);
   }
   function update() {
