@@ -60,7 +60,11 @@ export function SiteHeader({ path }: { path: string }) {
       </a>
       <nav className={styles.nav} aria-label="Main">
         <NavLinks path={path} className={styles.links} />
-        <a className={styles.github} href={header.github.href}>
+        <a
+          className={styles.github}
+          href={header.github.href}
+          data-goatcounter-click="github-cta"
+        >
           <Icon name="mark-github" />
           <span className={styles.visuallyHidden}>{header.github.label}</span>
         </a>

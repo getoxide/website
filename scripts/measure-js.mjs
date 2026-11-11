@@ -25,13 +25,25 @@ export function jsReferences(html) {
 }
 
 /**
+ * GoatCounter's count.js lives on its own origin, so it is not in `out/`. The
+ * budgets count it at this fixed allowance (about 3.5 kB gzip).
+ */
+export const GOATCOUNTER_GZIP_BYTES = 3500;
+
+/** Gzip bytes of one script: read from `out/`, or the allowance if external. */
+export function gzipBytesOf(src, read) {
+  if (/^(?:https?:)?\/\//i.test(src)) return GOATCOUNTER_GZIP_BYTES;
+  return gzipSync(read(src)).length;
+}
+
+/**
  * @param {string} html
  * @param {(src: string) => Buffer} read reads a script by its URL path
  */
 export function measureJs(html, read) {
   const files = jsReferences(html).map((src) => ({
     src,
-    gzipBytes: gzipSync(read(src)).length,
+    gzipBytes: gzipBytesOf(src, read),
   }));
   return {
     files,

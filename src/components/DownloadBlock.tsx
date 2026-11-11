@@ -2,7 +2,8 @@ import { COPY, GITHUB_REPO_URL } from "@/content/copy";
 import { readmeUrl } from "@/lib/oxide";
 import { OS_SCRIPT } from "@/lib/os";
 import { SNAPSHOT, tokensOf, type Snapshot } from "@/lib/snapshot";
-import { Button, type ClickEvent } from "./Button";
+import type { ClickEvent } from "@/lib/measurement";
+import { Button } from "./Button";
 import { DeckText } from "./DeckText";
 import styles from "./DownloadBlock.module.css";
 

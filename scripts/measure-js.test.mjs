@@ -1,6 +1,24 @@
 import { gzipSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
-import { jsReferences, measureJs } from "./measure-js.mjs";
+import {
+  GOATCOUNTER_GZIP_BYTES,
+  jsReferences,
+  measureJs,
+} from "./measure-js.mjs";
+
+describe("GoatCounter's script", () => {
+  const html = `<html><head><script async="" src="https://gc.zgo.at/count.js" data-goatcounter="https://x.goatcounter.com/count"></script><script src="/a.js" async=""></script></head></html>`;
+
+  it("counts as a fixed allowance and is never read from out/", () => {
+    const read = (src) => {
+      if (src !== "/a.js") throw new Error(`read ${src}`);
+      return Buffer.from("x");
+    };
+    expect(measureJs(html, read).gzipBytes).toBe(
+      gzipSync("x").length + GOATCOUNTER_GZIP_BYTES,
+    );
+  });
+});
 
 const HTML = `<!DOCTYPE html><html><head>
 <link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/a.js"/>
