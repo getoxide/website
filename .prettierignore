@@ -11,4 +11,7 @@ public
 docs/spec
 # Synced verbatim from the Oxide repo by `pnpm sync:oxide`: never reformat.
 content/oxide
+src/app/icon.svg
+src/app/favicon.ico
+src/app/apple-icon.png
 out-fixtures
