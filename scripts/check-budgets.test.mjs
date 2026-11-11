@@ -65,3 +65,41 @@ describe("checkBudgets: CSS and HTML", () => {
     ]);
   });
 });
+
+describe("checkBudgets: fonts", () => {
+  const head = `<link rel="preload" href="/_next/static/media/a.woff2" as="font" crossorigin="" type="font/woff2"/>
+<link rel="stylesheet" href="/_next/static/chunks/fonts.css"/>`;
+  // The stylesheet declares the preloaded face and one more, relative to itself.
+  const css = `@font-face{src:url(../media/a.woff2)}@font-face{src:url("../media/b.woff2") format("woff2")}`;
+
+  it("passes fonts within 120 kB, of which at most 75 kB preloaded", () => {
+    const read = exportOf({
+      "/_next/static/chunks/fonts.css": css,
+      "/_next/static/media/a.woff2": noise(70_000),
+      "/_next/static/media/b.woff2": noise(40_000),
+    });
+    expect(checkBudgets([page("/faq", "reading", head)], read)).toEqual([]);
+  });
+
+  it("fails a page whose preloaded fonts exceed 75 kB at file size", () => {
+    const read = exportOf({
+      "/_next/static/chunks/fonts.css": css,
+      "/_next/static/media/a.woff2": noise(80_000),
+      "/_next/static/media/b.woff2": noise(10_000),
+    });
+    expect(checkBudgets([page("/faq", "reading", head)], read)).toEqual([
+      expect.stringMatching(/^\/faq: preloaded fonts 80\.0 kB > 75\.0 kB/),
+    ]);
+  });
+
+  it("fails a page whose fonts, preloaded or declared in its CSS, exceed 120 kB", () => {
+    const read = exportOf({
+      "/_next/static/chunks/fonts.css": css,
+      "/_next/static/media/a.woff2": noise(70_000),
+      "/_next/static/media/b.woff2": noise(60_000),
+    });
+    expect(checkBudgets([page("/", "showcase", head)], read)).toEqual([
+      expect.stringMatching(/^\/: fonts 130\.0 kB > 120\.0 kB/),
+    ]);
+  });
+});
