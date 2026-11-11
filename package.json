@@ -7,7 +7,7 @@
   "scripts": {
     "predev": "node scripts/build-captures.mjs && node scripts/build-machine.mjs",
     "dev": "next dev",
-    "build": "node scripts/build-captures.mjs && node scripts/build-machine.mjs && next build && node scripts/strip-reading-js.mjs && node scripts/check-static.mjs",
+    "build": "node scripts/build-captures.mjs && node scripts/build-machine.mjs && next build && node scripts/strip-reading-js.mjs && node scripts/defer-hydration.mjs && node scripts/check-static.mjs",
     "serve": "node scripts/serve-out.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
