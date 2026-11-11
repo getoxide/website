@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { PAGES, SITE_URL } from "../src/content/pages";
+import { SEARCH_CONSOLE_PLACEHOLDER } from "../src/lib/verification";
 import { oxideFileUrl, SNAPSHOT } from "./snapshot";
 import { urlOf } from "./pages";
 
@@ -126,5 +127,11 @@ test("every page carries the Search Console verification meta tag", async ({
       .locator('meta[name="google-site-verification"]')
       .getAttribute("content");
     expect(content, entry.path).toBeTruthy();
+    // A configured production build must ship the real token; only an
+    // unconfigured local build may ship the documented placeholder.
+    expect(content, entry.path).toBe(
+      process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim() ||
+        SEARCH_CONSOLE_PLACEHOLDER,
+    );
   }
 });
