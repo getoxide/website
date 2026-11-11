@@ -48,11 +48,13 @@ describe("buildIco", () => {
 
 const BRAND = "assets/brand/oxide";
 const TOKENS = ":root { --ox-background: #1C1C1E; }\n";
+const LOGO = '<svg viewBox="0 0 570 192"><title>Oxide</title></svg>';
 
 function source() {
   return new Map([
     [`${BRAND}/palette/oxide-tokens.css`, Buffer.from(TOKENS)],
     [`${BRAND}/oxide-favicon.svg`, Buffer.from("<svg/>")],
+    [`${BRAND}/oxide-logo.svg`, Buffer.from(LOGO)],
     [`${BRAND}/png/favicon/16x16.png`, fakePng(16)],
     [`${BRAND}/png/favicon/32x32.png`, fakePng(32)],
     [`${BRAND}/png/favicon/48x48.png`, fakePng(48)],
@@ -86,6 +88,9 @@ describe("syncBrand", () => {
       written.get("content/oxide/brand/oxide-tokens.css")?.toString(),
     ).toBe(TOKENS);
     expect(written.get("src/app/icon.svg")?.toString()).toBe("<svg/>");
+    expect(written.get("content/oxide/brand/oxide-logo.svg")?.toString()).toBe(
+      LOGO,
+    );
     expect(written.get("src/app/apple-icon.png")?.readUInt32BE(16)).toBe(180);
 
     const ico = written.get("src/app/favicon.ico");
@@ -97,6 +102,12 @@ describe("syncBrand", () => {
     expect(
       JSON.parse(written.get("content/oxide/source.json").toString()),
     ).toEqual({ repo: "getoxide/oxide", ref: "v1.2.3" });
+  });
+
+  it("fails when the logo is missing", async () => {
+    const files = source();
+    files.delete(`${BRAND}/oxide-logo.svg`);
+    await expect(run(files)).rejects.toThrow(/oxide-logo\.svg/);
   });
 
   it("writes nothing when a file is missing", async () => {

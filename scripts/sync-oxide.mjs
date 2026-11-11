@@ -1,6 +1,6 @@
 // `pnpm sync:oxide [--ref <ref>]`: copies the Oxide brand kit into the site at
 // a pinned ref of getoxide/oxide (Design system, Tokens). First version: the
-// tokens CSS verbatim and the icon set. The content snapshot joins it later.
+// tokens CSS verbatim, the logo and the icon set. The content snapshot joins it later.
 //
 // Every file is fetched before anything is written, so a missing file fails
 // the sync and leaves the last good copy in place.
@@ -71,8 +71,9 @@ export function buildIco(pngs) {
  */
 export async function syncBrand({ ref, fetchFile, writeFile }) {
   const get = (path) => fetchFile(ref, `${BRAND}/${path}`);
-  const [tokens, iconSvg, appleIcon, ...favicons] = await Promise.all([
+  const [tokens, logo, iconSvg, appleIcon, ...favicons] = await Promise.all([
     get("palette/oxide-tokens.css"),
+    get("oxide-logo.svg"),
     get("oxide-favicon.svg"),
     get("png/avatar/180x180.png"),
     ...FAVICON_SIZES.map((s) => get(`png/favicon/${s}x${s}.png`)),
@@ -81,6 +82,7 @@ export async function syncBrand({ ref, fetchFile, writeFile }) {
 
   const outputs = [
     ["content/oxide/brand/oxide-tokens.css", tokens],
+    ["content/oxide/brand/oxide-logo.svg", logo],
     ["src/app/icon.svg", iconSvg],
     ["src/app/favicon.ico", ico],
     ["src/app/apple-icon.png", appleIcon],
