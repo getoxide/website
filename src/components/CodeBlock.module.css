@@ -1,0 +1,44 @@
+/* Design system, Code block. Token colours arrive inline from the Shiki
+   theme, as var(--ox-syntax-*). */
+.block {
+  position: relative;
+  margin: var(--site-space-5) 0;
+}
+
+.code :global(pre) {
+  margin: 0;
+  padding: var(--site-space-4) var(--site-space-5);
+  overflow-x: auto;
+  border-radius: var(--site-radius-sm);
+  background: var(--ox-surface-background);
+  font: 400 var(--site-text-mono) var(--site-font-code);
+  font-feature-settings: "calt" 0;
+}
+
+.code :global(pre):focus-visible {
+  outline: 2px solid var(--ox-focus-ring);
+  outline-offset: 2px;
+}
+
+.copy {
+  position: absolute;
+  top: var(--site-space-2);
+  right: var(--site-space-2);
+  min-width: 24px;
+  min-height: 24px;
+  padding: var(--site-space-1) var(--site-space-3);
+  border: 1px solid var(--ox-element-border);
+  border-radius: var(--site-radius-pill);
+  background: var(--ox-background);
+  color: var(--ox-text-muted);
+  font: 500 var(--site-text-caption) var(--site-font-body);
+  cursor: pointer;
+  transition:
+    color var(--site-dur-fast) var(--site-ease-fade),
+    background var(--site-dur-fast) var(--site-ease-fade);
+}
+
+.copy:hover {
+  background: var(--ox-element-background);
+  color: var(--ox-text-bright);
+}

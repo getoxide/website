@@ -1,0 +1,155 @@
+/* Design system, Proof path: a hairline with a node per step. Four columns at
+   --site-w-wide, vertical below 860px (a documented constant). The hidden
+   start state is `.wrap[data-pending]`, which <Reveal> sets only when
+   JavaScript runs, motion is allowed and the path is below the fold
+   (ADR-0001). The transitions apply only then, so reduced motion is instant. */
+.path {
+  width: 100%;
+  max-width: var(--site-w-wide);
+  margin: 0 auto;
+  padding: var(--site-section) 0;
+}
+
+.heading {
+  margin-bottom: clamp(40px, 5vw, 72px);
+  font: 500 var(--site-text-h2) var(--site-font-heading);
+  letter-spacing: -0.03em;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.wrap {
+  position: relative;
+}
+
+.line {
+  position: absolute;
+  top: 7px;
+  right: 0;
+  left: 7px;
+  height: 1px;
+  background: var(--ox-element-border);
+  transform-origin: left;
+}
+
+.steps {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: var(--site-space-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  position: relative;
+  padding-top: 40px;
+}
+
+.node {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 15px;
+  height: 15px;
+  background: var(--ox-background);
+  border: 1px solid var(--ox-element-border);
+  border-radius: 50%;
+  transition:
+    border-color var(--site-dur-base) var(--site-ease-fade),
+    box-shadow var(--site-dur-base) var(--site-ease-fade);
+}
+
+.icon {
+  display: block;
+  width: 20px;
+  height: 20px;
+  margin-bottom: 14px;
+  color: var(--ox-text-muted);
+}
+
+.title {
+  font: 500 var(--site-text-h3) var(--site-font-heading);
+  letter-spacing: -0.03em;
+}
+
+.sentence {
+  max-width: 26em;
+  margin-top: var(--site-space-3);
+  font: 400 var(--site-text-small) var(--site-font-body);
+  color: var(--ox-text-muted);
+}
+
+.more {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  margin-top: var(--site-space-4);
+  font: 500 var(--site-text-small) var(--site-font-body);
+}
+
+/* Lit nodes (the ring is the accent at low opacity): the resting state, so
+   the path is complete without JavaScript or motion. */
+.node {
+  border-color: var(--ox-text-accent);
+  box-shadow: 0 0 0 3px
+    color-mix(in srgb, var(--ox-text-accent) 16%, transparent);
+}
+
+.wrap[data-pending] .node {
+  border-color: var(--ox-element-border);
+  box-shadow: none;
+}
+
+.wrap[data-pending] .line {
+  transform: scaleX(0);
+}
+
+.wrap[data-pending] .body {
+  opacity: 0;
+}
+
+/* The reveal: the line draws, then each node and its text light one stagger
+   after the other. */
+.wrap[data-in] .line {
+  transition: transform var(--site-dur-slow) var(--site-ease-in-out);
+}
+
+.wrap[data-in] .body {
+  transition: opacity var(--site-dur-base) var(--site-ease-fade);
+  transition-delay: calc(var(--n, 0) * var(--site-stagger) + 200ms);
+}
+
+.wrap[data-in] .node {
+  transition-delay: calc(var(--n, 0) * var(--site-stagger) + 150ms);
+}
+
+@media (max-width: 860px) {
+  .steps {
+    grid-auto-flow: row;
+    gap: 36px;
+  }
+
+  .step {
+    padding: 0 0 0 44px;
+  }
+
+  .node {
+    top: 3px;
+  }
+
+  .line {
+    top: 7px;
+    right: auto;
+    bottom: 0;
+    left: 7px;
+    width: 1px;
+    height: auto;
+    transform-origin: top;
+  }
+
+  .wrap[data-pending] .line {
+    transform: scaleY(0);
+  }
+}

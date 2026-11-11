@@ -1,0 +1,106 @@
+{
+  "source": {
+    "repo": "getoxide/oxide",
+    "ref": "main",
+    "commit": "b7339d760bdead6234524f2e83d3487134974992"
+  },
+  "readme": {
+    "definition": "Oxide is a free, open-source desktop app for agentic coding that drives Claude Code, Codex and Antigravity CLI in one window and shows what each change touched and what was actually checked, so you can merge with confidence.",
+    "features": [
+      {
+        "group": "One app, every agent CLI",
+        "leadIns": [
+          "Multiple Providers",
+          "Threads",
+          "Permission modes",
+          "Slash commands, attachments and usage limits",
+          "Worktrees"
+        ]
+      },
+      {
+        "group": "Review before you merge",
+        "leadIns": [
+          "Diff by Turn, Uncommitted or Branch",
+          "Verification Dossier",
+          "Line comments",
+          "Blind review",
+          "Revert and Restore",
+          "Rule suggestions",
+          "Pull requests, from review to merge"
+        ]
+      },
+      {
+        "group": "A full workspace around the conversation",
+        "leadIns": [
+          "Git and GitHub",
+          "Code editor",
+          "Terminal",
+          "Local dictation",
+          "Keyboard first"
+        ]
+      }
+    ],
+    "install": "| Platform | File | Notes |\n| --- | --- | --- |\n| macOS (Apple Silicon) | `Oxide_<version>_aarch64.dmg` | Drag `Oxide.app` into `/Applications`. |\n| Windows 10/11 (x64) | `Oxide_<version>_x64-setup.exe` | Includes CPU and GPU (Vulkan, CUDA) dictation. |",
+    "requirements": "| Provider | Command | Install |\n| --- | --- | --- |\n| Claude Code | `claude` | [docs.claude.com](https://docs.claude.com/en/docs/claude-code) |\n| Codex | `codex` | [github.com/openai/codex](https://github.com/openai/codex) |\n| Antigravity CLI | `agy` | Google Antigravity |\n\n`git` is required. The [GitHub CLI](https://cli.github.com) (`gh`, logged in) is optional and enables the pull request and Issues features.",
+    "quickStart": "1. Install and log in to at least one Provider (for example, run `claude` once in a terminal).\n2. Launch Oxide and press **⌘⇧N** (Ctrl+Shift+N on Windows) to open the Project palette: pick a folder, create one with `git init`, or clone a repository.\n3. Start a Thread, choose the Provider, Model and Permission mode, and write your prompt.\n4. When the Turn finishes, open the **Diff** Surface: review the Turn, read the Dossier, leave Line comments or revert what you don't want.\n5. **Commit & Push**, then open the pull request from the **Pull request** Surface.",
+    "faq": "**What is Oxide?**\nOxide is a free, open-source desktop app for agentic coding that drives Claude Code, Codex and Antigravity CLI in one window and shows what each change touched and what was actually checked, so you can merge with confidence.\n\nOxide is not a coding agent: it is a desktop GUI that drives the agent CLIs you already have installed and logged in. Oxide is not affiliated with Oxide Computer Company.\n\n**Do I need an API key?**\nNo separate key for Oxide. Each Provider uses its own login and its own subscription or API billing, exactly as it does in the terminal.\n\n**Does Oxide send my code or prompts anywhere?**\nOxide has no telemetry and no server. Your prompts and code go only to the Provider you chose, through its own CLI. The Transcript, Checkpoints and Review ledger stay on your machine, and dictation runs fully on-device.\n\n**How is it different from using Claude Code or Codex in a terminal?**\nYou keep the same CLIs, sessions and logins. Oxide adds a per-Turn Diff, the Verification Dossier, Line comments, Blind review by a second Provider, Restore to before any Turn, worktrees per Thread and GitHub pull request review, in one window, for every Provider.\n\n**Which platforms are supported?**\nOfficial builds target macOS on Apple Silicon and Windows x64. Linux isn't packaged yet.\n\n**Is it free?**\nYes. Oxide is open source under the [MIT License](https://github.com/getoxide/oxide/blob/b7339d760bdead6234524f2e83d3487134974992/LICENSE)."
+  },
+  "concepts": [
+    {
+      "term": "Project",
+      "id": "project",
+      "definition": "A folder on the user's machine holding a Git repository, usually linked to a GitHub repository. The unit everything else belongs to."
+    },
+    {
+      "term": "Thread",
+      "id": "thread",
+      "definition": "One conversation with a single Provider inside a Project, with its own Model, Effort and context (Model and Effort can change between Turns); it maps one-to-one to the Provider's own session. `/clear` and ⌘N start a new Thread in the same Project; the old one stays in the sidebar until the user deletes it. A finished Thread is deleted, not archived: deleting removes its Transcript, Approvals, Attachments and Checkpoints for good, and its worktree with them (its branch stays). The Provider's own session files are left to the Provider. A new chat Thread works in a worktree of its own by default. See ADR-0005 and ADR-0011."
+    },
+    {
+      "term": "Turn",
+      "id": "turn",
+      "definition": "One user prompt in a Thread and everything the Provider does in response, until it completes, is interrupted, or fails."
+    },
+    {
+      "term": "Provider",
+      "id": "provider",
+      "definition": "An agent CLI installed and logged in on the user's machine that Oxide drives: Claude Code, Codex, or Antigravity CLI (`agy`)."
+    },
+    {
+      "term": "Surface",
+      "id": "surface",
+      "definition": "One of the five tools in the right dock: Diff, Files, Terminal, Pull request or Issues. Files is a navigator, not an editor: it browses the selected checkout and opens files in the **Code workspace**, which lives in the centre beside the Thread. A Surface can be maximized and restored while keeping its content and working state. The Pull request and Issues lists belong to the Project's repository; only branch actions (opening a pull request, checking one out) act on the selected Thread's checkout and name it. Reviewing a remote pull request records its identity for the Diff Surface and never changes a checkout."
+    },
+    {
+      "term": "Checkpoint",
+      "id": "checkpoint",
+      "definition": "A snapshot of a Thread's files taken when a Turn starts and when it ends, so the Diff Surface can show what that Turn changed and the Thread's files can be restored to how they were before a Turn. Restoring takes a Checkpoint first, so it can be undone, and does not rewind the Provider's session. See ADR-0011."
+    },
+    {
+      "term": "Verification Dossier",
+      "id": "verification-dossier",
+      "definition": "The account of a change's intent, evidence and risk signals that Oxide computes, without an LLM, from the Transcript, Checkpoints, Settings and GitHub. It is a section of the Diff Surface, shows separate signals instead of a single score, and keeps the agent's closing message apart as a claim. In Branch scope it covers the whole branch: every Turn, the commits no Turn produced, the pull request's checks, Approvals and Permission modes. Also called the Dossier. Published, it is a section of a pull request's body between HTML comment markers: computed facts only, commands redacted, and prompts or the agent's message only when the author opts in for that pull request. The section records the commit and the options it was published with; a push from Oxide rewrites only the marked range, and a section the author removed is never re-added. When the branch moves outside Oxide the section is out of date until the author refreshes it."
+    },
+    {
+      "term": "Blind review",
+      "id": "blind-review",
+      "definition": "A review of a change by a Provider session that received only the diff and the issue, never the original Thread. Its findings become Line comments the user keeps or dismisses."
+    },
+    {
+      "term": "Restore",
+      "id": "restore",
+      "definition": "Putting the selected Thread's files back to how they were before a chosen Turn, file by file: HEAD, the branches, the user's index and the ignored files stay as they were, and the Provider's session is not rewound. It asks first, naming the files it changes, and takes a Checkpoint first, so it can be undone. It is refused while a Turn runs in that checkout, and the agent is told on its next prompt which files went back. See ADR-0011."
+    }
+  ],
+  "release": {
+    "state": "none",
+    "releasesUrl": "https://github.com/getoxide/oxide/releases",
+    "latest": null,
+    "platforms": [
+      "macOS on Apple Silicon",
+      "Windows x64"
+    ],
+    "platformsFrom": "readme"
+  },
+  "changelog": []
+}

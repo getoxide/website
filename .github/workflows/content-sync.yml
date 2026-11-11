@@ -1,0 +1,141 @@
+name: Content sync
+
+# Pulls the latest stable Oxide release into the committed Snapshot
+# (ADR-0003). A changed Snapshot that passes the site's checks is pushed
+# straight to main and Vercel deploys it. No PR: PRs opened with GITHUB_TOKEN
+# trigger no workflows, and an extra PAT or App token was rejected.
+# Any failure happens before the push, so main keeps the last good Snapshot.
+on:
+  schedule:
+    - cron: "17 5 * * *"
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Oxide ref to sync (default: latest stable tag)"
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+# Never cancel a run halfway: queue it behind the running one.
+concurrency:
+  group: content-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      # The input reaches the script through the environment only, and must
+      # look like a git ref before it is used.
+      - name: Sync from the Oxide repo
+        id: sync
+        env:
+          SYNC_REF: ${{ inputs.ref }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          args=()
+          if [ -n "${SYNC_REF}" ]; then
+            if ! printf '%s' "${SYNC_REF}" | grep -Eq '^[A-Za-z0-9._/-]+$'; then
+              echo "::error::Invalid ref input" >&2
+              exit 1
+            fi
+            args=(--ref "${SYNC_REF}")
+          fi
+          pnpm sync:oxide "${args[@]}" 2>&1 | tee sync.log
+          {
+            echo "### Content sync"
+            if grep -q "Glossary terms not on the site" sync.log; then
+              echo
+              grep "Glossary terms not on the site" sync.log | sed 's/^/- /'
+            fi
+            if grep -q "installer asset" sync.log; then
+              echo
+              grep "installer asset" sync.log | sed 's/^/- /'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ -z "$(git status --porcelain -- content src/app)" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Snapshot unchanged, nothing to commit." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            if [ -n "$(git status --porcelain -- content/oxide/brand)" ]; then
+              echo "tokens=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "tokens=false" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      # The share card is a function of the brand tokens and the hero lines:
+      # regenerate it before the staleness test, or a token sync would fail
+      # every run and never reach main. It needs Chromium.
+      - name: Install the browser
+        if: steps.sync.outputs.changed == 'true'
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Regenerate the share card
+        if: steps.sync.outputs.changed == 'true' && steps.sync.outputs.tokens == 'true'
+        run: pnpm og:card
+
+      # The site's own checks (docs/agents/engineering.md), on the synced
+      # files, before anything is pushed. Budgets, copy and Concept links read
+      # the export, so they run after the build.
+      - name: Format
+        if: steps.sync.outputs.changed == 'true'
+        run: pnpm format:check
+      - name: Lint
+        if: steps.sync.outputs.changed == 'true'
+        run: pnpm lint
+      - name: Typecheck
+        if: steps.sync.outputs.changed == 'true'
+        run: pnpm typecheck
+      - name: Snapshot schema and unit tests
+        if: steps.sync.outputs.changed == 'true'
+        run: pnpm test
+      - name: Build
+        if: steps.sync.outputs.changed == 'true'
+        run: pnpm build
+      - name: Budgets
+        if: steps.sync.outputs.changed == 'true'
+        run: pnpm check:budgets
+      - name: Copy
+        if: steps.sync.outputs.changed == 'true'
+        run: pnpm check:copy
+      - name: Concept links
+        if: steps.sync.outputs.changed == 'true'
+        run: pnpm check:concept-links
+      - name: End-to-end tests
+        if: steps.sync.outputs.changed == 'true'
+        run: pnpm e2e
+      - name: Lighthouse
+        if: steps.sync.outputs.changed == 'true'
+        run: pnpm check:lighthouse
+
+      - name: Commit the Snapshot
+        if: steps.sync.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          ref="$(node -p "JSON.parse(require('fs').readFileSync('content/oxide/source.json','utf8')).ref")"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A content src/app public/og.png assets/og-card.json
+          git commit -m "chore(content): sync from oxide ${ref}"
+          echo "Synced from oxide ${ref}." >> "$GITHUB_STEP_SUMMARY"
+      - name: Push to main
+        if: steps.sync.outputs.changed == 'true'
+        run: git push origin HEAD:main

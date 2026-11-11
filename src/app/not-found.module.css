@@ -1,0 +1,16 @@
+.page {
+  width: 100%;
+  max-width: var(--site-w-prose);
+  margin: 0 auto;
+  padding-bottom: var(--site-space-9);
+}
+
+.links {
+  font: 500 var(--site-text-body) var(--site-font-body);
+  color: var(--ox-text-disabled);
+}
+
+.links a {
+  display: inline-block;
+  min-height: 24px;
+}

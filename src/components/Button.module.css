@@ -1,0 +1,64 @@
+/* Design system, Button. */
+.button {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: var(--site-space-2);
+  height: 46px;
+  padding: 0 22px;
+  border: 1px solid transparent;
+  border-radius: var(--site-radius-pill);
+  font: 500 15px / 1 var(--site-font-body);
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color var(--site-dur-fast) var(--site-ease-fade),
+    border-color var(--site-dur-fast) var(--site-ease-fade),
+    color var(--site-dur-fast) var(--site-ease-fade);
+}
+
+/* The Download block's platform pair (.macos, .windows) swaps looks when the
+   inline script finds Windows: the Windows button turns primary and the
+   macOS one ghost. Without JavaScript `variant` alone decides. */
+.primary,
+:global(html[data-os="windows"]) .windows {
+  background: var(--ox-accent);
+  border-color: transparent;
+  color: var(--ox-accent-foreground);
+}
+
+.primary:hover,
+:global(html[data-os="windows"]) .windows:hover {
+  background: var(--ox-accent-hover);
+}
+
+.primary:active,
+:global(html[data-os="windows"]) .windows:active {
+  background: var(--ox-accent-pressed);
+}
+
+.ghost,
+.nav,
+:global(html[data-os="windows"]) .macos {
+  background: color-mix(in srgb, var(--ox-background) 45%, transparent);
+  border-color: var(--ox-element-border);
+  color: var(--ox-text);
+}
+
+.ghost:hover,
+.nav:hover,
+:global(html[data-os="windows"]) .macos:hover,
+:global(html[data-os="windows"]) .macos:active {
+  background: var(--ox-element-background);
+}
+
+.nav {
+  height: auto;
+  padding: 8px 18px;
+  font-size: 14px;
+}
+
+.button[aria-current="page"] {
+  color: var(--ox-text-bright);
+}

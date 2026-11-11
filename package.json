@@ -1,0 +1,58 @@
+{
+  "name": "oxide-website",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.2.2",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "predev": "node scripts/build-captures.mjs && node scripts/build-machine.mjs",
+    "dev": "next dev",
+    "build": "node scripts/build-captures.mjs && node scripts/build-machine.mjs && next build && node scripts/strip-reading-js.mjs && node scripts/defer-hydration.mjs && node scripts/check-static.mjs",
+    "serve": "node scripts/serve-out.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "vitest run",
+    "e2e": "playwright test",
+    "sync:oxide": "node scripts/sync-oxide.mjs",
+    "measure:js": "node scripts/measure-js.mjs",
+    "check:budgets": "node scripts/check-budgets.mjs",
+    "check:copy": "node scripts/copy-lint.mjs",
+    "check:concept-links": "node scripts/concept-links.mjs",
+    "check:lighthouse": "node scripts/lighthouse.mjs",
+    "build:captures": "node scripts/build-captures.mjs",
+    "og:card": "node scripts/og-card.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.65.0",
+    "@types/mdast": "^4.0.4",
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "chrome-launcher": "^1.2.3",
+    "eslint": "^10.14.0",
+    "eslint-config-next": "^16.4.5",
+    "lighthouse": "^13.6.0",
+    "parse5": "^8.1.1",
+    "prettier": "^3.9.10",
+    "sharp": "^0.35.5",
+    "typescript": "^6.0.3",
+    "vitest": "^5.1.0"
+  },
+  "dependencies": {
+    "@primer/octicons": "^19.42.0",
+    "next": "^16.4.5",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
+    "shiki": "^4.6.0",
+    "unified": "^11.0.5"
+  }
+}

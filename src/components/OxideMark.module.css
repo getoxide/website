@@ -1,0 +1,91 @@
+/* Design system, Animated mark: 120px, centred above the hero H1. The eyes
+   blink and glance on two independent loops (11 s glance, 7 s blink; local to
+   the mark, not tokens), only when `animated`. They stay still under reduced
+   motion and while the hero is paused (`data-paused` on the hero section). */
+.mark {
+  display: block;
+  width: 120px;
+  height: 120px;
+  margin-bottom: 28px;
+  overflow: visible;
+  color: var(--ox-text);
+}
+
+.eyes,
+.eye {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Quick saccades (~150 ms) with long holds; blinks close in ~70 ms, one
+   single and one double per loop. */
+.animated .eyes {
+  animation: glance 11s cubic-bezier(0.3, 0, 0.2, 1) 1.4s infinite;
+}
+
+.animated .eye {
+  animation: blink 7s linear 2.2s infinite;
+}
+
+:global([data-paused]) .animated .eyes,
+:global([data-paused]) .animated .eye {
+  animation: none;
+}
+
+@keyframes glance {
+  0%,
+  26% {
+    transform: translate(0, 0);
+  }
+  27.5%,
+  40% {
+    transform: translate(-26px, 0);
+  }
+  41.5%,
+  47% {
+    transform: translate(0, 0);
+  }
+  48.5%,
+  63% {
+    transform: translate(26px, -6px);
+  }
+  64.5%,
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  1% {
+    transform: scaleY(0.12);
+  }
+  2.2% {
+    transform: scaleY(1);
+  }
+  58% {
+    transform: scaleY(1);
+  }
+  59% {
+    transform: scaleY(0.12);
+  }
+  60.2% {
+    transform: scaleY(1);
+  }
+  61.6% {
+    transform: scaleY(0.12);
+  }
+  62.8% {
+    transform: scaleY(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animated .eyes,
+  .animated .eye {
+    animation: none;
+  }
+}

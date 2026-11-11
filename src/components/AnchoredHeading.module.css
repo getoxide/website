@@ -1,0 +1,40 @@
+/* A heading with its own anchor link (Design system: Prose, Concepts;
+   FAQ; Changelog entry). */
+.heading {
+  display: flex;
+  align-items: center;
+  gap: var(--site-space-2);
+  margin-bottom: var(--site-space-3);
+}
+
+.heading .title {
+  margin-bottom: 0;
+}
+
+/* Revealed on hover and focus (Design system, Prose: Concepts). */
+.anchor {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  min-height: 24px;
+  border-radius: var(--site-radius-sm);
+  color: var(--ox-text-muted);
+  opacity: 0;
+  transition: opacity var(--site-dur-fast) var(--site-ease-fade);
+}
+
+.heading:hover .anchor,
+.anchor:focus-visible {
+  opacity: 1;
+}
+
+.anchor:hover {
+  color: var(--ox-text-bright);
+}
+
+@media (hover: none) {
+  .anchor {
+    opacity: 1;
+  }
+}

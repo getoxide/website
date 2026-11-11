@@ -1,0 +1,17 @@
+.next
+out
+node_modules
+pnpm-lock.yaml
+screenshots
+test-results
+playwright-report
+public
+.github/pull_request_template.md
+# Spec documents: hand-aligned tables, changed only by PRs Lorenzo approves.
+docs/spec
+# Synced verbatim from the Oxide repo by `pnpm sync:oxide`: never reformat.
+content/oxide
+src/app/icon.svg
+src/app/favicon.ico
+src/app/apple-icon.png
+out-fixtures

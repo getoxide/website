@@ -1,0 +1,79 @@
+/* Design system, Prose: rhythm from the type scale, links in
+   --ox-text-accent, inline code in the mono size, tables with --ox-border. */
+.prose {
+  max-width: var(--site-w-prose);
+  font: 400 var(--site-text-body) var(--site-font-body);
+  color: var(--ox-text);
+}
+
+.prose > * + * {
+  margin-top: var(--site-space-4);
+}
+
+.prose h2 {
+  margin-top: var(--site-space-7);
+  font: 500 var(--site-text-h3) var(--site-font-heading);
+  letter-spacing: -0.03em;
+}
+
+.prose h3 {
+  margin-top: var(--site-space-6);
+  font: 500 var(--site-text-body) var(--site-font-heading);
+  letter-spacing: -0.01em;
+}
+
+.prose a {
+  color: var(--ox-text-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.prose strong {
+  font-weight: 600;
+  color: var(--ox-text-bright);
+}
+
+.prose :not(pre) > code {
+  padding: 0.1em 0.35em;
+  border-radius: var(--site-radius-sm);
+  background: var(--ox-surface-background);
+  font: 400 var(--site-text-mono) var(--site-font-code);
+}
+
+.prose ol,
+.prose ul {
+  margin-bottom: 0;
+  padding-left: var(--site-space-5);
+}
+
+.prose li + li {
+  margin-top: var(--site-space-2);
+}
+
+.prose li::marker {
+  color: var(--ox-text-muted);
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font: 400 var(--site-text-small) var(--site-font-body);
+}
+
+.prose th,
+.prose td {
+  padding: var(--site-space-2) var(--site-space-3);
+  border-bottom: 1px solid var(--ox-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.prose th {
+  font-weight: 500;
+  color: var(--ox-text-bright);
+}
+
+.prose th:first-child,
+.prose td:first-child {
+  padding-left: 0;
+}

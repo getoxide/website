@@ -1,0 +1,78 @@
+/* Design system, Feature section: an anchored section per feature at
+   --site-w-wide, its text, then its capture frame. The hidden start state is
+   `.feature[data-pending]`, which <Reveal> sets only when JavaScript runs,
+   motion is allowed and the section is below the fold (ADR-0001); reduced
+   motion never sets it. */
+.group {
+  width: 100%;
+  max-width: var(--site-w-wide);
+  margin: 0 auto;
+  padding-bottom: var(--site-section);
+}
+
+.groupHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--site-space-3);
+  margin-bottom: var(--site-space-8);
+  padding-top: var(--site-space-6);
+  border-top: 1px solid var(--ox-element-border);
+}
+
+.groupHeading {
+  font: 500 var(--site-text-h2) var(--site-font-heading);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.groupSentence {
+  max-width: var(--site-w-prose);
+  font: 400 var(--site-text-lead) var(--site-font-body);
+  color: var(--ox-text-muted);
+}
+
+.feature + .feature {
+  margin-top: var(--site-space-9);
+}
+
+.text {
+  max-width: var(--site-w-prose);
+}
+
+.text h3 {
+  font: 500 var(--site-text-h3) var(--site-font-heading);
+  letter-spacing: -0.03em;
+}
+
+.key {
+  font: 400 var(--site-text-body) var(--site-font-body);
+  color: var(--ox-text);
+}
+
+.detail {
+  margin-top: var(--site-space-3);
+  font: 400 var(--site-text-small) var(--site-font-body);
+  color: var(--ox-text-muted);
+}
+
+.figure {
+  margin: var(--site-space-6) 0 0;
+}
+
+.caption {
+  max-width: var(--site-w-frame);
+  margin: var(--site-space-3) auto 0;
+  font: 400 var(--site-text-small) var(--site-font-body);
+  color: var(--ox-text-muted);
+}
+
+.feature[data-pending] {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.feature[data-in] {
+  transition:
+    opacity var(--site-dur-slow) var(--site-ease-out),
+    transform var(--site-dur-slow) var(--site-ease-out);
+}

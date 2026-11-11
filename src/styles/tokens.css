@@ -1,0 +1,58 @@
+/* Site tokens (docs/spec/design.md, Tokens): type scale, spacing, radii,
+   widths, motion. Colours are never defined here: components use the synced
+   `--ox-*` brand tokens directly. One breakpoint, 860px, is a documented
+   constant because custom properties cannot drive media queries. */
+:root {
+  /* Font stacks: the next/font face (with its metric-matched fallback) in
+     front of the brand stack from `--ox-font-*`. */
+  --site-font-heading: var(--site-face-heading), var(--ox-font-web-heading);
+  --site-font-body: var(--site-face-body), var(--ox-font-web-body);
+  --site-font-code: var(--site-face-code), var(--ox-font-code);
+
+  /* Type scale: size / line height, for the `font` shorthand. */
+  --site-text-display: clamp(40px, 5.3vw, 76px) / 1.04;
+  --site-text-h1: clamp(32px, 4vw, 52px) / 1.1;
+  --site-text-h2: clamp(28px, 3.2vw, 44px) / 1.15;
+  --site-text-h3: 22px / 1.2;
+  --site-text-lead: 18px / 1.55;
+  --site-text-body: 16px / 1.55;
+  --site-text-small: 15px / 1.6;
+  --site-text-caption: 13px / 1.5;
+  --site-text-mono: 14px / 1.6;
+  --site-text-mono-xs: 12px / 1.5;
+
+  /* Spacing */
+  --site-space-1: 4px;
+  --site-space-2: 8px;
+  --site-space-3: 12px;
+  --site-space-4: 16px;
+  --site-space-5: 24px;
+  --site-space-6: 32px;
+  --site-space-7: 48px;
+  --site-space-8: 64px;
+  --site-space-9: 96px;
+  --site-space-10: 128px;
+  --site-gutter: clamp(20px, 4vw, 56px);
+  --site-section: clamp(72px, 9vw, 128px);
+
+  /* Radii */
+  --site-radius-pill: 999px;
+  --site-radius-frame: 12px;
+  --site-radius-sm: 8px;
+
+  /* Widths */
+  --site-w-wide: 1240px;
+  --site-w-frame: 1160px;
+  --site-w-text: 820px;
+  --site-w-prose: 68ch;
+
+  /* Motion */
+  --site-dur-fast: 150ms;
+  --site-dur-base: 600ms;
+  --site-dur-slow: 900ms;
+  --site-dur-reduced: 200ms;
+  --site-stagger: 220ms;
+  --site-ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --site-ease-in-out: cubic-bezier(0.65, 0, 0.2, 1);
+  --site-ease-fade: ease;
+}

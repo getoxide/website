@@ -1,0 +1,134 @@
+/* Design system, Animated mark, Hero shader (its static fallback) and Capture
+   frame. The header is absolutely positioned over the top of the hero. The
+   hero is full-bleed: it cancels the main landmark's gutter. */
+.hero {
+  position: relative;
+  display: grid;
+  min-height: 92vh;
+  margin: 0 calc(-1 * var(--site-gutter));
+  padding: 110px var(--site-gutter) 200px;
+  place-items: center;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* The static radial gradient, always painted: the hero is complete without
+   WebGL or JavaScript (the shader fades in over it). */
+.gradient {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(
+      60% 50% at 30% 35%,
+      var(--ox-element-background) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      45% 40% at 75% 55%,
+      color-mix(in srgb, var(--ox-accent) 22%, transparent) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      50% 40% at 55% 80%,
+      var(--ox-elevated-surface-background) 0%,
+      transparent 75%
+    ),
+    var(--ox-background);
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.title {
+  max-width: 14em;
+  font: 500 var(--site-text-display) var(--site-font-heading);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+/* Headline reveal (Design system, Motion): CSS only, about 1 s at most, words
+   staggered. It plays only on a full load (`data-reveal`, set by the inline
+   script in Hero), never when paused, and it never touches the CTAs. */
+.word {
+  display: inline-block;
+}
+
+.hero[data-reveal]:not([data-paused]) .word {
+  animation: word var(--site-dur-base) var(--site-ease-out) both;
+  animation-delay: calc(var(--i) * 50ms + 100ms);
+}
+
+@keyframes word {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero[data-reveal]:not([data-paused]) .word {
+    animation: fade var(--site-dur-reduced) var(--site-ease-fade) both;
+    animation-delay: 0s;
+  }
+}
+
+.subheadline {
+  max-width: 40em;
+  margin-top: var(--site-space-5);
+  font: 400 var(--site-text-lead) var(--site-font-body);
+  color: var(--ox-text);
+  text-wrap: balance;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--site-space-3);
+  margin-top: var(--site-space-6);
+}
+
+.platforms {
+  margin-top: 14px;
+  font: 400 var(--site-text-caption) var(--site-font-body);
+  color: var(--ox-text-muted);
+}
+
+/* The capture rises over the hero: -150px, -110px below 860px. */
+.shot {
+  position: relative;
+  z-index: 2;
+  margin-top: -150px;
+}
+
+@media (max-width: 860px) {
+  /* On a phone the first screen is the hero alone, the capture only peeking
+     in: the H1 stays the largest paint, so it is the LCP element and the
+     capture never decides it (Budgets, Home LCP). */
+  .hero {
+    min-height: calc(100svh + 60px);
+    padding-bottom: 160px;
+  }
+
+  .shot {
+    margin-top: -110px;
+  }
+}

@@ -1,0 +1,64 @@
+/* Design system, Download block. */
+.block {
+  display: grid;
+  gap: var(--site-space-4);
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--site-space-4);
+}
+
+/* The ghost GitHub CTA sits beside the platform options in every state. */
+.github {
+  display: grid;
+}
+
+/* One platform button and its sublabel. The detected platform comes first:
+   the inline script sets `html[data-os]` before the block is parsed, so the
+   order is final at first paint. */
+.option {
+  display: grid;
+  gap: var(--site-space-2);
+  justify-items: start;
+}
+
+:global(html[data-os="windows"]) .windows {
+  order: -1;
+}
+
+/* Pre-release labels: the primary button names the test pre-release, the
+   secondary one its platform. macOS is primary unless Windows is detected. */
+.windows .asPrimary,
+.macos .asSecondary,
+:global(html[data-os="windows"]) .macos .asPrimary {
+  display: none;
+}
+
+:global(html[data-os="windows"]) .macos .asSecondary,
+:global(html[data-os="windows"]) .windows .asPrimary {
+  display: inline;
+}
+
+:global(html[data-os="windows"]) .windows .asSecondary {
+  display: none;
+}
+
+.sublabel {
+  margin: 0;
+  padding-left: 22px;
+  font: var(--site-text-caption) var(--site-font-body);
+  color: var(--ox-text-muted);
+}
+
+.line {
+  margin: 0;
+  font: var(--site-text-caption) var(--site-font-body);
+  color: var(--ox-text-muted);
+}
+
+.line a {
+  color: var(--ox-text-accent);
+}

@@ -1,0 +1,22 @@
+/* Design system, Definition line: --site-w-text, --site-text-small, muted;
+   the trust line in mono-xs, disabled text. */
+.definition {
+  width: 100%;
+  max-width: var(--site-w-text);
+  margin: 0 auto;
+  padding: clamp(56px, 7vw, 96px) 0 0;
+  text-align: center;
+}
+
+.sentence {
+  font: 400 var(--site-text-small) var(--site-font-body);
+  color: var(--ox-text-muted);
+  text-wrap: pretty;
+}
+
+.trust {
+  margin-top: var(--site-space-4);
+  font: 400 var(--site-text-mono-xs) var(--site-font-code);
+  font-feature-settings: "calt" 0;
+  color: var(--ox-text-disabled);
+}
