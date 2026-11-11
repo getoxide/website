@@ -5,6 +5,7 @@ import { Prose } from "@/components/Prose";
 import { SiteFrame } from "@/components/SiteFrame";
 import { COPY } from "@/content/copy";
 import { PAGES } from "@/content/pages";
+import { seenBefore } from "@/lib/concept-links";
 import { faqOf } from "@/lib/faq";
 import { pageMetadata } from "@/lib/metadata";
 import { SNAPSHOT } from "@/lib/snapshot";
@@ -19,17 +20,19 @@ export const metadata = pageMetadata(PAGES.faq);
  */
 export default function FaqPage() {
   const page = PAGES.faq;
+  const faq = faqOf(SNAPSHOT);
+  const seen = seenBefore(faq.map((entry) => entry.answer));
   return (
     <SiteFrame page={page}>
       <div className={styles.page}>
         <PageHeader title={page.h1} />
-        {faqOf(SNAPSHOT).map(({ question, id, answer }) => (
+        {faq.map(({ question, id, answer }, i) => (
           <section key={id} className={styles.section} aria-labelledby={id}>
             <AnchoredHeading id={id} label={COPY.anchorLabel(question)}>
               {question}
             </AnchoredHeading>
             <Prose>
-              <Markdown source={answer} />
+              <Markdown source={answer} conceptLinks={seen[i]} />
             </Prose>
           </section>
         ))}

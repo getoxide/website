@@ -8,6 +8,7 @@ import { COPY } from "@/content/copy";
 import { PAGES } from "@/content/pages";
 import { pageMetadata } from "@/lib/metadata";
 import { GLOSSARY_URL } from "@/lib/oxide";
+import { seenBefore } from "@/lib/concept-links";
 import { SNAPSHOT } from "@/lib/snapshot";
 import styles from "../../reading.module.css";
 
@@ -17,6 +18,13 @@ export const metadata = pageMetadata(PAGES.docsConcepts);
 export default function ConceptsPage() {
   const page = PAGES.docsConcepts;
   const copy = COPY.docs.concepts;
+  const { concepts } = SNAPSHOT;
+  // Each definition follows its own heading and the ones before it: those
+  // terms are already on the page, the others link to their sections.
+  const seen = seenBefore(concepts.map((c) => c.definition)).map(
+    (before, i) =>
+      new Set([...before, ...concepts.slice(0, i + 1).map((c) => c.term)]),
+  );
   return (
     <SiteFrame page={page}>
       <div className={styles.page}>
@@ -29,13 +37,13 @@ export default function ConceptsPage() {
           }
         />
         <DocsNav path={page.path} />
-        {SNAPSHOT.concepts.map(({ term, id, definition }) => (
+        {concepts.map(({ term, id, definition }, i) => (
           <section key={id} className={styles.section} aria-labelledby={id}>
             <AnchoredHeading id={id} label={COPY.anchorLabel(term)}>
               {term}
             </AnchoredHeading>
             <Prose id={`${id}-definition`}>
-              <Markdown source={definition} />
+              <Markdown source={definition} conceptLinks={seen[i]} />
             </Prose>
           </section>
         ))}

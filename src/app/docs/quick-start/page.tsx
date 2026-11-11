@@ -6,6 +6,7 @@ import { SiteFrame } from "@/components/SiteFrame";
 import { COPY } from "@/content/copy";
 import { PAGES } from "@/content/pages";
 import { pageMetadata } from "@/lib/metadata";
+import { seenBefore } from "@/lib/concept-links";
 import { SNAPSHOT, token } from "@/lib/snapshot";
 import styles from "../../reading.module.css";
 
@@ -15,6 +16,11 @@ export const metadata = pageMetadata(PAGES.docsQuickStart);
 export default function QuickStartPage() {
   const page = PAGES.docsQuickStart;
   const copy = COPY.docs.quickStart;
+  const [requirements, steps] = [
+    token("requirements")!,
+    SNAPSHOT.readme.quickStart,
+  ];
+  const seen = seenBefore([requirements, steps]);
   return (
     <SiteFrame page={page}>
       <div className={styles.page}>
@@ -23,13 +29,13 @@ export default function QuickStartPage() {
         <section className={styles.section} aria-labelledby="requirements">
           <h2 id="requirements">{copy.requirements}</h2>
           <Prose>
-            <Markdown source={token("requirements")!} />
+            <Markdown source={requirements} conceptLinks={seen[0]} />
           </Prose>
         </section>
         <section className={styles.section} aria-labelledby="steps">
           <h2 id="steps">{copy.steps}</h2>
           <Prose>
-            <Markdown source={SNAPSHOT.readme.quickStart} />
+            <Markdown source={steps} conceptLinks={seen[1]} />
           </Prose>
         </section>
       </div>

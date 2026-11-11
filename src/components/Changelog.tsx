@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 import { COPY } from "@/content/copy";
+import { seenBefore } from "@/lib/concept-links";
 import { formatDate, type Snapshot } from "@/lib/snapshot";
 import { AnchoredHeading } from "./AnchoredHeading";
 import { Markdown } from "./Markdown";
@@ -37,6 +38,20 @@ export function Changelog({ snapshot }: { snapshot: Snapshot }) {
     .filter((entry) => STABLE.test(entry.version))
     .sort((a, b) => byVersionDesc(a.version, b.version));
   const entries = stable.slice(0, LATEST);
+  // Release notes in reading order, for the first-mention Concept links.
+  const sections = entries.flatMap((entry) =>
+    GROUPS.flatMap((group) =>
+      entry[group]
+        ? [{ key: `${entry.version}/${group}`, notes: entry[group] }]
+        : [],
+    ),
+  );
+  const seen = new Map(
+    seenBefore(sections.map((s) => s.notes)).map((before, i) => [
+      sections[i].key,
+      before,
+    ]),
+  );
   if (!entries.length) {
     return (
       <Prose>
@@ -67,7 +82,10 @@ export function Changelog({ snapshot }: { snapshot: Snapshot }) {
                 return notes ? (
                   <Fragment key={group}>
                     <h3>{copy.groups[group]}</h3>
-                    <Markdown source={notes} />
+                    <Markdown
+                      source={notes}
+                      conceptLinks={seen.get(`${entry.version}/${group}`)}
+                    />
                   </Fragment>
                 ) : null;
               })}

@@ -1,5 +1,7 @@
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
+import type { PluggableList } from "unified";
+import { remarkConceptLinks } from "@/lib/concept-links";
 import { CodeBlock } from "./CodeBlock";
 
 type HastNode = {
@@ -37,10 +39,22 @@ const COMPONENTS: Components = { pre };
  * static HTML at build time. Raw HTML in the source is not rendered. Style it
  * by wrapping it in `<Prose>`; for a single inline paragraph use
  * `<InlineMarkdown>`.
+ * @param conceptLinks in main content, the Concepts terms already mentioned
+ *   earlier on the page (`seenBefore`): the first mention of every other term
+ *   links to its Concept (Content #12 addendum, point 4)
  */
-export function Markdown({ source }: { source: string }) {
+export function Markdown({
+  source,
+  conceptLinks,
+}: {
+  source: string;
+  conceptLinks?: ReadonlySet<string>;
+}) {
+  const plugins: PluggableList = conceptLinks
+    ? [remarkGfm, [remarkConceptLinks, { seen: conceptLinks }]]
+    : [remarkGfm];
   return (
-    <ReactMarkdown remarkPlugins={[remarkGfm]} components={COMPONENTS}>
+    <ReactMarkdown remarkPlugins={plugins} components={COMPONENTS}>
       {source}
     </ReactMarkdown>
   );
