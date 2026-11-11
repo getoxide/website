@@ -3,6 +3,10 @@ import type { Os } from "@/lib/os";
 import { Icon } from "./Icon";
 import styles from "./Button.module.css";
 
+/** The click events the Measurement plan (#16) freezes. */
+export type ClickEvent =
+  "download-macos-arm" | "download-windows" | "download-linux" | "github-cta";
+
 export type ButtonVariant = "primary" | "ghost" | "nav";
 
 /**
@@ -17,6 +21,7 @@ export function Button({
   current = false,
   platform,
   describedBy,
+  event,
   children,
 }: {
   href: string;
@@ -33,6 +38,11 @@ export function Button({
   platform?: Exclude<Os, "other">;
   /** Id of the element that describes the link (a sublabel). */
   describedBy?: string;
+  /**
+   * GoatCounter click event (Measurement plan #16): rendered as
+   * `data-goatcounter-click`, inert until the counter script loads.
+   */
+  event?: ClickEvent;
   children: ReactNode;
 }) {
   const classes = [
@@ -46,6 +56,7 @@ export function Button({
       className={classes.filter(Boolean).join(" ")}
       aria-current={current ? "page" : undefined}
       aria-describedby={describedBy}
+      data-goatcounter-click={event}
     >
       {icon ? <Icon name={icon} /> : null}
       {children}

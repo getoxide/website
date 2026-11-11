@@ -120,3 +120,41 @@ describe("DownloadBlock, stable release", () => {
     for (const id of ids) expect(html).toContain(`id="${id}"`);
   });
 });
+
+describe("DownloadBlock, an installer that could not be resolved", () => {
+  it("links the GitHub release page instead, with no size", () => {
+    const html = render("unresolved");
+    const [mac, win] = links(html);
+    expect(mac.href).toBe(
+      "https://github.com/getoxide/oxide/releases/download/v1.1.0/Oxide_1.1.0_aarch64.dmg",
+    );
+    expect(win).toEqual({
+      href: "https://github.com/getoxide/oxide/releases/tag/v1.1.0",
+      text: "Download for Windows",
+    });
+    const text = textOf(html);
+    expect(text).toContain("x64 · installer");
+    expect(text).not.toContain("x64 · installer ·");
+    expect(text).not.toMatch(/null|undefined/);
+  });
+});
+
+describe("DownloadBlock, click events (Measurement plan #16)", () => {
+  const eventsOf = (html: string) =>
+    [...html.matchAll(/data-goatcounter-click="([^"]+)"/g)].map(([, e]) => e);
+
+  it("names each download button's event, macOS first", () => {
+    expect(eventsOf(render("stable"))).toEqual([
+      "download-macos-arm",
+      "download-windows",
+    ]);
+    expect(eventsOf(render("prerelease-only"))).toEqual([
+      "download-macos-arm",
+      "download-windows",
+    ]);
+  });
+
+  it("counts Follow on GitHub as the GitHub CTA", () => {
+    expect(eventsOf(render("none"))).toEqual(["github-cta"]);
+  });
+});

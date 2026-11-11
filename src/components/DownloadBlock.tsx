@@ -1,7 +1,7 @@
 import { COPY, GITHUB_REPO_URL } from "@/content/copy";
 import { readmeUrl } from "@/lib/oxide";
 import { SNAPSHOT, tokensOf, type Snapshot } from "@/lib/snapshot";
-import { Button } from "./Button";
+import { Button, type ClickEvent } from "./Button";
 import { DeckText } from "./DeckText";
 import styles from "./DownloadBlock.module.css";
 
@@ -9,6 +9,11 @@ type Platform = "macos" | "windows";
 
 /** macOS is primary without JavaScript (Download experience #13). */
 const PLATFORMS: Platform[] = ["macos", "windows"];
+
+const EVENTS = {
+  macos: "download-macos-arm",
+  windows: "download-windows",
+} as const satisfies Record<Platform, ClickEvent>;
 
 /**
  * The download buttons and the quiet line under them (Design system, Download
@@ -27,7 +32,12 @@ export function DownloadBlock({
     return (
       <div className={styles.block}>
         <div className={styles.buttons}>
-          <Button href={GITHUB_REPO_URL} variant="primary" icon="mark-github">
+          <Button
+            href={GITHUB_REPO_URL}
+            variant="primary"
+            icon="mark-github"
+            event="github-cta"
+          >
             {copy.buttons.followGithub}
           </Button>
           <Button href={readmeUrl("build-from-source")} variant="ghost">
@@ -77,6 +87,7 @@ export function DownloadBlock({
                 platform={platform}
                 icon="download"
                 describedBy={id}
+                event={EVENTS[platform]}
               >
                 {label(platform)}
               </Button>
