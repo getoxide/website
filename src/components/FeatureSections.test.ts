@@ -6,14 +6,16 @@ import type { CaptureManifest } from "@/lib/captures";
 import { SNAPSHOT, type Snapshot } from "@/lib/snapshot";
 import { FeatureSections } from "./FeatureSections";
 
-const withPullRequests: Snapshot = {
+const withoutPullRequests: Snapshot = {
   ...SNAPSHOT,
   readme: {
     ...SNAPSHOT.readme,
-    features: [
-      ...SNAPSHOT.readme.features,
-      { group: "Review", leadIns: ["Pull requests, from review to merge"] },
-    ],
+    features: SNAPSHOT.readme.features.map((group) => ({
+      ...group,
+      leadIns: group.leadIns.filter(
+        (l) => l !== "Pull requests, from review to merge",
+      ),
+    })),
   },
 };
 
@@ -27,7 +29,7 @@ const ids = (html: string) =>
 describe("FeatureSections", () => {
   it("renders one anchored h3 per Snapshot lead-in, under three group h2s", () => {
     const html = render(SNAPSHOT);
-    expect(ids(html)).toHaveLength(16);
+    expect(ids(html)).toHaveLength(17);
     expect(ids(html)).toContain("verification-dossier");
     expect(
       [...html.matchAll(/<h2[^>]*>(.*?)<\/h2>/g)].map(([, h]) => h),
@@ -38,14 +40,14 @@ describe("FeatureSections", () => {
     ]);
   });
 
-  it("has no #pull-requests, nor any link to it, until the Snapshot carries the lead-in", () => {
+  it("has #pull-requests only when the Snapshot carries the lead-in", () => {
     const html = render(SNAPSHOT);
-    expect(html).not.toContain("pull-requests");
-    expect(html).not.toMatch(/auto-merge/);
-    const after = render(withPullRequests);
-    expect(ids(after)).toContain("pull-requests");
-    expect(after).toContain('href="#pull-requests"');
-    expect(after).toMatch(/auto-merge/);
+    expect(ids(html)).toContain("pull-requests");
+    expect(html).toContain('href="#pull-requests"');
+    expect(html).toMatch(/auto-merge/);
+    const before = render(withoutPullRequests);
+    expect(before).not.toContain("pull-requests");
+    expect(before).not.toMatch(/auto-merge/);
   });
 
   it("links the Verification Dossier and Blind review guides", () => {

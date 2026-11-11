@@ -1,12 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { FEATURE_GROUPS } from "@/content/features";
-import {
-  checkFeatureContract,
-  featureSections,
-  leadInKey,
-  PENDING_UPSTREAM,
-} from "./features";
+import { checkFeatureContract, featureSections, leadInKey } from "./features";
 import { SNAPSHOT, type Snapshot } from "./snapshot";
 
 const withLeadIns = (leadIns: string[][]): Snapshot => ({
@@ -17,16 +12,14 @@ const withLeadIns = (leadIns: string[][]): Snapshot => ({
   },
 });
 
-/** Every contract lead-in the README carries today (without the period). */
+/** Every contract lead-in, without the closing period. */
 const CURRENT = FEATURE_GROUPS.map((g) =>
-  g.features
-    .filter((f) => !PENDING_UPSTREAM.includes(f.leadIn))
-    .map((f) => f.leadIn.replace(/\.$/, "")),
+  g.features.map((f) => f.leadIn.replace(/\.$/, "")),
 );
 
-/** The README after oxide#416: the current lead-ins plus Pull requests. */
-const AFTER_416 = CURRENT.map((leadIns, i) =>
-  i === 1 ? [...leadIns, "Pull requests, from review to merge"] : leadIns,
+/** A README from before oxide#416, which lacks the Pull requests lead-in. */
+const BEFORE_416 = CURRENT.map((leadIns) =>
+  leadIns.filter((l) => l !== "Pull requests, from review to merge"),
 );
 
 const DECK = readFileSync(
@@ -81,11 +74,10 @@ describe("checkFeatureContract", () => {
     });
   });
 
-  it("passes for the README after oxide#416", () => {
-    expect(checkFeatureContract(withLeadIns(AFTER_416))).toEqual({
-      unknown: [],
-      missing: [],
-    });
+  it("reports the Pull requests lead-in missing from an older README", () => {
+    expect(checkFeatureContract(withLeadIns(BEFORE_416)).missing).toEqual([
+      "Pull requests, from review to merge.",
+    ]);
   });
 
   it("fails on a Snapshot lead-in the contract lacks", () => {
@@ -134,6 +126,7 @@ describe("featureSections", () => {
       "line-comments",
       "restore",
       "rule-suggestions",
+      "pull-requests",
       "git-and-github",
       "code-editor",
       "terminal",
@@ -142,11 +135,12 @@ describe("featureSections", () => {
     ]);
   });
 
-  it("leaves #pull-requests out until the Snapshot carries its lead-in", () => {
-    expect(anchors(SNAPSHOT)).not.toContain("pull-requests");
-    const after = featureSections(withLeadIns(AFTER_416));
-    expect(anchors(withLeadIns(AFTER_416))).toContain("pull-requests");
-    const group = after.find((g) => g.heading === "Review before you merge")!;
+  it("renders #pull-requests only once the Snapshot carries its lead-in", () => {
+    expect(anchors(SNAPSHOT)).toContain("pull-requests");
+    expect(anchors(withLeadIns(BEFORE_416))).not.toContain("pull-requests");
+    const group = featureSections(SNAPSHOT).find(
+      (g) => g.heading === "Review before you merge",
+    )!;
     expect(group.features.at(-1)!.anchor).toBe("pull-requests");
   });
 
@@ -155,8 +149,8 @@ describe("featureSections", () => {
       featureSections(s)
         .flatMap((g) => g.features)
         .find((f) => f.anchor === "git-and-github")!;
-    expect(git(SNAPSHOT).see).toBeNull();
-    expect(git(withLeadIns(AFTER_416)).see?.anchor).toBe("pull-requests");
+    expect(git(SNAPSHOT).see?.anchor).toBe("pull-requests");
+    expect(git(withLeadIns(BEFORE_416)).see).toBeNull();
   });
 
   it("refuses to render a Snapshot lead-in the contract lacks", () => {
@@ -165,7 +159,7 @@ describe("featureSections", () => {
   });
 
   it("keeps the merge, auto-merge and Fix claims out while the section is absent", () => {
-    const text = JSON.stringify(featureSections(SNAPSHOT));
+    const text = JSON.stringify(featureSections(withLeadIns(BEFORE_416)));
     expect(text).not.toMatch(/auto-merge|Fix sends|Merge, squash/);
   });
 });

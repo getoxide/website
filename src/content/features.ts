@@ -39,11 +39,11 @@ export type FeatureGroup = {
 /**
  * README lead-ins that Oxide does not carry yet. Their sections stay out of
  * the page, and out of the contract test's "missing" report, until the
- * Snapshot has the lead-in (getoxide/oxide#416 adds "Pull requests, from
- * review to merge."): this keeps the merge, auto-merge and Fix claims absent
- * until the README backs them.
+ * Snapshot has the lead-in. Empty since getoxide/oxide#416 added "Pull
+ * requests, from review to merge." to the README; the mechanism stays for the
+ * next upstream-first claim.
  */
-export const PENDING_UPSTREAM = ["Pull requests, from review to merge."];
+export const PENDING_UPSTREAM: string[] = [];
 
 /** The capture slot of a feature section: `assets/captures/<slot>.png`. */
 export const featureSlot = (anchor: string) => `feature-${anchor}`;
