@@ -42,6 +42,28 @@ export const PAGES = {
     indexable: true,
     llmsSection: "Pages",
   },
+  claudeCodeGui: {
+    path: "/claude-code-gui",
+    h1: "A Claude Code GUI from the first prompt to the merge",
+    title: "Claude Code GUI: an open-source desktop app · Oxide",
+    description:
+      "Oxide is an open-source desktop GUI for Claude Code: keep your claude login and sessions, review each Turn, then open the pull request and merge in one window.",
+    budgetClass: "showcase",
+    structuredData: "WebPage",
+    indexable: true,
+    llmsSection: "Pages",
+  },
+  codexGui: {
+    path: "/codex-gui",
+    h1: "A Codex GUI that takes each change all the way to the merge",
+    title: "Codex GUI: a desktop app for the Codex CLI · Oxide",
+    description:
+      "Is there a GUI for Codex? Oxide is an open-source desktop app that drives the codex CLI you already use, from the prompt to the pull request and the merge.",
+    budgetClass: "showcase",
+    structuredData: "WebPage",
+    indexable: true,
+    llmsSection: "Pages",
+  },
   features: {
     path: "/features",
     h1: "Everything between the prompt and the merge",

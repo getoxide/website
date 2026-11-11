@@ -1,0 +1,51 @@
+/* Provider landing pages (Budget class showcase): the page is as wide as a
+   capture frame, the text keeps the reading measure and the capture spans the
+   frame (Design system, Capture frame; Feature section). */
+.page {
+  width: 100%;
+  max-width: var(--site-w-wide);
+  margin: 0 auto;
+  padding-bottom: var(--site-space-9);
+}
+
+.definition {
+  max-width: var(--site-w-prose);
+  margin-bottom: var(--site-space-8);
+  font: 400 var(--site-text-body) var(--site-font-body);
+  color: var(--ox-text-muted);
+}
+
+.section + .section {
+  margin-top: var(--site-space-8);
+}
+
+.text {
+  max-width: var(--site-w-prose);
+}
+
+.section h2,
+.faq h2 {
+  font: 500 var(--site-text-h3) var(--site-font-heading);
+  letter-spacing: -0.03em;
+}
+
+.text > * + * {
+  margin-top: var(--site-space-4);
+}
+
+.capture {
+  margin-top: var(--site-space-6);
+}
+
+.faq {
+  max-width: var(--site-w-prose);
+  margin-top: var(--site-space-9);
+}
+
+.faq h2 {
+  margin-bottom: var(--site-space-5);
+}
+
+.faq section + section {
+  margin-top: var(--site-space-6);
+}
