@@ -1,6 +1,7 @@
 import type { Viewport } from "next";
 import localFont from "next/font/local";
 import { COPY } from "@/content/copy";
+import { GOATCOUNTER_ENDPOINT, GOATCOUNTER_SCRIPT } from "@/lib/measurement";
 import "../../content/oxide/brand/oxide-tokens.css";
 import "../styles/tokens.css";
 import "./globals.css";
@@ -45,6 +46,12 @@ export default function RootLayout({
         </a>
         {/* Each page wraps itself in SiteFrame: header, main, footer. */}
         {children}
+        {/* Measurement plan (#16): the only third-party script, async. */}
+        <script
+          async
+          src={GOATCOUNTER_SCRIPT}
+          data-goatcounter={GOATCOUNTER_ENDPOINT}
+        />
       </body>
     </html>
   );

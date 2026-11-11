@@ -3,9 +3,7 @@ import type { Os } from "@/lib/os";
 import { Icon } from "./Icon";
 import styles from "./Button.module.css";
 
-/** The click events the Measurement plan (#16) freezes. */
-export type ClickEvent =
-  "download-macos-arm" | "download-windows" | "download-linux" | "github-cta";
+import type { ClickEvent } from "@/lib/measurement";
 
 export type ButtonVariant = "primary" | "ghost" | "nav";
 

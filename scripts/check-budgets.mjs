@@ -10,7 +10,7 @@ import {
   readerOf,
   registry,
 } from "./exported-pages.mjs";
-import { jsReferences } from "./measure-js.mjs";
+import { gzipBytesOf, jsReferences } from "./measure-js.mjs";
 
 /** Bytes per kB, as the budgets count them (135,192 bytes = 135.2 kB). */
 const KB = 1000;
@@ -197,7 +197,7 @@ export function measurePage(html, read) {
   const initialImages = allImages.filter((p) => !images.get(p));
 
   const sizes = {
-    js: sum(jsReferences(html), gzip),
+    js: sum(jsReferences(html), (src) => gzipBytesOf(src, read)),
     css: sum(stylesheets, gzip),
     html: gzipSync(html).length,
     fonts: sum(fonts, file),
