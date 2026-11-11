@@ -51,6 +51,45 @@
   text-wrap: balance;
 }
 
+/* Headline reveal (Design system, Motion): CSS only, about 1 s at most, words
+   staggered. It plays only on a full load (`data-reveal`, set by the inline
+   script in Hero), never when paused, and it never touches the CTAs. */
+.word {
+  display: inline-block;
+}
+
+.hero[data-reveal]:not([data-paused]) .word {
+  animation: word var(--site-dur-base) var(--site-ease-out) both;
+  animation-delay: calc(var(--i) * 50ms + 100ms);
+}
+
+@keyframes word {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero[data-reveal]:not([data-paused]) .word {
+    animation: fade var(--site-dur-reduced) var(--site-ease-fade) both;
+    animation-delay: 0s;
+  }
+}
+
 .subheadline {
   max-width: 40em;
   margin-top: var(--site-space-5);

@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import releases from "../../e2e/fixtures/releases.json";
 import type { CaptureManifest } from "@/lib/captures";
 import { SNAPSHOT, type Snapshot } from "@/lib/snapshot";
+import { PAUSED_KEY } from "@/lib/hero-shader";
 import { Hero } from "./Hero";
 
 const manifest: CaptureManifest = {
@@ -41,7 +42,7 @@ const text = (html: string) =>
 describe("Hero", () => {
   it("has the frozen H1 and subheadline, the H1 first", () => {
     const html = render();
-    expect(html.match(/<h1[^>]*>(.*?)<\/h1>/)![1]).toBe(
+    expect(text(html.match(/<h1[^>]*>(.*?)<\/h1>/)![1])).toBe(
       "The complete desktop app for agentic coding.",
     );
     expect(text(html)).toContain(
@@ -93,5 +94,33 @@ describe("Hero", () => {
     const html = render("stable", {});
     expect(html).not.toContain("<picture");
     expect(html).not.toContain("<img");
+  });
+
+  // Ticket #39 (Design system, Hero shader and Animated mark; Budgets, Shader).
+  it("paints the static gradient first, with the shader canvas over it", () => {
+    const html = render();
+    expect(html.indexOf("gradient")).toBeGreaterThan(-1);
+    expect(html.indexOf("<canvas")).toBeGreaterThan(html.indexOf("gradient"));
+    expect(html).toMatch(/<canvas[^>]*aria-hidden="true"/);
+  });
+
+  it("applies the saved pause before first paint, from an inline script", () => {
+    const html = render();
+    const script = html.match(/<script>(.*?)<\/script>/)![1];
+    expect(script).toContain(PAUSED_KEY);
+    expect(script).toContain("data-paused");
+    // before the headline, the mark and the canvas
+    expect(html.indexOf("<script")).toBeLessThan(html.indexOf("<svg"));
+    expect(html.indexOf("<script")).toBeLessThan(html.indexOf("<canvas"));
+  });
+
+  it("splits the headline into words for the CSS reveal, text intact", () => {
+    const html = render();
+    expect(html.match(/<span class="[^"]*word[^"]*"/g)).toHaveLength(7);
+    expect(html).not.toMatch(/opacity:\s*0/);
+  });
+
+  it("animates the mark's eyes on the hero only", () => {
+    expect(render()).toContain("animated");
   });
 });

@@ -1,11 +1,16 @@
+import { Fragment, type CSSProperties } from "react";
 import { COPY, GITHUB_REPO_URL } from "@/content/copy";
 import { PAGES } from "@/content/pages";
 import type { CaptureManifest } from "@/lib/captures";
 import { SNAPSHOT, tokensOf, type Snapshot } from "@/lib/snapshot";
 import { Button } from "./Button";
 import { Capture } from "./Capture";
+import { HeroMotion } from "./HeroMotion";
 import { OxideMark } from "./OxideMark";
 import styles from "./Hero.module.css";
+
+// Must match PAUSED_KEY in `@/lib/hero-shader` (asserted in Hero.test.ts).
+const EARLY = `try{var s=document.currentScript.parentElement;s.setAttribute("data-reveal","");if(localStorage.getItem("oxide-hero-paused")==="1")s.setAttribute("data-paused","")}catch(e){}`;
 
 /**
  * The home hero (Copy deck, Home → Hero, frozen; Design system, Animated
@@ -28,11 +33,29 @@ export function Hero({
   const platforms = tokensOf(snapshot)("platforms");
   return (
     <>
-      <section className={styles.hero}>
+      <section className={styles.hero} data-hero="" suppressHydrationWarning>
+        {/* Runs while the HTML is parsed, before the hero first paints: marks
+            a full load (the headline reveal plays; a client navigation never
+            runs this script) and applies a saved "Pause animation" so a
+            paused visitor never sees a frame of motion. */}
+        <script dangerouslySetInnerHTML={{ __html: EARLY }} />
         <div className={styles.gradient} aria-hidden="true" />
+        <HeroMotion />
         <div className={styles.inner}>
-          <OxideMark />
-          <h1 className={styles.title}>{PAGES.home.h1}</h1>
+          <OxideMark animated />
+          <h1 className={styles.title}>
+            {PAGES.home.h1.split(" ").map((word, i, words) => (
+              <Fragment key={i}>
+                <span
+                  className={styles.word}
+                  style={{ "--i": i } as CSSProperties}
+                >
+                  {word}
+                </span>
+                {i < words.length - 1 ? " " : null}
+              </Fragment>
+            ))}
+          </h1>
           <p className={styles.subheadline}>{copy.subheadline}</p>
           <div className={styles.buttons}>
             <Button href="/download" variant="primary" icon="download">

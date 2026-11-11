@@ -3,14 +3,14 @@ import styles from "./OxideMark.module.css";
 /**
  * The Oxide Braces mark, inline, 120px (Design system, Animated mark). The
  * geometry is the brand's (the mark inside `oxide-logo.svg`). It is static
- * here; the eyes (`.eyes`, `.eye`) are grouped so the hero's motion can blink
- * and glance them, on the home hero only. Decorative: the H1 below it names
- * the page.
+ * unless `animated`, which only the home hero sets: the eyes (`.eyes`,
+ * `.eye`) then blink and glance in CSS, frozen by the hero's pause toggle and
+ * under reduced motion. Decorative: the H1 below it names the page.
  */
-export function OxideMark() {
+export function OxideMark({ animated = false }: { animated?: boolean }) {
   return (
     <svg
-      className={styles.mark}
+      className={`${styles.mark} ${animated ? styles.animated : ""}`}
       viewBox="232 232 560 560"
       width="120"
       height="120"
