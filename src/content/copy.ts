@@ -131,6 +131,19 @@ export const COPY = {
     },
   },
 
+  /**
+   * Copy deck, Closing CTA block (locked): on every page except `/download`.
+   * The primary reads "Get Oxide" while the Release state is `none`.
+   */
+  closingCta: {
+    heading: "Take your next Turn all the way to the merge.",
+    sentence:
+      "Oxide drives the Claude Code, Codex or Antigravity CLI you already use. Open a Project, start a Thread and review what comes back.",
+    download: "Download Oxide",
+    getOxide: "Get Oxide",
+    github: "View on GitHub",
+  },
+
   /** Copy deck, 404 (locked). */
   notFound: {
     sentence:
