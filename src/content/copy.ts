@@ -98,6 +98,19 @@ export const COPY = {
     },
   },
 
+  /**
+   * `/changelog`. The group names, the per-version link and the maintenance
+   * line come from Content #12 (Changelog); the empty-state line is
+   * build-written, a draft Lorenzo approves in review.
+   */
+  changelog: {
+    empty: {
+      before: "No stable release yet. New versions will be listed here and on",
+      link: "GitHub Releases",
+      after: ".",
+    },
+  },
+
   /** Copy deck, Home → Hero (frozen). */
   hero: {
     subheadline:
