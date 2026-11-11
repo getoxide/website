@@ -23,6 +23,23 @@
   order: -1;
 }
 
+/* Pre-release labels: the primary button names the test pre-release, the
+   secondary one its platform. macOS is primary unless Windows is detected. */
+.windows .asPrimary,
+.macos .asSecondary,
+:global(html[data-os="windows"]) .macos .asPrimary {
+  display: none;
+}
+
+:global(html[data-os="windows"]) .macos .asSecondary,
+:global(html[data-os="windows"]) .windows .asPrimary {
+  display: inline;
+}
+
+:global(html[data-os="windows"]) .windows .asSecondary {
+  display: none;
+}
+
 .sublabel {
   margin: 0;
   padding-left: 22px;

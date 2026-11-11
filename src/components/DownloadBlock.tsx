@@ -42,6 +42,21 @@ export function DownloadBlock({
   }
 
   const token = tokensOf(snapshot);
+  const prerelease = release.state === "prerelease-only";
+  // A test pre-release names itself on the primary button; the secondary
+  // button names its platform. Both labels are in the HTML and CSS shows the
+  // one for the button's role, so detection swaps them without a reflow.
+  const label = (platform: Platform) =>
+    prerelease ? (
+      <>
+        <span className={styles.asPrimary}>
+          {copy.buttons.prerelease(latest.version)}
+        </span>
+        <span className={styles.asSecondary}>{copy.buttons[platform]}</span>
+      </>
+    ) : (
+      copy.buttons[platform]
+    );
   return (
     <div className={styles.block}>
       <div className={styles.buttons}>
@@ -63,7 +78,7 @@ export function DownloadBlock({
                 icon="download"
                 describedBy={id}
               >
-                {copy.buttons[platform]}
+                {label(platform)}
               </Button>
               <p id={id} className={styles.sublabel}>
                 {sublabel}
@@ -74,10 +89,11 @@ export function DownloadBlock({
       </div>
       <p className={styles.line}>
         <DeckText
-          source={copy.lines.stable(
-            token("version")!,
-            token("release-date")!,
-          )}
+          source={
+            prerelease
+              ? copy.lines.prerelease
+              : copy.lines.stable(token("version")!, token("release-date")!)
+          }
         />
       </p>
     </div>

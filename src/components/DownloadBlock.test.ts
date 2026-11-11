@@ -47,6 +47,40 @@ describe("DownloadBlock, no release (`none`)", () => {
   });
 });
 
+describe("DownloadBlock, only a test pre-release", () => {
+  const html = render("prerelease-only");
+  const MAC =
+    "https://github.com/getoxide/oxide/releases/download/v1.2.0-rc.1/Oxide_1.2.0-rc.1_aarch64.dmg";
+  const WIN =
+    "https://github.com/getoxide/oxide/releases/download/v1.2.0-rc.1/Oxide_1.2.0-rc.1_x64-setup.exe";
+
+  it("labels the primary button as the test pre-release, the other with its platform", () => {
+    const [mac, win] = links(html);
+    expect(mac.href).toBe(MAC);
+    expect(win.href).toBe(WIN);
+    // Each button carries both labels; CSS shows the one for its role
+    // (primary or secondary) once the platform is known.
+    for (const link of [mac, win]) {
+      expect(link.text).toContain("Download test pre-release 1.2.0-rc.1");
+    }
+    expect(mac.text).toContain("Download for macOS");
+    expect(win.text).toContain("Download for Windows");
+    expect(textOf(html)).toContain("Apple Silicon · .dmg · 102.3 MB");
+    expect(textOf(html)).toContain("x64 · installer · 89.9 MB");
+  });
+
+  it("warns that it never reaches the updater and links build from source", () => {
+    expect(textOf(html)).toContain(
+      "This is a test pre-release: it never reaches the in-app updater. Build from source for the latest code.",
+    );
+    expect(links(html)[2]).toEqual({
+      href: readmeUrl("build-from-source"),
+      text: "Build from source",
+    });
+    expect(textOf(html)).not.toMatch(/Version|Release notes/);
+  });
+});
+
 describe("DownloadBlock, stable release", () => {
   it("links both installers directly, macOS first, with their sublabels", () => {
     const html = render("stable");
