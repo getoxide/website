@@ -15,7 +15,8 @@
     "test": "vitest run",
     "e2e": "playwright test",
     "sync:oxide": "node scripts/sync-oxide.mjs",
-    "measure:js": "node scripts/measure-js.mjs"
+    "measure:js": "node scripts/measure-js.mjs",
+    "check:budgets": "node scripts/check-budgets.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",

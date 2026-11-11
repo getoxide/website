@@ -107,7 +107,10 @@ describe("checkBudgets: fonts", () => {
 describe("checkBudgets: images and page total", () => {
   it("fails a reading page whose initial images exceed 100 kB", () => {
     const body = `<img src="/a.avif" alt="a"/><link rel="preload" as="image" href="/logo.svg"/>`;
-    const read = exportOf({ "/a.avif": noise(95_000), "/logo.svg": "x".repeat(10_000) });
+    const read = exportOf({
+      "/a.avif": noise(95_000),
+      "/logo.svg": "x".repeat(10_000),
+    });
     expect(checkBudgets([page("/faq", "reading", "", body)], read)).toEqual([
       expect.stringMatching(/^\/faq: initial images 105\.0 kB > 100\.0 kB/),
     ]);
@@ -131,7 +134,10 @@ describe("checkBudgets: images and page total", () => {
 
   it("leaves lazy images out of the initial images but counts them in the page total", () => {
     const body = `<img src="/a.avif" alt="a" loading="lazy"/><img src="/b.avif" alt="b" loading="lazy"/>`;
-    const read = exportOf({ "/a.avif": noise(200_000), "/b.avif": noise(210_000) });
+    const read = exportOf({
+      "/a.avif": noise(200_000),
+      "/b.avif": noise(210_000),
+    });
     expect(checkBudgets([page("/faq", "reading", "", body)], read)).toEqual([
       expect.stringMatching(/^\/faq: page total 41\d\.\d kB > 400\.0 kB/),
     ]);
@@ -139,7 +145,10 @@ describe("checkBudgets: images and page total", () => {
 
   it("holds a showcase page to 300 kB of initial images and 1 MB in total", () => {
     const body = `<img src="/a.avif" alt="a"/><img src="/b.avif" alt="b" loading="lazy"/>`;
-    const read = exportOf({ "/a.avif": noise(290_000), "/b.avif": noise(650_000) });
+    const read = exportOf({
+      "/a.avif": noise(290_000),
+      "/b.avif": noise(650_000),
+    });
     expect(checkBudgets([page("/", "showcase", "", body)], read)).toEqual([]);
   });
 });

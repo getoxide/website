@@ -2,7 +2,14 @@
 // ceilings; Enforcement in CI). Reads every page of the PAGES registry from
 // the static export in `out/`, sums what it references and fails when a page
 // exceeds the ceilings of its budget class.
+import { fileURLToPath } from "node:url";
 import { gzipSync } from "node:zlib";
+import {
+  OUT_DIR,
+  exportedPages,
+  readerOf,
+  registry,
+} from "./exported-pages.mjs";
 import { jsReferences } from "./measure-js.mjs";
 
 /** Bytes per kB, as the budgets count them (135,192 bytes = 135.2 kB). */
@@ -146,7 +153,9 @@ function imageReferences(html) {
 /** Video files the page references, once each. */
 function videoReferences(html) {
   const videos = [];
-  for (const [, inner] of html.matchAll(/<video\b[^>]*>([\s\S]*?)<\/video>/gi)) {
+  for (const [, inner] of html.matchAll(
+    /<video\b[^>]*>([\s\S]*?)<\/video>/gi,
+  )) {
     for (const [tag] of inner.matchAll(/<source\b[^>]*>/gi)) {
       if (attr(tag, "src")) videos.push(pathOf(attr(tag, "src")));
     }
@@ -168,7 +177,10 @@ export function measurePage(html, read) {
     cssUrls(read(href).toString("utf8"), href),
   );
   const preloadedFonts = preloadedFontReferences(html);
-  const fonts = unique([...preloadedFonts, ...fromCss.filter((u) => FONT.test(u))]);
+  const fonts = unique([
+    ...preloadedFonts,
+    ...fromCss.filter((u) => FONT.test(u)),
+  ]);
 
   // An image counts once, at its largest candidate, initial if any use of it
   // is not lazy. Images a stylesheet references load with it: initial.
@@ -194,7 +206,10 @@ export function measurePage(html, read) {
   };
   sizes.total =
     sizes.js + sizes.css + sizes.html + sizes.fonts + sum(allImages, file);
-  sizes.videos = videoReferences(html).map((src) => ({ src, bytes: file(src) }));
+  sizes.videos = videoReferences(html).map((src) => ({
+    src,
+    bytes: file(src),
+  }));
   return sizes;
 }
 
@@ -225,3 +240,25 @@ export function checkBudgets(pages, read) {
   }
   return violations;
 }
+
+async function main() {
+  const pages = exportedPages(OUT_DIR, await registry());
+  const read = readerOf(OUT_DIR);
+  for (const { path, budgetClass, html } of pages) {
+    const s = measurePage(html, read);
+    console.log(
+      `${path} (${budgetClass}): JS ${kb(s.js)}, CSS ${kb(s.css)}, HTML ${kb(s.html)}, fonts ${kb(s.fonts)} (preloaded ${kb(s.preloadedFonts)}), initial images ${kb(s.initialImages)}, total ${kb(s.total)}`,
+    );
+  }
+  const violations = checkBudgets(pages, read);
+  if (violations.length > 0) {
+    console.error(
+      "\nBudgets failed (docs/spec/budgets.md, Per-page ceilings):",
+    );
+    for (const v of violations) console.error(`  - ${v}`);
+    process.exit(1);
+  }
+  console.log(`\nBudgets passed: ${pages.length} pages within their ceilings.`);
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) await main();
