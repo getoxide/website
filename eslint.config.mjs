@@ -8,6 +8,7 @@ export default defineConfig([
   globalIgnores([
     ".next/**",
     "out/**",
+    "out-fixtures/**",
     "node_modules/**",
     "next-env.d.ts",
     "test-results/**",

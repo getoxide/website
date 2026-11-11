@@ -1,0 +1,77 @@
+/* `/download`: one reading column (Design system, Download block; Prose). */
+.page {
+  display: grid;
+  gap: var(--site-space-7);
+  width: 100%;
+  max-width: var(--site-w-prose);
+  margin: 0 auto;
+  padding-bottom: var(--site-space-9);
+}
+
+.page h2 {
+  font: 500 var(--site-text-h3) var(--site-font-heading);
+  letter-spacing: -0.03em;
+}
+
+.page p {
+  margin: 0;
+}
+
+.byoa a,
+.notes a {
+  color: var(--ox-text-accent);
+}
+
+.byoa {
+  display: grid;
+  gap: var(--site-space-3);
+}
+
+.providers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--site-space-2) var(--site-space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font: var(--site-text-small) var(--site-font-body);
+  color: var(--ox-text-muted);
+}
+
+.provider {
+  color: var(--ox-text);
+}
+
+/* Signing note, verify link and the unsupported-platform line: quiet. */
+.notes {
+  display: grid;
+  gap: var(--site-space-3);
+  font: var(--site-text-small) var(--site-font-body);
+  color: var(--ox-text-muted);
+}
+
+.notes strong {
+  color: var(--ox-text);
+  font-weight: 500;
+}
+
+.unsupported {
+  padding-top: var(--site-space-3);
+  border-top: 1px solid var(--ox-border);
+}
+
+.faq {
+  display: grid;
+  gap: var(--site-space-7);
+  padding-top: var(--site-space-5);
+}
+
+.faq h3 {
+  font: 500 var(--site-text-body) var(--site-font-body);
+  color: var(--ox-text-bright);
+  scroll-margin-top: var(--site-space-6);
+}
+
+.page code {
+  font: var(--site-text-mono-xs) var(--site-font-code);
+}

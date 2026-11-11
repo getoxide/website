@@ -17,7 +17,7 @@ test("/changelog with no stable release says so and links GitHub Releases, JavaS
   const page = await context.newPage();
   await page.goto("/changelog");
   await expect(page.locator("h1")).toHaveText("Changelog");
-  await expect(page.locator("main h2")).toHaveCount(0);
+  await expect(page.locator("main h2:not(#closing-cta)")).toHaveCount(0);
   await expect(page.locator("main")).toContainText("No stable release yet.");
   await expect(
     page.getByRole("link", { name: "GitHub Releases", exact: true }),
@@ -33,7 +33,10 @@ test("/changelog#v… lands on the newest version with JavaScript off", async ({
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto("/changelog");
-  const id = await page.locator("main h2").first().getAttribute("id");
+  const id = await page
+    .locator("main h2:not(#closing-cta)")
+    .first()
+    .getAttribute("id");
   expect(id).toMatch(/^v\d+-\d+-\d+$/);
   await page.goto(`/changelog#${id}`);
   await expect(page.locator(`h2#${id}`)).toBeInViewport();

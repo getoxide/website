@@ -93,16 +93,22 @@ test.describe("every registered page", () => {
 });
 
 test.describe("home", () => {
-  test("shows only the frozen hero H1 and its subheadline", async ({
+  test("shows the frozen hero H1 and its subheadline, then the closing CTA", async ({
     page,
   }) => {
     await page.goto("/");
     await expect(page.locator("h1")).toHaveText(
       "The complete desktop app for agentic coding.",
     );
-    await expect(page.locator("main")).toHaveText(
+    const sections = page.locator("main > section");
+    await expect(sections).toHaveCount(2);
+    await expect(sections.first()).toHaveText(
       "The complete desktop app for agentic coding." +
         "Prompt, review, pull request and merge, with Claude Code, Codex and Antigravity CLI.",
+    );
+    await expect(sections.last()).toHaveAttribute(
+      "aria-labelledby",
+      "closing-cta",
     );
   });
 

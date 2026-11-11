@@ -1,0 +1,31 @@
+/* Copy deck, Closing CTA block: centred, after the page's own content. */
+.cta {
+  display: grid;
+  justify-items: center;
+  gap: var(--site-space-5);
+  width: 100%;
+  max-width: var(--site-w-text);
+  margin: 0 auto;
+  padding: var(--site-section) 0;
+  text-align: center;
+}
+
+.heading {
+  font: 500 var(--site-text-h2) var(--site-font-heading);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.sentence {
+  font: 400 var(--site-text-lead) var(--site-font-body);
+  color: var(--ox-text-muted);
+  text-wrap: pretty;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--site-space-4);
+  margin-top: var(--site-space-3);
+}

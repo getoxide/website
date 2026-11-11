@@ -94,7 +94,8 @@ test.describe("/docs/concepts", () => {
     page,
   }) => {
     await page.goto("/docs/concepts");
-    const headings = page.locator("main h2");
+    // The closing CTA block's heading follows the terms.
+    const headings = page.locator("main h2:not(#closing-cta)");
     await expect(headings).toHaveText(NINE.map(([term]) => term));
     expect(await headings.evaluateAll((hs) => hs.map((h) => h.id))).toEqual(
       NINE.map(([, id]) => id),

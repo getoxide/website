@@ -26,7 +26,9 @@ test("/faq lists the README questions in order, every answer visible with JavaSc
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto("/faq");
-  await expect(page.locator("main h2")).toHaveText(FAQ.map((e) => e.question));
+  await expect(page.locator("main h2:not(#closing-cta)")).toHaveText(
+    FAQ.map((e) => e.question),
+  );
   await expect(page.locator("main details")).toHaveCount(0);
   for (const { question, answer } of FAQ) {
     const section = page.getByRole("region", { name: question });
@@ -43,7 +45,7 @@ test("/faq anchors each question; a deep link lands on it with JavaScript off", 
   const page = await context.newPage();
   await page.goto("/faq");
   const ids = await page
-    .locator("main h2")
+    .locator("main h2:not(#closing-cta)")
     .evaluateAll((hs) => hs.map((h) => h.id));
   expect(ids).toHaveLength(FAQ.length);
   expect(new Set(ids).size).toBe(ids.length);
