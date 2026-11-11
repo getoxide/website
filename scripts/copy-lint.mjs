@@ -1,61 +1,20 @@
 // `pnpm check:copy`: copy-lint over the visible text of every exported page
-// (Copy #18, Checks; Copy deck, Rules every string here follows, 1-3). The
-// visible text is the page body without scripts, styles and hidden elements,
-// so the inline RSC payload and `href`s never count.
+// (Copy #18, Checks; Copy deck, Rules every string here follows, 1-3).
 import { fileURLToPath } from "node:url";
-import { parse } from "parse5";
 import {
   OUT_DIR,
   exportedPages,
   registry,
   snapshot,
 } from "./exported-pages.mjs";
-
-/** Elements whose content is never visible text. */
-const INVISIBLE = new Set(["head", "script", "style", "template", "noscript"]);
-
-/** Elements that break the text flow: their text never runs into a neighbour's. */
-const BLOCK = new Set(
-  "address article aside blockquote br dd details div dl dt figcaption figure footer form h1 h2 h3 h4 h5 h6 header hr li main nav ol p pre section summary table tbody td tfoot th thead tr ul".split(
-    " ",
-  ),
-);
-
-const attrOf = (node, name) =>
-  node.attrs?.find((a) => a.name === name)?.value ?? null;
-
-/** Marks a block boundary in extracted text. */
-const BREAK = "\u0000";
-
-const normalize = (text) => text.replace(/[\s\u0000]+/g, " ").trim();
-
-/** The visible text of a node as its blocks (paragraphs, list items...). */
-const blocksOf = (node, skip) =>
-  textOf(node, skip).split(BREAK).map(normalize).filter(Boolean);
-
-/** The visible text of a node, optionally leaving out some subtrees. */
-function textOf(node, skip = () => false) {
-  if (node.nodeName === "#text") return node.value;
-  if (INVISIBLE.has(node.nodeName) || attrOf(node, "hidden") !== null) {
-    return "";
-  }
-  if (skip(node)) return BREAK;
-  const children = node.content ?? node;
-  const inner = (children.childNodes ?? [])
-    .map((c) => textOf(c, skip))
-    .join("");
-  return BLOCK.has(node.nodeName) ? `${BREAK}${inner}${BREAK}` : inner;
-}
-
-/** Every element of a tree, depth first. */
-function* elements(node) {
-  for (const child of node.childNodes ?? []) {
-    if (child.tagName) {
-      yield child;
-      yield* elements(child);
-    }
-  }
-}
+import {
+  attrOf,
+  blocksOf,
+  elements,
+  normalize,
+  parse,
+  textOf,
+} from "./html-text.mjs";
 
 /**
  * Banned phrases (Copy #18 rule 2; Copy deck rules 2 and 6), matched
