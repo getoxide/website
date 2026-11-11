@@ -39,3 +39,21 @@ PNG / JPEG q82 at 1200×630, from `out/sizes.json`:
 | D | 264 KB | 81 KB |
 
 All are far below the platform limits: LinkedIn 5 MB and at least 1200×627, Next's `twitter-image` 5 MB, `opengraph-image` 8 MB.
+
+## Verdict (Lorenzo, 2026-11-11)
+
+- **Card**: B · Passivation, one site-wide image, with candidate 7 and its subline:
+  - "The complete desktop app for agentic coding."
+  - "Prompt, review, pull request and merge, with Claude Code, Codex and Antigravity CLI."
+  - "Complete" is claimed openly.
+- **og:title**: the page `<title>` without " · Oxide", plus `og:site_name` "Oxide".
+- **Icons**: I1 · Brand favicon kit.
+
+Config: `?variant=B&copy=7&sub=1&mode=bare&icons=I1`.
+
+Rejected:
+- Cards A, C and D.
+- Icons I2 and I3.
+- Round 2 headlines 1–6 and round 3 headlines 8–12.
+
+The resolution is on getoxide/website#23.
