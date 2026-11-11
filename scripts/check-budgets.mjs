@@ -16,6 +16,8 @@ export const CEILINGS = {
     html: 50_000,
     fonts: 120_000,
     preloadedFonts: 75_000,
+    initialImages: 300_000,
+    total: 1_000_000,
   },
   reading: {
     js: 155_200,
@@ -23,8 +25,13 @@ export const CEILINGS = {
     html: 50_000,
     fonts: 120_000,
     preloadedFonts: 75_000,
+    initialImages: 100_000,
+    total: 400_000,
   },
 };
+
+/** Per-loop ceiling of a video file (Product captures, Video loops). */
+export const VIDEO_CEILING = 1_500_000;
 
 /** What each ceiling measures, in report order. */
 const MEASURES = [
@@ -33,22 +40,29 @@ const MEASURES = [
   ["html", "HTML", "gzip, inline RSC payload included"],
   ["fonts", "fonts", "file size, preloaded or declared in the page's CSS"],
   ["preloadedFonts", "preloaded fonts", "file size"],
+  ["initialImages", "initial images", "file size, not lazy"],
+  ["total", "page total", "excluding video"],
 ];
 
 const FONT = /\.(?:woff2?|ttf|otf|eot)(?:[?#]|$)/i;
 
 const kb = (bytes) => `${(bytes / KB).toFixed(1)} kB`;
+const unique = (list) => [...new Set(list)];
+/** The URL path of a reference, query and hash dropped. */
+const pathOf = (src, base = "http://x/") => new URL(src, base).pathname;
+
+/** The value of an attribute in one tag, or `null`. */
+const attr = (tag, name) =>
+  tag.match(new RegExp(`\\s${name}="([^"]*)"`, "i"))?.[1] ?? null;
 
 /** Every `<link>` tag of the page with its attributes, in order. */
 function links(html) {
   return [...html.matchAll(/<link\b[^>]*>/gi)].map(([tag]) => ({
-    rel: tag.match(/\brel="([^"]*)"/i)?.[1].toLowerCase() ?? "",
-    as: tag.match(/\bas="([^"]*)"/i)?.[1].toLowerCase() ?? "",
-    href: tag.match(/\bhref="([^"]*)"/i)?.[1] ?? "",
+    rel: (attr(tag, "rel") ?? "").toLowerCase(),
+    as: (attr(tag, "as") ?? "").toLowerCase(),
+    href: attr(tag, "href") ?? "",
   }));
 }
-
-const unique = (list) => [...new Set(list)];
 
 /** Stylesheets the page loads or preloads, once each. */
 function cssReferences(html) {
@@ -69,17 +83,78 @@ function preloadedFontReferences(html) {
   return unique(
     links(html)
       .filter((l) => l.href && l.rel === "preload" && l.as === "font")
-      .map((l) => l.href),
+      .map((l) => pathOf(l.href)),
   );
 }
 
 /** URL paths of every `url(...)` in a stylesheet, resolved against it. */
 function cssUrls(css, cssHref) {
-  const base = new URL(cssHref, "http://x");
+  const base = new URL(cssHref, "http://x/");
   return [...css.matchAll(/url\(\s*(["']?)([^"')]+)\1\s*\)/gi)]
     .map((m) => m[2])
     .filter((u) => !u.startsWith("data:"))
-    .map((u) => new URL(u, base).pathname);
+    .map((u) => pathOf(u, base));
+}
+
+/** The URLs of a `srcset`, descriptors dropped. */
+const srcsetUrls = (srcset) =>
+  (srcset ?? "")
+    .split(",")
+    .map((c) => c.trim().split(/\s+/)[0])
+    .filter(Boolean);
+
+/**
+ * Images the page shows, each as the candidate URLs one of them is picked
+ * from. In a `<picture>` the browser takes its first `<source>` it supports;
+ * the first one is the preferred format, so that is the one counted.
+ */
+function imageReferences(html) {
+  const images = [];
+  const pictures = /<picture\b[^>]*>([\s\S]*?)<\/picture>/gi;
+  for (const [, inner] of html.matchAll(pictures)) {
+    const img = inner.match(/<img\b[^>]*>/i)?.[0] ?? "";
+    const source = inner.match(/<source\b[^>]*>/i)?.[0];
+    const candidates = source
+      ? srcsetUrls(attr(source, "srcset"))
+      : [...srcsetUrls(attr(img, "srcset")), attr(img, "src")];
+    images.push({ candidates, lazy: attr(img, "loading") === "lazy" });
+  }
+  for (const [tag] of html.replace(pictures, "").matchAll(/<img\b[^>]*>/gi)) {
+    images.push({
+      candidates: [...srcsetUrls(attr(tag, "srcset")), attr(tag, "src")],
+      lazy: attr(tag, "loading") === "lazy",
+    });
+  }
+  for (const [tag] of html.matchAll(/<video\b[^>]*>/gi)) {
+    if (attr(tag, "poster")) {
+      images.push({ candidates: [attr(tag, "poster")], lazy: false });
+    }
+  }
+  for (const l of links(html)) {
+    if (l.rel === "preload" && l.as === "image" && l.href) {
+      images.push({ candidates: [l.href], lazy: false });
+    }
+  }
+  return images.map(({ candidates, lazy }) => ({
+    candidates: candidates
+      .filter((c) => c && !c.startsWith("data:"))
+      .map((c) => pathOf(c)),
+    lazy,
+  }));
+}
+
+/** Video files the page references, once each. */
+function videoReferences(html) {
+  const videos = [];
+  for (const [, inner] of html.matchAll(/<video\b[^>]*>([\s\S]*?)<\/video>/gi)) {
+    for (const [tag] of inner.matchAll(/<source\b[^>]*>/gi)) {
+      if (attr(tag, "src")) videos.push(pathOf(attr(tag, "src")));
+    }
+  }
+  for (const [tag] of html.matchAll(/<video\b[^>]*>/gi)) {
+    if (attr(tag, "src")) videos.push(pathOf(attr(tag, "src")));
+  }
+  return unique(videos);
 }
 
 /** Sizes of one exported page, in bytes, as the budgets count them. */
@@ -87,23 +162,40 @@ export function measurePage(html, read) {
   const gzip = (src) => gzipSync(read(src)).length;
   const file = (src) => read(src).length;
   const sum = (list, size) => list.reduce((total, x) => total + size(x), 0);
+
   const stylesheets = cssReferences(html);
   const fromCss = stylesheets.flatMap((href) =>
     cssUrls(read(href).toString("utf8"), href),
   );
-  const path = (src) => new URL(src, "http://x").pathname;
-  const preloadedFonts = unique(preloadedFontReferences(html).map(path));
-  const fonts = unique([
-    ...preloadedFonts,
-    ...fromCss.filter((u) => FONT.test(u)),
-  ]);
-  return {
+  const preloadedFonts = preloadedFontReferences(html);
+  const fonts = unique([...preloadedFonts, ...fromCss.filter((u) => FONT.test(u))]);
+
+  // An image counts once, at its largest candidate, initial if any use of it
+  // is not lazy. Images a stylesheet references load with it: initial.
+  const images = new Map();
+  const addImage = (path, lazy) =>
+    images.set(path, (images.get(path) ?? true) && lazy);
+  for (const { candidates, lazy } of imageReferences(html)) {
+    if (candidates.length === 0) continue;
+    const largest = candidates.reduce((a, b) => (file(b) > file(a) ? b : a));
+    addImage(largest, lazy);
+  }
+  for (const u of fromCss.filter((u) => !FONT.test(u))) addImage(u, false);
+  const allImages = [...images.keys()];
+  const initialImages = allImages.filter((p) => !images.get(p));
+
+  const sizes = {
     js: sum(jsReferences(html), gzip),
     css: sum(stylesheets, gzip),
     html: gzipSync(html).length,
     fonts: sum(fonts, file),
     preloadedFonts: sum(preloadedFonts, file),
+    initialImages: sum(initialImages, file),
   };
+  sizes.total =
+    sizes.js + sizes.css + sizes.html + sizes.fonts + sum(allImages, file);
+  sizes.videos = videoReferences(html).map((src) => ({ src, bytes: file(src) }));
+  return sizes;
 }
 
 /**
@@ -120,6 +212,13 @@ export function checkBudgets(pages, read) {
       if (sizes[key] > ceilings[key]) {
         violations.push(
           `${path}: ${label} ${kb(sizes[key])} > ${kb(ceilings[key])} (${how}, ${budgetClass})`,
+        );
+      }
+    }
+    for (const { src, bytes } of sizes.videos) {
+      if (bytes > VIDEO_CEILING) {
+        violations.push(
+          `${path}: video ${src} ${kb(bytes)} > ${kb(VIDEO_CEILING)} (file size, per loop)`,
         );
       }
     }

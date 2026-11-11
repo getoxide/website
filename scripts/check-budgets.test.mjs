@@ -103,3 +103,70 @@ describe("checkBudgets: fonts", () => {
     ]);
   });
 });
+
+describe("checkBudgets: images and page total", () => {
+  it("fails a reading page whose initial images exceed 100 kB", () => {
+    const body = `<img src="/a.avif" alt="a"/><link rel="preload" as="image" href="/logo.svg"/>`;
+    const read = exportOf({ "/a.avif": noise(95_000), "/logo.svg": "x".repeat(10_000) });
+    expect(checkBudgets([page("/faq", "reading", "", body)], read)).toEqual([
+      expect.stringMatching(/^\/faq: initial images 105\.0 kB > 100\.0 kB/),
+    ]);
+  });
+
+  it("counts the largest candidate of a srcset, and of a <picture> its first <source>", () => {
+    const body = `<picture>
+<source type="image/avif" srcset="/c-640.avif 640w, /c-1280.avif 1280w"/>
+<img src="/c.png" srcset="/c-1280.webp 1280w" alt="capture" width="1280" height="800"/>
+</picture>`;
+    const read = exportOf({
+      "/c-640.avif": noise(40_000),
+      "/c-1280.avif": noise(120_000),
+      "/c-1280.webp": noise(500_000),
+      "/c.png": noise(900_000),
+    });
+    expect(checkBudgets([page("/faq", "reading", "", body)], read)).toEqual([
+      expect.stringMatching(/^\/faq: initial images 120\.0 kB > 100\.0 kB/),
+    ]);
+  });
+
+  it("leaves lazy images out of the initial images but counts them in the page total", () => {
+    const body = `<img src="/a.avif" alt="a" loading="lazy"/><img src="/b.avif" alt="b" loading="lazy"/>`;
+    const read = exportOf({ "/a.avif": noise(200_000), "/b.avif": noise(210_000) });
+    expect(checkBudgets([page("/faq", "reading", "", body)], read)).toEqual([
+      expect.stringMatching(/^\/faq: page total 41\d\.\d kB > 400\.0 kB/),
+    ]);
+  });
+
+  it("holds a showcase page to 300 kB of initial images and 1 MB in total", () => {
+    const body = `<img src="/a.avif" alt="a"/><img src="/b.avif" alt="b" loading="lazy"/>`;
+    const read = exportOf({ "/a.avif": noise(290_000), "/b.avif": noise(650_000) });
+    expect(checkBudgets([page("/", "showcase", "", body)], read)).toEqual([]);
+  });
+});
+
+describe("checkBudgets: video loops", () => {
+  const body = `<video preload="none" poster="/loop.avif" muted loop playsinline>
+<source src="/loop-av1.mp4" type="video/mp4; codecs=av01.0.05M.08"/>
+<source src="/loop-h264.mp4" type="video/mp4"/>
+</video>`;
+
+  it("keeps video out of the page total and counts the poster as an initial image", () => {
+    const read = exportOf({
+      "/loop.avif": noise(20_000),
+      "/loop-av1.mp4": noise(900_000),
+      "/loop-h264.mp4": noise(1_400_000),
+    });
+    expect(checkBudgets([page("/", "showcase", "", body)], read)).toEqual([]);
+  });
+
+  it("fails a loop over its own 1.5 MB ceiling", () => {
+    const read = exportOf({
+      "/loop.avif": noise(20_000),
+      "/loop-av1.mp4": noise(900_000),
+      "/loop-h264.mp4": noise(1_600_000),
+    });
+    expect(checkBudgets([page("/", "showcase", "", body)], read)).toEqual([
+      "/: video /loop-h264.mp4 1600.0 kB > 1500.0 kB (file size, per loop)",
+    ]);
+  });
+});
