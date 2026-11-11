@@ -1,0 +1,54 @@
+/* Design system, Button. */
+.button {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: var(--site-space-2);
+  height: 46px;
+  padding: 0 22px;
+  border: 1px solid transparent;
+  border-radius: var(--site-radius-pill);
+  font: 500 15px / 1 var(--site-font-body);
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color var(--site-dur-fast) var(--site-ease-fade),
+    border-color var(--site-dur-fast) var(--site-ease-fade),
+    color var(--site-dur-fast) var(--site-ease-fade);
+}
+
+.primary {
+  background: var(--ox-accent);
+  color: var(--ox-accent-foreground);
+}
+
+.primary:hover {
+  background: var(--ox-accent-hover);
+}
+
+.primary:active {
+  background: var(--ox-accent-pressed);
+}
+
+.ghost,
+.nav {
+  background: color-mix(in srgb, var(--ox-background) 45%, transparent);
+  border-color: var(--ox-element-border);
+  color: var(--ox-text);
+}
+
+.ghost:hover,
+.nav:hover {
+  background: var(--ox-element-background);
+}
+
+.nav {
+  height: auto;
+  padding: 8px 18px;
+  font-size: 14px;
+}
+
+.button[aria-current="page"] {
+  color: var(--ox-text-bright);
+}
