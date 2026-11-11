@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { lintCopy } from "./copy-lint.mjs";
+import {
+  GUI_EXCEPTION_DEFINITION,
+  lintCopy,
+  markdownText,
+} from "./copy-lint.mjs";
 
 /** A definition in the Snapshot's shape: Markdown, one paragraph. */
 const DEFINITION =
@@ -95,5 +99,77 @@ describe("lintCopy: banned phrases", () => {
   it("ignores scripts, hidden elements and link targets", () => {
     const main = `<a href="/the-best-magic">Docs</a><div hidden>the best</div>`;
     expect(lint("/", html({ main }))).toEqual([]);
+  });
+});
+
+describe("lintCopy: GUI", () => {
+  const gui = `<p>A desktop GUI for agents.</p>`;
+  const ruleBroken = (path) =>
+    `${path}: "GUI" outside /claude-code-gui, /codex-gui and /faq#what-is-oxide in "A desktop GUI for agents."`;
+
+  it("fails GUI on any other page", () => {
+    expect(lint("/changelog", html({ main: gui }))).toEqual([
+      ruleBroken("/changelog"),
+    ]);
+  });
+
+  it("allows GUI on /claude-code-gui and /codex-gui", () => {
+    expect(lint("/claude-code-gui", html({ main: gui }))).toEqual([]);
+    expect(lint("/codex-gui", html({ main: gui }))).toEqual([]);
+  });
+
+  it("allows GUI in the /faq answer to What is Oxide?, and only there", () => {
+    const section = (id, body) =>
+      `<section aria-labelledby="${id}"><h2 id="${id}">Q</h2>${body}</section>`;
+    expect(lint("/faq", html({ main: section("what-is-oxide", gui) }))).toEqual(
+      [],
+    );
+    expect(lint("/faq", html({ main: section("is-it-free", gui) }))).toEqual([
+      ruleBroken("/faq"),
+    ]);
+    expect(
+      lint("/changelog", html({ main: section("what-is-oxide", gui) })),
+    ).toEqual([ruleBroken("/changelog")]);
+  });
+
+  it("fails GUIs and lowercase gui too, but not words that contain it", () => {
+    const main = `<p>Two GUIs.</p><p>A gui.</p><p>Guide and guidance.</p>`;
+    expect(lint("/", html({ main }))).toHaveLength(2);
+  });
+
+  describe("the canonical definition exception (getoxide/oxide#416)", () => {
+    const pinned = GUI_EXCEPTION_DEFINITION;
+    const rendered = markdownText(pinned);
+
+    it("pins a definition that says GUI", () => {
+      expect(rendered).toMatch(/\bGUI\b/);
+    });
+
+    it("lets the exact pinned definition say GUI on every page", () => {
+      const page = html({ definition: rendered });
+      expect(lint("/", page, pinned)).toEqual([]);
+      expect(lint("/404", page, pinned)).toEqual([]);
+    });
+
+    it("still fails any other GUI on the page", () => {
+      const page = html({ main: gui, definition: rendered });
+      expect(lint("/", page, pinned)).toEqual([ruleBroken("/")]);
+    });
+
+    it("still fails a page that repeats the definition with words around it", () => {
+      const main = `<p>${rendered} Try the GUI.</p>`;
+      const page = html({ main, definition: rendered });
+      expect(lint("/", page, pinned)).toEqual([
+        expect.stringMatching(/^\/: "GUI" outside .* in ".*Try the GUI\."$/),
+      ]);
+    });
+
+    it("stops applying once the Snapshot's definition changes", () => {
+      const changed = pinned.replace("AI coding agents", "coding agents");
+      const page = html({ definition: markdownText(changed) });
+      expect(lint("/", page, changed)).toEqual([
+        expect.stringMatching(/^\/: "GUI" outside .* in "Oxide is a free/),
+      ]);
+    });
   });
 });
