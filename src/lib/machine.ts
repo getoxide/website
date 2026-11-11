@@ -6,7 +6,7 @@ import { SITE_URL, type Page } from "../content/pages.ts";
 
 /** The subset of the Snapshot the machine files need. */
 export type MachineSnapshot = {
-  source: { repo: string; ref: string };
+  source: { repo: string; ref: string; commit: string };
   readme: { definition: string };
   release: {
     state: "stable" | "prerelease-only" | "none";
@@ -94,12 +94,17 @@ export function llmsTxt(
   });
 
   const repo = `https://github.com/${snapshot.source.repo}`;
+  // A tag never moves; `main` does, so link the contributor file at the
+  // commit the Snapshot was taken from (ADR-0003).
+  const linkRef = /^v\d+\.\d+\.\d+$/.test(snapshot.source.ref)
+    ? snapshot.source.ref
+    : snapshot.source.commit;
   const optional = sections[sections.length - 1];
   optional.push(
     `- [GitHub repository](${repo}): the source code, issues and discussions.`,
     `- [Releases](${snapshot.release.releasesUrl}): installers and release notes.`,
     "",
-    `[llms.txt for contributors](${repo}/blob/${snapshot.source.ref}/llms.txt) covers the architecture, ADRs and DevOps.`,
+    `[llms.txt for contributors](${repo}/blob/${linkRef}/llms.txt) covers the architecture, ADRs and DevOps.`,
   );
 
   return [

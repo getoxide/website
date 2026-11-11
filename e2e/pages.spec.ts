@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { PAGES } from "../src/content/pages";
 import { REGISTERED, UNKNOWN_PATH, urlOf } from "./pages";
+import { oxideFileUrl } from "./snapshot";
 
 const PROD = "https://oxide.cavallinilorenzo.com";
 
@@ -187,9 +188,7 @@ test.describe("privacy", () => {
     const main = page.locator("main");
     await expect(main).toContainText("The Oxide app has no telemetry.");
     await expect(
-      main.locator(
-        'a[href="https://github.com/getoxide/oxide/blob/main/README.md#faq"]',
-      ),
+      main.locator(`a[href="${oxideFileUrl("README.md#faq")}"]`),
     ).toHaveCount(1);
   });
 

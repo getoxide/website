@@ -35,7 +35,10 @@ export type ChangelogEntry = {
 export type Snapshot = {
   source: {
     repo: string;
+    /** The ref the sync was asked for: a stable tag, else `main`. */
     ref: string;
+    /** The commit `ref` resolved to when the files were fetched. */
+    commit: string;
     local?: { ref: string; commit: string };
   };
   /** Markdown of the README sections inside the `site:*` markers. */

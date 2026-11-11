@@ -1,6 +1,14 @@
-import { readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { buildIco, checkSnapshot, syncOxide } from "./sync-oxide.mjs";
+import {
+  buildIco,
+  checkSnapshot,
+  fetchAllReleases,
+  syncOxide,
+  writeOutputsAtomically,
+} from "./sync-oxide.mjs";
 
 describe("the committed Snapshot", () => {
   it("has every expected key", () => {
@@ -199,6 +207,7 @@ async function run(
       if (!file) throw new Error(`404 ${path}`);
       return file;
     },
+    fetchCommit: async (ref) => `commit-of-${ref}`,
     fetchReleases: async () => {
       if (releasesError) throw new Error(releasesError);
       return releases;
@@ -216,7 +225,7 @@ describe("syncOxide: brand kit", () => {
   it("copies the tokens CSS verbatim and the icon set at the pinned ref", async () => {
     const { fetched, written } = await run(source(), { ref: "v1.2.3" });
 
-    expect(fetched.every((f) => f.startsWith("v1.2.3:"))).toBe(true);
+    expect(fetched.every((f) => f.startsWith("commit-of-v1.2.3:"))).toBe(true);
     expect(
       written.get("content/oxide/brand/oxide-tokens.css")?.toString(),
     ).toBe(TOKENS);
@@ -234,7 +243,11 @@ describe("syncOxide: brand kit", () => {
 
     expect(
       JSON.parse(written.get("content/oxide/source.json").toString()),
-    ).toEqual({ repo: "getoxide/oxide", ref: "v1.2.3" });
+    ).toEqual({
+      repo: "getoxide/oxide",
+      ref: "v1.2.3",
+      commit: "commit-of-v1.2.3",
+    });
   });
 
   it("fails when the logo is missing", async () => {
@@ -247,15 +260,19 @@ describe("syncOxide: brand kit", () => {
 describe("syncOxide: ref", () => {
   it("reads the latest stable tag when no ref is given", async () => {
     const { fetched, snapshot } = await run(source(), { releases: [STABLE] });
-    expect(fetched.every((f) => f.startsWith("v1.1.0:"))).toBe(true);
-    expect(snapshot.source).toEqual({ repo: "getoxide/oxide", ref: "v1.1.0" });
+    expect(fetched.every((f) => f.startsWith("commit-of-v1.1.0:"))).toBe(true);
+    expect(snapshot.source).toEqual({
+      repo: "getoxide/oxide",
+      ref: "v1.1.0",
+      commit: "commit-of-v1.1.0",
+    });
   });
 
   it("reads main while no stable tag exists", async () => {
     const { fetched } = await run(source(), {
       releases: [{ ...STABLE, tag_name: "v1.1.0-rc.1", prerelease: true }],
     });
-    expect(fetched.every((f) => f.startsWith("main:"))).toBe(true);
+    expect(fetched.every((f) => f.startsWith("commit-of-main:"))).toBe(true);
   });
 
   it("records a local source's ref and commit, while links use the pinned ref", async () => {
@@ -265,10 +282,11 @@ describe("syncOxide: ref", () => {
     expect(snapshot.source).toEqual({
       repo: "getoxide/oxide",
       ref: "main",
+      commit: "3719414abc",
       local: { ref: "docs/site-markers", commit: "3719414abc" },
     });
     expect(snapshot.readme.definition).toContain(
-      "(https://github.com/getoxide/oxide/blob/main/LICENSE)",
+      "(https://github.com/getoxide/oxide/blob/3719414abc/LICENSE)",
     );
   });
 });
@@ -306,7 +324,7 @@ describe("syncOxide: snapshot", () => {
       definition: "The Turn definition.",
     });
     expect(result.unlisted).toEqual(["Board Thread"]);
-    expect(logs).toContain("New glossary terms not on the site: Board Thread");
+    expect(logs).toContain("Glossary terms not on the site: Board Thread");
   });
 
   it("writes the release state and the changelog", async () => {
@@ -355,6 +373,7 @@ describe("syncOxide: failures write nothing", () => {
           if (!file) throw new Error(`404 ${path}`);
           return file;
         },
+        fetchCommit: async (ref) => `commit-of-${ref}`,
         fetchReleases:
           options.fetchReleases ??
           (async () => {
@@ -419,6 +438,12 @@ describe("checkSnapshot", () => {
     );
   });
 
+  it("requires the commit the synced ref resolved to", async () => {
+    const { snapshot } = await run(source());
+    delete snapshot.source.commit;
+    expect(() => checkSnapshot(snapshot)).toThrow(/source\.commit/);
+  });
+
   it("rejects a release state outside stable, prerelease-only and none", async () => {
     const { snapshot } = await run(source());
     snapshot.release.state = "beta";
@@ -429,5 +454,78 @@ describe("checkSnapshot", () => {
     const { snapshot } = await run(source());
     snapshot.concepts.pop();
     expect(() => checkSnapshot(snapshot)).toThrow(/concepts/);
+  });
+});
+
+describe("fetchAllReleases (issue #29, item 18)", () => {
+  const batch = (n) =>
+    Array.from({ length: n }, (_, i) => ({ tag_name: `v${i}.0.0` }));
+
+  it("follows pagination until a short page", async () => {
+    const pages = [batch(100), batch(3)];
+    const seen = [];
+    const releases = await fetchAllReleases(async (page) => {
+      seen.push(page);
+      return pages[page - 1] ?? [];
+    });
+    expect(seen).toEqual([1, 2]);
+    expect(releases).toHaveLength(103);
+  });
+
+  it("stops on an empty page after a full one", async () => {
+    const releases = await fetchAllReleases(async (page) =>
+      page === 1 ? batch(100) : [],
+    );
+    expect(releases).toHaveLength(100);
+  });
+
+  it("fails instead of truncating when every page is full", async () => {
+    await expect(fetchAllReleases(async () => batch(100), 3)).rejects.toThrow(
+      /refusing to truncate/,
+    );
+  });
+});
+
+describe("writeOutputsAtomically (issue #29, item 17)", () => {
+  it("writes every output once all of them are staged", async () => {
+    const root = mkdtempSync(join(tmpdir(), "oxide-sync-"));
+    await writeOutputsAtomically(root, [
+      ["a.txt", "A"],
+      ["nested/b.txt", "B"],
+    ]);
+    expect(readFileSync(join(root, "a.txt"), "utf8")).toBe("A");
+    expect(readFileSync(join(root, "nested/b.txt"), "utf8")).toBe("B");
+  });
+
+  it("leaves the previous files in place when staging fails", async () => {
+    const root = mkdtempSync(join(tmpdir(), "oxide-sync-"));
+    await writeOutputsAtomically(root, [["a.txt", "old"]]);
+    writeFileSync(join(root, "blocked"), "not a directory");
+    await expect(
+      writeOutputsAtomically(root, [
+        ["a.txt", "new"],
+        ["blocked/x.txt", "X"],
+      ]),
+    ).rejects.toThrow();
+    expect(readFileSync(join(root, "a.txt"), "utf8")).toBe("old");
+  });
+});
+
+describe("syncOxide: unresolved installers are reported (issue #29, item 15)", () => {
+  it("warns instead of silently falling back to the release page", async () => {
+    const logs = [];
+    const { snapshot } = await run(source(), {
+      releases: [
+        {
+          ...STABLE,
+          assets: STABLE.assets.filter((a) => a.name.includes("aarch64")),
+        },
+      ],
+      logs,
+    });
+    expect(snapshot.release.latest.assets.windows.name).toBeNull();
+    expect(logs).toContain(
+      "Warning: no Windows x64 installer asset (Oxide_1.1.0) in v1.1.0: the button falls back to the release page.",
+    );
   });
 });

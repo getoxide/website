@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { plainText } from "./markdown";
-import { SNAPSHOT } from "./snapshot";
+import { oxideFileUrl, SNAPSHOT } from "./snapshot";
 
 // `/download` on the committed Snapshot (Copy deck, `/download`; Download
 // experience #13). The other Release states are in download-states.spec.ts.
@@ -12,7 +12,7 @@ const FAQ = [
   ["updates", "How do I stay up to date?"],
 ] as const;
 
-const README = `https://github.com/${SNAPSHOT.source.repo}/blob/${SNAPSHOT.source.ref}/README.md`;
+const README = oxideFileUrl("README.md");
 
 test("the blocks come in the Copy deck's order", async ({ page }) => {
   await page.goto("/download");

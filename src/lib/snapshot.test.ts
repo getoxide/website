@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import source from "../../content/oxide/source.json";
 import {
   providerInstalls,
   SNAPSHOT,
@@ -105,6 +106,20 @@ describe("tokens (Copy deck, Tokens)", () => {
 describe("the committed Snapshot", () => {
   it("renders the definition token today", () => {
     expect(tokensOf(SNAPSHOT)("definition")).toMatch(/^Oxide is /);
+  });
+
+  // ADR-0003: one source. The site's links read source.json while the page
+  // content reads the Snapshot; a drift between them would split the facts.
+  it("agrees with content/oxide/source.json", () => {
+    expect(SNAPSHOT.source.repo).toBe(source.repo);
+    expect(SNAPSHOT.source.ref).toBe(source.ref);
+    expect(SNAPSHOT.source.commit).toBe(source.commit);
+  });
+
+  it("records the commit a branch ref resolved to", () => {
+    if (!/^v\d+\.\d+\.\d+$/.test(source.ref)) {
+      expect(source.commit).toMatch(/^[0-9a-f]{40}$/);
+    }
   });
 });
 

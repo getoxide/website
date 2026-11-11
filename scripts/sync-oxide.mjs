@@ -13,7 +13,7 @@
 // clone (for a ref not pushed yet) and records that ref and commit in the
 // Snapshot. Production runs never pass it.
 import { execFileSync } from "node:child_process";
-import { mkdir, writeFile as fsWriteFile } from "node:fs/promises";
+import { mkdir, rename, rm, writeFile as fsWriteFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -338,6 +338,7 @@ export function releaseData(releases, { install }) {
   let latest = null;
   let platforms = readmePlatforms(install);
   let platformsFrom = "readme";
+  let unresolved = [];
   if (newest) {
     const version = newest.tag_name.replace(/^v/, "");
     const assets = Object.fromEntries(
@@ -351,6 +352,9 @@ export function releaseData(releases, { install }) {
       prerelease: !isStable(newest),
       assets,
     };
+    unresolved = INSTALLERS.filter((i) => assets[i.key].name === null).map(
+      (i) => ({ platform: i.platform, version, tag: newest.tag_name }),
+    );
     const shipped = INSTALLERS.filter((i) => assets[i.key].name !== null);
     if (shipped.length) {
       platforms = shipped.map((i) => i.platform);
@@ -378,6 +382,7 @@ export function releaseData(releases, { install }) {
       platformsFrom,
     },
     changelog,
+    unresolved,
   };
 }
 
@@ -406,6 +411,7 @@ export function checkSnapshot(s) {
 
   text("source.repo");
   text("source.ref");
+  text("source.commit");
   if (at("source.local") !== undefined) {
     text("source.local.ref");
     text("source.local.commit");
@@ -537,20 +543,30 @@ const SECTIONS = {
  * Builds the Snapshot from the Oxide README and glossary at `ref` and the
  * Releases API payload. Throws on a missing marker or allowlisted term.
  */
-export function buildSnapshot({ ref, readme, glossary, releases, local }) {
+export function buildSnapshot({
+  ref,
+  commit,
+  readme,
+  glossary,
+  releases,
+  local,
+}) {
+  // A tag never moves; `main` does, so pin every rewritten link to the commit
+  // that was actually read (issue #29, item 5).
+  const linkRef = STABLE_TAG.test(ref) ? ref : commit;
   const readmeData = Object.fromEntries(
     Object.entries(SECTIONS).map(([key, marker]) => [
       key,
-      rewriteLinks(extractSection(readme, marker), ref),
+      rewriteLinks(extractSection(readme, marker), linkRef),
     ]),
   );
   readmeData.features = extractFeatures(extractSection(readme, "features"));
   const { concepts, unlisted } = extractConcepts(glossary);
-  const { release, changelog } = releaseData(releases, {
+  const { release, changelog, unresolved } = releaseData(releases, {
     install: readmeData.install,
   });
   const snapshot = {
-    source: { repo: OXIDE_REPO, ref, ...(local ? { local } : {}) },
+    source: { repo: OXIDE_REPO, ref, commit, ...(local ? { local } : {}) },
     readme: {
       definition: readmeData.definition,
       features: readmeData.features,
@@ -561,25 +577,30 @@ export function buildSnapshot({ ref, readme, glossary, releases, local }) {
     },
     concepts: concepts.map((c) => ({
       ...c,
-      definition: rewriteLinks(c.definition, ref, "GLOSSARY.md"),
+      definition: rewriteLinks(c.definition, linkRef, "GLOSSARY.md"),
     })),
     release,
     changelog,
   };
-  return { snapshot: checkSnapshot(snapshot), unlisted };
+  return { snapshot: checkSnapshot(snapshot), unlisted, unresolved };
 }
 
 /**
  * `pnpm sync:oxide`: the brand kit and the content Snapshot from
  * getoxide/oxide, at `ref` or, without one, at the latest stable tag (`main`
- * while none exists). Everything is fetched and checked before the first
- * write, so any failure leaves the last good copy in place.
+ * while none exists). `ref` is resolved to a commit first; every file is
+ * fetched at that commit and the Snapshot records it, so a moving `main` is
+ * pinned to what was actually read (ADR-0003). Everything is fetched and
+ * checked before the first write, so any failure leaves the last good copy in
+ * place.
  * @param {{
  *   ref?: string,
  *   local?: { ref: string, commit: string },
  *   fetchFile: (ref: string, path: string) => Promise<Buffer>,
+ *   fetchCommit: (ref: string) => Promise<string>,
  *   fetchReleases: () => Promise<any[]>,
- *   writeFile: (path: string, data: Buffer | string) => Promise<void>,
+ *   writeFile?: (path: string, data: Buffer | string) => Promise<void>,
+ *   writeFiles?: (outputs: [string, Buffer | string][]) => Promise<void>,
  *   log?: (line: string) => void,
  * }} io
  */
@@ -587,19 +608,23 @@ export async function syncOxide({
   ref: requested,
   local,
   fetchFile,
+  fetchCommit,
   fetchReleases,
   writeFile,
+  writeFiles,
   log = () => {},
 }) {
   const releases = await fetchReleases();
   const ref = requested ?? latestStableTag(releases) ?? OXIDE_REF;
+  const commit = local?.commit ?? (await fetchCommit(ref));
   const [brand, readme, glossary] = await Promise.all([
-    brandOutputs(ref, fetchFile),
-    fetchFile(ref, "README.md"),
-    fetchFile(ref, "GLOSSARY.md"),
+    brandOutputs(commit, fetchFile),
+    fetchFile(commit, "README.md"),
+    fetchFile(commit, "GLOSSARY.md"),
   ]);
-  const { snapshot, unlisted } = buildSnapshot({
+  const { snapshot, unlisted, unresolved } = buildSnapshot({
     ref,
+    commit,
     readme: readme.toString("utf8"),
     glossary: glossary.toString("utf8"),
     releases,
@@ -611,14 +636,20 @@ export async function syncOxide({
     ["content/oxide/snapshot.json", JSON.stringify(snapshot, null, 2) + "\n"],
     [
       "content/oxide/source.json",
-      JSON.stringify({ repo: OXIDE_REPO, ref }, null, 2) + "\n",
+      JSON.stringify({ repo: OXIDE_REPO, ref, commit }, null, 2) + "\n",
     ],
   ];
-  for (const [path, data] of outputs) await writeFile(path, data);
+  if (writeFiles) await writeFiles(outputs);
+  else for (const [path, data] of outputs) await writeFile(path, data);
   if (unlisted.length) {
-    log(`New glossary terms not on the site: ${unlisted.join(", ")}`);
+    log(`Glossary terms not on the site: ${unlisted.join(", ")}`);
   }
-  return { ref, written: outputs.map(([path]) => path), unlisted };
+  for (const { platform, version, tag } of unresolved) {
+    log(
+      `Warning: no ${platform} installer asset (Oxide_${version}) in ${tag}: the button falls back to the release page.`,
+    );
+  }
+  return { ref, commit, written: outputs.map(([path]) => path), unlisted };
 }
 
 async function fetchRaw(ref, path) {
@@ -628,9 +659,8 @@ async function fetchRaw(ref, path) {
   return Buffer.from(await res.arrayBuffer());
 }
 
-/** Every release of the Oxide repo (public; `GITHUB_TOKEN` only lifts the
- * rate limit when the environment provides one). */
-async function fetchReleases() {
+/** GitHub API headers, with the token when the environment provides one. */
+function apiHeaders() {
   const headers = {
     accept: "application/vnd.github+json",
     "user-agent": "oxide-website-sync",
@@ -639,12 +669,85 @@ async function fetchReleases() {
   if (process.env.GITHUB_TOKEN) {
     headers.authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
   }
+  return headers;
+}
+
+/** The commit a ref resolves to, so a moving `main` is recorded as a SHA. */
+export async function fetchCommitOf(ref) {
   const res = await fetch(
-    `https://api.github.com/repos/${OXIDE_REPO}/releases?per_page=100`,
-    { headers },
+    `https://api.github.com/repos/${OXIDE_REPO}/commits/${encodeURIComponent(ref)}`,
+    { headers: apiHeaders() },
   );
-  if (!res.ok) throw new Error(`GitHub Releases API answered ${res.status}`);
-  return res.json();
+  if (!res.ok) {
+    throw new Error(`GitHub Commits API answered ${res.status} for ${ref}`);
+  }
+  const { sha } = await res.json();
+  if (!/^[0-9a-f]{40}$/.test(sha ?? "")) {
+    throw new Error(`GitHub Commits API returned no SHA for ${ref}`);
+  }
+  return sha;
+}
+
+/**
+ * Every release, following GitHub's pagination (`per_page=100`). A full last
+ * page is never taken as the end silently: if `MAX_PAGES` pages are all full,
+ * the sync fails instead of truncating past 1000 releases.
+ */
+export const RELEASES_PER_PAGE = 100;
+
+export async function fetchAllReleases(fetchPage, maxPages = 10) {
+  const releases = [];
+  for (let page = 1; page <= maxPages; page++) {
+    const batch = await fetchPage(page);
+    if (!Array.isArray(batch)) {
+      throw new Error("GitHub Releases API did not return a list");
+    }
+    releases.push(...batch);
+    if (batch.length < RELEASES_PER_PAGE) return releases;
+  }
+  throw new Error(
+    `GitHub Releases API returned ${maxPages} full pages of ${RELEASES_PER_PAGE}: refusing to truncate the list`,
+  );
+}
+
+/** Every release of the Oxide repo (public; `GITHUB_TOKEN` only lifts the
+ * rate limit when the environment provides one). */
+async function fetchReleases() {
+  return fetchAllReleases(async (page) => {
+    const res = await fetch(
+      `https://api.github.com/repos/${OXIDE_REPO}/releases?per_page=${RELEASES_PER_PAGE}&page=${page}`,
+      { headers: apiHeaders() },
+    );
+    if (!res.ok) throw new Error(`GitHub Releases API answered ${res.status}`);
+    return res.json();
+  });
+}
+
+/**
+ * Writes every output to a temp file first, then renames them into place, so
+ * a failure while fetching or staging leaves the committed files untouched.
+ * All-or-nothing across files: the renames happen only after every temp file
+ * is written.
+ * @param {string} root
+ * @param {[string, Buffer | string][]} outputs
+ */
+export async function writeOutputsAtomically(root, outputs) {
+  const staged = [];
+  try {
+    for (const [path, data] of outputs) {
+      const target = join(root, path);
+      await mkdir(dirname(target), { recursive: true });
+      const temp = `${target}.tmp-${process.pid}-${staged.length}`;
+      await fsWriteFile(temp, data);
+      staged.push([temp, target]);
+    }
+  } catch (error) {
+    await Promise.all(
+      staged.map(([temp]) => rm(temp, { force: true }).catch(() => {})),
+    );
+    throw error;
+  }
+  for (const [temp, target] of staged) await rename(temp, target);
 }
 
 /**
@@ -696,24 +799,21 @@ async function main() {
     ref: option(argv, "--ref"),
     local: local?.local,
     fetchFile: local?.fetchFile ?? fetchRaw,
+    fetchCommit: fetchCommitOf,
     fetchReleases,
-    writeFile: async (path, data) => {
-      const target = join(root, path);
-      await mkdir(dirname(target), { recursive: true });
-      await fsWriteFile(target, data);
-    },
+    writeFiles: (outputs) => writeOutputsAtomically(root, outputs),
     log: (line) => console.log(line),
   });
   const from = local
     ? ` (files from ${local.local.ref}@${local.local.commit.slice(0, 7)}, local)`
-    : "";
+    : ` (commit ${result.commit.slice(0, 7)})`;
   console.log(`Synced ${OXIDE_REPO}@${result.ref}${from}:`);
   for (const path of result.written) console.log(`  ${path}`);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   main().catch((err) => {
-    console.error(`sync:oxide failed, nothing written: ${err.message}`);
+    console.error(`sync:oxide failed, no files were replaced: ${err.message}`);
     process.exit(1);
   });
 }

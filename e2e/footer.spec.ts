@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { REGISTERED, urlOf } from "./pages";
+import { oxideFileUrl } from "./snapshot";
 
 // Page inventory (#9), Footer; Design system, Footer.
 const COLUMNS: [string, [string, string][]][] = [
@@ -66,7 +67,7 @@ for (const entry of REGISTERED) {
     const links: [string, string][] = [
       ["Made by Lorenzo Cavallini", "https://cavallinilorenzo.com"],
       ["Privacy", "/privacy"],
-      ["Licence", "https://github.com/getoxide/oxide/blob/main/LICENSE"],
+      ["Licence", oxideFileUrl("LICENSE")],
     ];
     for (const [name, href] of links) {
       await expect(

@@ -13,7 +13,7 @@ const pages = Object.values(PAGES);
 const indexable = pages.filter((page) => page.indexable);
 
 const snapshot: MachineSnapshot = {
-  source: { repo: "getoxide/oxide", ref: "main" },
+  source: { repo: "getoxide/oxide", ref: "main", commit: "0123456789abcdef" },
   readme: { definition: SNAPSHOT.readme.definition },
   release: {
     state: "stable",
@@ -118,7 +118,21 @@ describe("llms.txt", () => {
       "[Releases](https://github.com/getoxide/oxide/releases)",
     );
     expect(optional).toContain(
-      "[llms.txt for contributors](https://github.com/getoxide/oxide/blob/main/llms.txt)",
+      "[llms.txt for contributors](https://github.com/getoxide/oxide/blob/0123456789abcdef/llms.txt)",
+    );
+  });
+
+  it("links at a stable tag when the Snapshot was taken at one", () => {
+    const tagged = {
+      ...snapshot,
+      source: {
+        repo: "getoxide/oxide",
+        ref: "v1.2.3",
+        commit: "0123456789abcdef",
+      },
+    };
+    expect(llmsTxt(pages, tagged)).toContain(
+      "[llms.txt for contributors](https://github.com/getoxide/oxide/blob/v1.2.3/llms.txt)",
     );
   });
 });

@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { PAGES, SITE_URL } from "../src/content/pages";
-import { SNAPSHOT } from "./snapshot";
+import { oxideFileUrl, SNAPSHOT } from "./snapshot";
 import { urlOf } from "./pages";
 
 const PAGES_ALL = Object.values(PAGES);
@@ -64,7 +64,7 @@ test.describe("machine-readable root files", () => {
       "[Releases](https://github.com/getoxide/oxide/releases)",
     );
     expect(text).toContain(
-      "[llms.txt for contributors](https://github.com/getoxide/oxide/blob/main/llms.txt)",
+      `[llms.txt for contributors](${oxideFileUrl("llms.txt")})`,
     );
   });
 
