@@ -3,6 +3,7 @@ import type { Page } from "@/content/pages";
 import { ClosingCta } from "./ClosingCta";
 import { SiteFooter } from "./SiteFooter";
 import { SiteHeader } from "./SiteHeader";
+import { StructuredData } from "./StructuredData";
 import styles from "./SiteFrame.module.css";
 
 /**
@@ -26,6 +27,7 @@ export function SiteFrame({
         {children}
         {/* Page inventory #9, internal linking rule 1. */}
         {page.path === "/download" ? null : <ClosingCta />}
+        <StructuredData page={page} />
       </main>
       <SiteFooter path={page.path} />
     </>

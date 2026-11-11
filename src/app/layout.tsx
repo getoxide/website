@@ -1,7 +1,8 @@
-import type { Viewport } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { COPY } from "@/content/copy";
 import { GOATCOUNTER_ENDPOINT, GOATCOUNTER_SCRIPT } from "@/lib/measurement";
+import { GOOGLE_SITE_VERIFICATION } from "@/lib/verification";
 import "../../content/oxide/brand/oxide-tokens.css";
 import "../styles/tokens.css";
 import "./globals.css";
@@ -31,6 +32,13 @@ const code = localFont({
 });
 
 export const viewport: Viewport = { colorScheme: "dark" };
+
+// Search Console verification (Measurement plan #16). Share-card meta lives
+// in `pageMetadata`, because Next replaces rather than merges a page's
+// `openGraph`/`twitter` object over this layout's.
+export const metadata: Metadata = {
+  verification: { google: GOOGLE_SITE_VERIFICATION },
+};
 
 export default function RootLayout({
   children,

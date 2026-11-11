@@ -48,9 +48,9 @@ export function setHeroPaused(paused: boolean, store?: Store) {
   }
 }
 
-const VERT = `attribute vec2 a; void main(){ gl_Position = vec4(a, 0.0, 1.0); }`;
+export const SHADER_VERTEX = `attribute vec2 a; void main(){ gl_Position = vec4(a, 0.0, 1.0); }`;
 
-const FRAG = `
+export const SHADER_FRAGMENT = `
 #ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
 #else
@@ -146,8 +146,8 @@ export function mountShader(
     ctx.compileShader(s);
     return ctx.getShaderParameter(s, ctx.COMPILE_STATUS) ? s : null;
   };
-  const vs = compile(ctx.VERTEX_SHADER, VERT);
-  const fs = compile(ctx.FRAGMENT_SHADER, FRAG);
+  const vs = compile(ctx.VERTEX_SHADER, SHADER_VERTEX);
+  const fs = compile(ctx.FRAGMENT_SHADER, SHADER_FRAGMENT);
   if (!vs || !fs) return null;
   const prog = ctx.createProgram()!;
   ctx.attachShader(prog, vs);

@@ -1,6 +1,7 @@
 // `pnpm check:copy`: copy-lint over the visible text of every exported page
 // (Copy #18, Checks; Copy deck, Rules every string here follows, 1-3).
 import { fileURLToPath } from "node:url";
+import { markdownText } from "../src/lib/markdown-text.ts";
 import {
   OUT_DIR,
   exportedPages,
@@ -64,15 +65,7 @@ export const GUI_EXCEPTION_DEFINITION =
   "Oxide is a free, open-source **desktop GUI for AI coding agents**, built with Rust and [Tauri](https://tauri.app). It doesn't ship an agent of its own: it drives the agent CLIs you already have installed and logged in (**Claude Code**, **OpenAI Codex** and **Antigravity CLI**) and puts Git, GitHub, a code editor and a terminal around the conversation.";
 
 /** The visible text of a line of Markdown: marks and link targets dropped. */
-export function markdownText(markdown) {
-  return normalize(
-    markdown
-      .replace(/!?\[([^\]]*)\]\([^)]*\)/g, "$1")
-      .replace(/\*\*([^*]+)\*\*/g, "$1")
-      .replace(/(^|[^\w])[*_]([^*_]+)[*_](?=[^\w]|$)/g, "$1$2")
-      .replace(/`([^`]*)`/g, "$1"),
-  );
-}
+export { markdownText };
 
 /**
  * @param {{ path: string, html: string, definition: string }} page

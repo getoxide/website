@@ -63,6 +63,26 @@ describe("pageMetadata", () => {
     });
   });
 
+  it("links the one site-wide share card on every indexable page", () => {
+    for (const page of [guide, home]) {
+      expect(pageMetadata(page).openGraph?.images).toEqual([
+        {
+          url: "https://oxide.cavallinilorenzo.com/og.png",
+          width: 1200,
+          height: 630,
+          type: "image/png",
+          alt: "Oxide: The complete desktop app for agentic coding.",
+        },
+      ]);
+      expect(pageMetadata(page).twitter?.images).toEqual([
+        {
+          url: "https://oxide.cavallinilorenzo.com/og.png",
+          alt: "Oxide: The complete desktop app for agentic coding.",
+        },
+      ]);
+    }
+  });
+
   it("keeps non-indexable pages out of search and without a canonical", () => {
     const notFound: Page = {
       ...guide,
@@ -75,5 +95,7 @@ describe("pageMetadata", () => {
     expect(meta.robots).toEqual({ index: false });
     expect(meta.alternates).toBeUndefined();
     expect(meta.description).toBeUndefined();
+    expect(meta.openGraph?.images).toHaveLength(1);
+    expect(meta.twitter?.images).toHaveLength(1);
   });
 });

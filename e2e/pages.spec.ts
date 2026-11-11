@@ -52,6 +52,25 @@ test.describe("every registered page", () => {
           "content",
           "summary_large_image",
         );
+        for (const [selector, value] of [
+          ['meta[property="og:image"]', `${PROD}/og.png`],
+          ['meta[property="og:image:width"]', "1200"],
+          ['meta[property="og:image:height"]', "630"],
+          [
+            'meta[property="og:image:alt"]',
+            "Oxide: The complete desktop app for agentic coding.",
+          ],
+          ['meta[name="twitter:image"]', `${PROD}/og.png`],
+          [
+            'meta[name="twitter:image:alt"]',
+            "Oxide: The complete desktop app for agentic coding.",
+          ],
+        ] as const) {
+          await expect(meta(selector), selector).toHaveAttribute(
+            "content",
+            value,
+          );
+        }
         await expect(meta('meta[name="robots"]')).toHaveCount(0);
       } else {
         await expect(meta('meta[name="description"]')).toHaveCount(0);
@@ -59,6 +78,14 @@ test.describe("every registered page", () => {
         await expect(meta('meta[name="robots"]')).toHaveAttribute(
           "content",
           /noindex/,
+        );
+        await expect(meta('meta[property="og:image"]')).toHaveAttribute(
+          "content",
+          `${PROD}/og.png`,
+        );
+        await expect(meta('meta[name="twitter:image"]')).toHaveAttribute(
+          "content",
+          `${PROD}/og.png`,
         );
       }
     });
