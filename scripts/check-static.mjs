@@ -7,6 +7,8 @@ import { fileURLToPath } from "node:url";
 
 const SOURCE_EXT = /\.(?:[cm]?[jt]sx?)$/;
 const NOT_FOUND = "/_not-found";
+// Next-internal pages that are prerendered but never written to `out/`.
+const NOT_EXPORTED = new Set(["/_global-error"]);
 
 function htmlFileFor(route) {
   if (route === "/") return "index.html";
@@ -39,7 +41,12 @@ export function findViolations({
     if (!prerenderedSet.has(route)) {
       violations.push(`route ${route} is not prerendered as static`);
     }
-    if (exportedSet && isPage && !exportedSet.has(htmlFileFor(route))) {
+    if (
+      exportedSet &&
+      isPage &&
+      !NOT_EXPORTED.has(route) &&
+      !exportedSet.has(htmlFileFor(route))
+    ) {
       violations.push(
         `page ${route} has no ${htmlFileFor(route)} in the static export`,
       );

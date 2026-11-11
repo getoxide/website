@@ -59,6 +59,15 @@ describe("findViolations", () => {
     expect(findViolations({ ...ok, exported })).toEqual([]);
   });
 
+  it("does not expect Next's internal global error page in the export", () => {
+    const appPaths = { ...ok.appPaths, "/_global-error/page": "x" };
+    const prerendered = [...ok.prerendered, "/_global-error"];
+    const exported = ["index.html", "privacy.html", "404.html"];
+    expect(findViolations({ ...ok, appPaths, prerendered, exported })).toEqual(
+      [],
+    );
+  });
+
   it("flags a page missing from the export", () => {
     const exported = ["index.html", "404.html"];
     expect(text({ ...ok, exported })).toContain("/privacy");
