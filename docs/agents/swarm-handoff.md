@@ -1,26 +1,41 @@
 # Swarm hand-off (spec #29, Oxide website v1)
 
-Integration branch: `feat/oxide-website-v1` (pushed). One PR for the whole spec.
+Integration branch: `feat/oxide-website-v1`. One PR for the whole spec.
 
-## Merged on the integration branch
+## Merged
 
-#30, #31, #32, #33, #34, #35, #36, #37, #38, #39, #40.
+#30–#43 are merged on the integration branch. #44 is the production launch:
+its code-side work is done, the remaining steps need Lorenzo and are listed in
+[`launch-checklist.md`](./launch-checklist.md).
 
-## In progress (pushed, unmerged)
+## Verified locally
 
-- #41 Provider pages: branch `worktree-agent-a1afa877b0abaa52a`, last commit is a WIP save. Based on an older tip: merge `feat/oxide-website-v1` into it first.
-- #42 Guides: branch `worktree-agent-a812fff3db130a017`, may hold no commits beyond the integration tip yet. `/features` already links `/guides/review-ai-generated-code` and `/guides/claude-code-and-codex-together`.
+The full recipe in [`engineering.md`](./engineering.md) passes at the tip:
+format, lint, typecheck, unit tests, build, budgets, copy-lint, Concept links,
+e2e (278 passed, 1 skipped) and Lighthouse (`/` and `/changelog`, four
+repeated 3-run medians). The verification receipt is outside the diff.
 
-## Still to do
+## Needs Lorenzo before launch
 
-- #43 (blocked by #34, #39: now free once #41/#42 land, no real dependency on them), then #44 (needs everything), then one verifier run, `judge`, one fix pass, verifier again, cleanup.
+- `NEXT_PUBLIC_GOATCOUNTER_CODE`: the real GoatCounter site code, set in
+  Vercel. Unset warns; explicitly setting the placeholder fails a production
+  build.
+- `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION`: the Search Console token, set in
+  Vercel. Same guard.
+- Real product captures (#15). `assets/captures/hero.png` is still the
+  prototype still; feature capture slots are empty, so no frame renders.
+- The `getoxide/website` repository must be public (Vercel Hobby cannot deploy
+  a private organization repository), and the first stable Oxide release must
+  exist.
+- The GitHub workflows have never run: dispatch `content-sync.yml` and watch
+  `ci.yml` on the PR and on `main`.
 
-## Known issues
+## Notes
 
-- `check:lighthouse` fails on `/changelog` TBT (62-86 ms vs 50 ms ceiling). Implementers say it also fails without their changes; not investigated.
-- `GOATCOUNTER_CODE` in `src/lib/measurement.ts` is a placeholder (`TODO(#38)`): needs the real GoatCounter site code from Lorenzo.
-- Captures: `assets/captures/hero.png` is the prototype still; real captures come from Lorenzo (#15). Feature captions/alt texts are drafts to approve.
-- `#pull-requests` section and proof-path steps 3-4 appear once the Snapshot has the oxide#416 lead-in (re-run `pnpm sync:oxide`).
-- #33 workflow has never run on GitHub: dispatch it manually (changed ref, ref missing a marker, same ref twice).
-- Add the release-day manual sync step to `docs/agents/engineering.md`.
+- The Snapshot is pinned to an Oxide commit (`source.commit`) while no stable
+  tag exists; links use the tag when there is one.
+- Reading pages ship no client runtime; showcase pages defer their hydration
+  to `load`. Both are post-export steps guarded by tests.
+- `#pull-requests` and proof-path steps 3–4 render because the synced Snapshot
+  carries the oxide#416 lead-in.
 - `pnpm typecheck` needs a prior `pnpm build` (generated `next-env.d.ts`).

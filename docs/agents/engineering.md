@@ -45,3 +45,4 @@ Read by `/verify`, `/judge`, `/build`, `/ship`, `/ui` and `/release`.
 ## Release
 
 - release: none (Vercel deploys from `main`; previews per PR)
+- launch: `docs/agents/launch-checklist.md` (production steps, env vars and the workflow first runs)
