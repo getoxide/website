@@ -18,7 +18,14 @@ const BLOCK = new Set(
 const attrOf = (node, name) =>
   node.attrs?.find((a) => a.name === name)?.value ?? null;
 
-const normalize = (text) => text.replace(/\s+/g, " ").trim();
+/** Marks a block boundary in extracted text. */
+const BREAK = "\u0000";
+
+const normalize = (text) => text.replace(/[\s\u0000]+/g, " ").trim();
+
+/** The visible text of a node as its blocks (paragraphs, list items...). */
+const blocksOf = (node, skip) =>
+  textOf(node, skip).split(BREAK).map(normalize).filter(Boolean);
 
 /** The visible text of a node, optionally leaving out some subtrees. */
 function textOf(node, skip = () => false) {
@@ -26,12 +33,12 @@ function textOf(node, skip = () => false) {
   if (INVISIBLE.has(node.nodeName) || attrOf(node, "hidden") !== null) {
     return "";
   }
-  if (skip(node)) return " ";
+  if (skip(node)) return BREAK;
   const children = node.content ?? node;
   const inner = (children.childNodes ?? [])
     .map((c) => textOf(c, skip))
     .join("");
-  return BLOCK.has(node.nodeName) ? ` ${inner} ` : inner;
+  return BLOCK.has(node.nodeName) ? `${BREAK}${inner}${BREAK}` : inner;
 }
 
 /** Every element of a tree, depth first. */
@@ -43,6 +50,32 @@ function* elements(node) {
     }
   }
 }
+
+/**
+ * Banned phrases (Copy #18 rule 2; Copy deck rules 2 and 6), matched
+ * case-insensitively on whole words within one block of visible text.
+ */
+export const BANNED = [
+  ["10x", /\b10\s?[x×](?!\w)/i],
+  ["magic", /\bmagic(?:al|ally)?\b/i],
+  ["army of agents", /\barmy of agents\b/i],
+  ["the only", /\bthe only\b/i],
+  ["agentic engineering", /\bagentic engineering\b/i],
+  ["senior", /\bseniors?\b/i],
+  ["write code with Oxide", /\bwrit(?:e|es|ing)\s+code\s+with\s+Oxide\b/i],
+  [
+    "code with Oxide",
+    /(?<!\bwrit(?:e|es|ing)\s+)\bcod(?:e|es|ing)\s+with\s+Oxide\b/i,
+  ],
+  [
+    "Oxide writes code",
+    /\bOxide\s+(?:writes|will\s+write|generates)\s+(?:the\s+|your\s+)?code\b/i,
+  ],
+  ["the most complete", /\bthe most complete\b/i],
+  ["the best", /\bthe best\b/i],
+  // Not bare "the main", which would match "the main branch".
+  ["the main app", /\bthe main app\b/i],
+];
 
 /** The visible text of a line of Markdown: marks and link targets dropped. */
 export function markdownText(markdown) {
@@ -80,6 +113,15 @@ export function lintCopy({ path, html, definition }) {
       violations.push(
         `${path}: a definition differs from the Snapshot's: "${shown}"`,
       );
+    }
+  }
+
+  // Rule 2: no banned phrase.
+  for (const block of blocksOf(document)) {
+    for (const [phrase, pattern] of BANNED) {
+      if (pattern.test(block)) {
+        violations.push(`${path}: banned phrase "${phrase}" in "${block}"`);
+      }
     }
   }
   return violations;

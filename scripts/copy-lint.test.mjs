@@ -49,3 +49,51 @@ describe("lintCopy: canonical definition", () => {
     );
   });
 });
+
+describe("lintCopy: banned phrases", () => {
+  // Copy #18 rule 2, plus the three superlatives of Copy deck rule 2, plus
+  // anything saying Oxide writes the code (Copy deck rule 6).
+  const BANNED = [
+    ["Ship 10x faster", "10x"],
+    ["Ship 10× faster", "10x"],
+    ["It feels like magic", "magic"],
+    ["Command an army of agents", "army of agents"],
+    ["The only app you need", "the only"],
+    ["Built for agentic engineering", "agentic engineering"],
+    ["Like a senior engineer", "senior"],
+    ["Write code with Oxide", "write code with Oxide"],
+    ["Start to code with Oxide today", "code with Oxide"],
+    ["Coding with Oxide is fast", "code with Oxide"],
+    ["Oxide writes the code for you", "Oxide writes code"],
+    ["The most complete desktop app", "the most complete"],
+    ["The best way to review", "the best"],
+    ["The main app for agents", "the main app"],
+  ];
+
+  for (const [sentence, phrase] of BANNED) {
+    it(`fails "${sentence}" (${phrase})`, () => {
+      expect(lint("/", html({ main: `<p>${sentence}</p>` }))).toEqual([
+        `/: banned phrase "${phrase}" in "${sentence}"`,
+      ]);
+    });
+  }
+
+  it("matches across inline markup and line breaks in the source", () => {
+    const main = `<p>The <em>best</em>\n way</p>`;
+    expect(lint("/", html({ main }))).toEqual([
+      `/: banned phrase "the best" in "The best way"`,
+    ]);
+  });
+
+  it("allows the near misses the deck allows", () => {
+    // "the main branch" (deck rule 2), "complete" in its absolute form, and
+    // Oxide driving the agent that writes the code (deck rule 6).
+    const main = `<p>Merge into the main branch.</p><p>The complete desktop app for agentic coding.</p><p>Oxide drives the agent; the agent writes the code.</p><p>Seniority is not a word we use, and neither is imagination.</p>`;
+    expect(lint("/", html({ main }))).toEqual([]);
+  });
+
+  it("ignores scripts, hidden elements and link targets", () => {
+    const main = `<a href="/the-best-magic">Docs</a><div hidden>the best</div>`;
+    expect(lint("/", html({ main }))).toEqual([]);
+  });
+});
