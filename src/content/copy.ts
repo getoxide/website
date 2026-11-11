@@ -3,8 +3,27 @@
 
 export const GITHUB_REPO_URL = "https://github.com/getoxide/oxide";
 
+export type Link = { label: string; href: string };
+
 export const COPY = {
   skipLink: "Skip to content",
+
+  /**
+   * Site header. Labels and targets from Page inventory (#9), Header; the
+   * logo's alt text, the GitHub link's name and "Menu" are build-written.
+   */
+  header: {
+    logoAlt: "Oxide",
+    links: [
+      { label: "Features", href: "/features" },
+      { label: "Docs", href: "/docs/quick-start" },
+      { label: "Guides", href: "/guides" },
+      { label: "Changelog", href: "/changelog" },
+    ] satisfies Link[],
+    github: { label: "GitHub", href: GITHUB_REPO_URL },
+    download: { label: "Download", href: "/download" },
+    menu: "Menu",
+  },
 
   /** Copy deck, Home → Hero (frozen). */
   hero: {

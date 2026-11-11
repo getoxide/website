@@ -1,7 +1,3 @@
-.header {
-  padding: 0 var(--site-gutter);
-}
-
 .main {
   flex: 1;
   display: flex;
