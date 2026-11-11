@@ -40,13 +40,14 @@ Counting rules:
 
 | Class | JS | CSS | HTML (incl. inline RSC payload) | Fonts (of which preloaded) | Initial images | Page total, excluding video |
 | --- | --- | --- | --- | --- | --- | --- |
-| `showcase` | ≤ 160 kB | ≤ 25 kB | ≤ 50 kB | ≤ 120 kB (≤ 75 kB) | ≤ 300 kB | ≤ 1 MB |
-| `reading` | ≤ 130 kB | ≤ 15 kB | ≤ 50 kB | ≤ 120 kB (≤ 75 kB) | ≤ 100 kB | ≤ 400 kB |
+| `showcase` | ≤ 185.2 kB | ≤ 25 kB | ≤ 50 kB | ≤ 120 kB (≤ 75 kB) | ≤ 300 kB | ≤ 1 MB |
+| `reading` | ≤ 155.2 kB | ≤ 15 kB | ≤ 50 kB | ≤ 120 kB (≤ 75 kB) | ≤ 100 kB | ≤ 400 kB |
 
 **JS.**
 - Next 16's App Router and React weigh about 100–110 kB gzip on their own; the ceilings sit on top of that floor.
 - The `showcase` ceiling includes the shader (~2.5 kB gzip), reveals, the video controller, the animated mark, GoatCounter and, if a page uses it, the tier-3 Motion escape hatch (`LazyMotion` + `m` + `domAnimation`, about 20 kB gzip). Motion gets **no extra allowance**: an effect that does not fit under the ceiling does not ship.
 - **One-off calibration.** The first build issue measures an empty page. If its JS exceeds 110 kB gzip, both JS ceilings move up by the difference, once, and that change is recorded in this file.
+  - **Done** in [Site skeleton](https://github.com/getoxide/website/issues/30). The near-empty home (only the hero H1 and subheadline, no client component; Next 16.4.6 with Turbopack, React 19.3.1) loads **135.2 kB** gzip of JS (135,192 bytes, `pnpm measure:js`; the `nomodule` polyfills are excluded because no module-capable browser loads them). That is 25.2 kB over 110 kB, so both ceilings moved up by 25.2 kB: `showcase` 160 → 185.2 kB, `reading` 130 → 155.2 kB. The ceilings do not move again.
 
 **HTML.** `/changelog` grows with every release and is the page most at risk. If it exceeds the ceiling, the page paginates or keeps only the latest N releases; the ceiling does not move.
 
