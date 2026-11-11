@@ -5,8 +5,9 @@
   "type": "module",
   "packageManager": "pnpm@11.2.2",
   "scripts": {
+    "predev": "node scripts/build-captures.mjs",
     "dev": "next dev",
-    "build": "next build && node scripts/check-static.mjs",
+    "build": "node scripts/build-captures.mjs && next build && node scripts/check-static.mjs",
     "serve": "node scripts/serve-out.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -19,7 +20,8 @@
     "check:budgets": "node scripts/check-budgets.mjs",
     "check:copy": "node scripts/copy-lint.mjs",
     "check:concept-links": "node scripts/concept-links.mjs",
-    "check:lighthouse": "node scripts/lighthouse.mjs"
+    "check:lighthouse": "node scripts/lighthouse.mjs",
+    "build:captures": "node scripts/build-captures.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
@@ -34,6 +36,7 @@
     "lighthouse": "^13.6.0",
     "parse5": "^8.1.1",
     "prettier": "^3.9.10",
+    "sharp": "^0.35.5",
     "typescript": "^6.0.3",
     "vitest": "^5.1.0"
   },
