@@ -12,6 +12,9 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# Every gate runs against the static export served locally, never against a
+# Vercel preview (docs/spec/budgets.md, Enforcement in CI). The gates read the
+# PAGES registry, so a new page is covered without touching this file.
 jobs:
   checks:
     runs-on: ubuntu-latest
@@ -23,6 +26,7 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
+          # 22.18 or later: the gates import the TypeScript registry directly.
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
@@ -32,6 +36,10 @@ jobs:
       - run: pnpm test
       # Static export into out/, then the static-only guard.
       - run: pnpm build
+      # Per-page ceilings, copy-lint and first-mention Concept links.
+      - run: pnpm check:budgets
+      - run: pnpm check:copy
+      - run: pnpm check:concept-links
       - run: pnpm exec playwright install --with-deps chromium
       # Playwright and axe against out/ served locally, never a preview.
       - run: pnpm e2e
@@ -43,3 +51,22 @@ jobs:
             playwright-report/
             test-results/
           if-no-files-found: ignore
+
+  lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm exec playwright install --with-deps chromium
+      # Mobile preset, median of 3, on / and /changelog: Core Web Vitals per
+      # budget class and accessibility 100 fail; performance score warns.
+      - run: pnpm check:lighthouse
