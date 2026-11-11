@@ -1,0 +1,1 @@
+{"name":"oxide-website","private":true,"type":"module","scripts":{"proto:social":"node prototypes/social-assets/serve.mjs","proto:social:render":"python3 prototypes/social-assets/render.py"}}

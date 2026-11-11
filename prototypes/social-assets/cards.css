@@ -1,0 +1,47 @@
+/* PROTOTYPE: card styles. Colours mirror --ox-* from oxide-tokens.css (dark). */
+@font-face { font-family: "Space Grotesk"; src: url(assets/fonts/space-grotesk-latin-wght-normal.woff2) format("woff2"); font-weight: 300 700; }
+@font-face { font-family: "Inter"; src: url(assets/fonts/inter-latin-wght-normal.woff2) format("woff2"); font-weight: 100 900; }
+@font-face { font-family: "JetBrains Mono"; src: url(assets/fonts/jetbrains-mono-latin-wght-normal.woff2) format("woff2"); font-weight: 100 800; }
+
+.k {
+  --bg: #1C1C1E; --text: #E8E6E1; --bright: #FFFFFF; --muted: #B3B1AB; --faint: #9A9892; --frame: #48484A;
+  position: relative; width: 1200px; height: 630px; overflow: hidden; flex: none; box-sizing: border-box;
+  background: var(--bg); color: var(--text); font-family: Inter, sans-serif;
+  transform-origin: 0 0;
+}
+.k h1 { margin: 0; font-family: "Space Grotesk", sans-serif; font-weight: 500; letter-spacing: -0.03em; color: var(--bright); text-wrap: balance; }
+.k-shader { position: absolute; inset: 0; background: url(assets/shader-still.png) center / cover no-repeat; }
+.k-mark { display: block; }
+.k-logo { display: block; height: 48px; width: auto; }
+
+/* A · Plate: flat, left-aligned, hero line. */
+.k-a { padding: 80px 96px; display: flex; flex-direction: column; }
+.k-a__h { margin-top: auto !important; font-size: 84px; line-height: 1.04; max-width: 12em; }
+.k-a__host { margin: 40px 0 0; font: 400 24px/1 "JetBrains Mono", monospace; color: var(--faint); font-feature-settings: "calt" 0; }
+
+/* B · Passivation: shader still, centred mark + hero, like the live hero. */
+.k-b__in { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 36px; text-align: center; }
+.k-b .k-mark { width: 150px; height: 150px; }
+.k-b__h { font-size: 78px; line-height: 1.04; max-width: 13em; }
+
+/* C · Page title: per page, logo + page H1 + URL; shader fades in from the right. */
+.k-c { padding: 72px 88px; display: flex; flex-direction: column; }
+.k-c__shader { left: 38%; -webkit-mask-image: linear-gradient(90deg, transparent, #000 45%); mask-image: linear-gradient(90deg, transparent, #000 45%); }
+.k-c__top, .k-c__h, .k-c__url { position: relative; }
+.k-c__h { margin-top: auto !important; line-height: 1.06; max-width: 15em; }
+.k-c__url { margin: 36px 0 0; font: 400 24px/1 "JetBrains Mono", monospace; color: var(--text); font-feature-settings: "calt" 0; }
+.k-c__url span { color: var(--faint); }
+
+/* D · Capture: hero line on the shader, real capture rising off the bottom edge. */
+.k-d__head { position: absolute; top: 56px; left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: 24px; }
+.k-d .k-mark { width: 64px; height: 64px; }
+.k-d__h { font-size: 54px; line-height: 1; }
+.k-d__frame {
+  position: absolute; left: 50%; top: 172px; width: 1000px; transform: translateX(-50%);
+  border: 1px solid var(--frame); border-radius: 12px; overflow: hidden; background: #242426;
+  box-shadow: 0 -20px 80px rgba(0, 0, 0, .45);
+}
+.k-d__frame img { display: block; width: 100%; height: auto; }
+
+.k-box { position: relative; overflow: hidden; flex: none; }
+.k-box > .k { position: absolute; top: 0; left: 0; }

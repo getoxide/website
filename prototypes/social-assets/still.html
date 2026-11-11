@@ -1,0 +1,9 @@
+<!doctype html>
+<!-- PROTOTYPE: one frame of the shader at 1200×630, screenshotted by render.py into assets/shader-still.png -->
+<html><head><meta charset="utf-8"><style>html,body{margin:0;background:#1C1C1E}canvas{display:block}</style></head>
+<body><script type="module">
+import { renderStill } from "./shader-still.js";
+const t = Number(new URLSearchParams(location.search).get("t") ?? 6);
+document.body.append(renderStill(1200, 630, t));
+document.body.dataset.ready = "1";
+</script></body></html>

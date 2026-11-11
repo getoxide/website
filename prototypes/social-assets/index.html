@@ -1,0 +1,67 @@
+<!doctype html>
+<!--
+  PROTOTYPE · throwaway · getoxide/website#23 "Social and share assets".
+  Four card variants (A Plate, B Passivation, C Page title, D Capture) switchable via ?variant=,
+  shown full size and inside approximate unfurl mocks; icon options via ?icons=; page via ?page=.
+  Run: pnpm proto:social  →  http://localhost:4312/   (re-render PNGs: pnpm proto:social:render)
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PROTOTYPE · Social and share assets</title>
+<link rel="icon" href="assets/oxide-favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="cards.css">
+<link rel="stylesheet" href="gallery.css">
+</head>
+<body>
+<header class="bar">
+  <strong>PROTOTYPE · Social and share assets</strong>
+  <label>Page <select id="page"></select></label>
+  <label>og:title <select id="mode">
+    <option value="bare">&lt;title&gt; without “ · Oxide”</option>
+    <option value="full">full &lt;title&gt;</option>
+    <option value="h1">page H1</option>
+  </select></label>
+  <label>Feeds <select id="theme"><option value="dark">dark</option><option value="light">light</option></select></label>
+  <label>Icons <select id="icons">
+    <option value="I1">I1 · Brand favicon kit</option>
+    <option value="I2">I2 · Bare mark</option>
+    <option value="I3">I3 · Adaptive mark</option>
+  </select></label>
+</header>
+
+<main>
+  <section>
+    <h2>1 · The card, 1200×630 <small id="cardmeta"></small></h2>
+    <label class="tick"><input type="checkbox" id="guides" checked> crop guides (dashed: centre square used by WhatsApp/Telegram thumbnails · red: where X overlays the title)</label>
+    <div id="full" class="full"></div>
+  </section>
+
+  <section>
+    <h2>2 · Pasted in a feed <small>approximate mocks, real proportions; text is og:title / og:description</small></h2>
+    <div id="feeds" class="feeds"></div>
+  </section>
+
+  <section>
+    <h2>3 · Icons at real size <small id="iconmeta"></small></h2>
+    <div id="iconset" class="iconset"></div>
+  </section>
+
+  <section>
+    <h2>4 · State: what the build emits for this page</h2>
+    <div class="state">
+      <pre id="head"></pre>
+      <div><h3>Files</h3><table id="files"></table></div>
+    </div>
+  </section>
+</main>
+
+<nav class="switcher" aria-label="Prototype variant">
+  <button type="button" data-dir="-1" aria-label="Previous variant">←</button>
+  <output></output>
+  <button type="button" data-dir="1" aria-label="Next variant">→</button>
+</nav>
+<script type="module" src="app.js"></script>
+</body>
+</html>

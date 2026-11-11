@@ -1,0 +1,62 @@
+{
+  "A": {
+    "home": {
+      "png": 35802,
+      "jpg": 32364
+    }
+  },
+  "B": {
+    "home": {
+      "png": 198826,
+      "jpg": 42523
+    }
+  },
+  "D": {
+    "home": {
+      "png": 270460,
+      "jpg": 83631
+    }
+  },
+  "C": {
+    "home": {
+      "png": 134396,
+      "jpg": 39042
+    },
+    "features": {
+      "png": 139319,
+      "jpg": 44531
+    },
+    "claude-code-gui": {
+      "png": 142772,
+      "jpg": 44703
+    },
+    "codex-gui": {
+      "png": 139046,
+      "jpg": 41826
+    },
+    "guides--review-ai-generated-code": {
+      "png": 144852,
+      "jpg": 44501
+    },
+    "guides--claude-code-and-codex-together": {
+      "png": 153345,
+      "jpg": 50284
+    },
+    "docs--quick-start": {
+      "png": 126805,
+      "jpg": 28395
+    },
+    "faq": {
+      "png": 128525,
+      "jpg": 33981
+    },
+    "changelog": {
+      "png": 125468,
+      "jpg": 27963
+    },
+    "download": {
+      "png": 128962,
+      "jpg": 31302
+    }
+  }
+}

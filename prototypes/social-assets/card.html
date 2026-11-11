@@ -1,0 +1,13 @@
+<!doctype html>
+<!-- PROTOTYPE: renders one card at 1200×630 for render.py. card.html?v=C&p=/features -->
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="cards.css"><style>html,body{margin:0;background:#000}</style></head>
+<body><script type="module">
+import { card } from "./cards.js";
+import { PAGES } from "./data.js";
+const q = new URLSearchParams(location.search);
+const page = PAGES.find((p) => p.path === (q.get("p") ?? "/")) ?? PAGES[0];
+document.body.append(card(q.get("v") ?? "A", page));
+await document.fonts.ready;
+await Promise.all([...document.images].map((i) => i.decode().catch(() => {})));
+document.body.dataset.ready = "1";
+</script></body></html>
