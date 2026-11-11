@@ -1,0 +1,21 @@
+/* Design system, Download block. */
+.block {
+  display: grid;
+  gap: var(--site-space-4);
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--site-space-4);
+}
+
+.line {
+  margin: 0;
+  font: var(--site-text-caption) var(--site-font-body);
+  color: var(--ox-text-muted);
+}
+
+.line a {
+  color: var(--ox-text-accent);
+}

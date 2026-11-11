@@ -102,6 +102,35 @@ export const COPY = {
       "Prompt, review, pull request and merge, with Claude Code, Codex and Antigravity CLI.",
   },
 
+  /**
+   * `/download`, Copy deck → `/download` (locked). Strings keep the deck's
+   * notation: `[label](README#anchor)` links to the README at the pinned ref,
+   * `` `x` `` is code and `**x**` is bold; `<DeckText>` renders them.
+   */
+  download: {
+    byoa: {
+      heading: "Bring your own agent",
+      sentence:
+        "Oxide doesn't ship an agent: it drives the one you already have. Install and log in to Claude Code, Codex or Antigravity CLI first; Oxide offers only the ones it finds.",
+    },
+    buttons: {
+      macos: "Download for macOS",
+      windows: "Download for Windows",
+      prerelease: (version: string) => `Download test pre-release ${version}`,
+      followGithub: "Follow on GitHub",
+      buildFromSource: "Build from source",
+      /** Sublabel parts before the size token. */
+      sublabel: { macos: "Apple Silicon · .dmg", windows: "x64 · installer" },
+    },
+    lines: {
+      stable: (version: string, date: string) =>
+        `Version ${version} · ${date} · [Release notes](/changelog)`,
+      prerelease:
+        "This is a test pre-release: it never reaches the in-app updater. [Build from source](README#build-from-source) for the latest code.",
+      none: "No release yet. Oxide is pre-release software; follow the repository to hear about the first one.",
+    },
+  },
+
   /** Copy deck, 404 (locked). */
   notFound: {
     sentence:
