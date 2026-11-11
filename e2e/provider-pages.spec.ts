@@ -30,7 +30,8 @@ for (const { page: entry, copy } of LANDING) {
       await page.goto(entry.path);
       const main = page.locator("main");
       await expect(main).toContainText(copy.intro.replaceAll("`", ""));
-      await expect(page.getByTestId("definition")).toBeVisible();
+      // The footer carries the definition too; this is the page's own copy.
+      await expect(main.getByTestId("definition")).toBeVisible();
       for (const { heading } of copy.sections) {
         await expect(
           main.getByRole("heading", { name: heading, level: 2 }),
@@ -73,7 +74,7 @@ for (const { page: entry, copy } of LANDING) {
       await expect(page.locator(`h3#${last}`)).toBeInViewport();
     });
 
-    test("links the required pages, and every link to a built page resolves", async ({
+    test("links the required pages, and every internal link resolves", async ({
       page,
     }) => {
       await page.goto(entry.path);
@@ -82,12 +83,16 @@ for (const { page: entry, copy } of LANDING) {
         .evaluateAll((as) => as.map((a) => a.getAttribute("href")!));
       for (const required of REQUIRED_LINKS) expect(hrefs).toContain(required);
       for (const href of new Set(hrefs)) {
-        const path = href.split("#")[0];
-        // /features and the guides ship in sibling tickets (#40, #37): their
-        // links are asserted above, followed once their routes exist.
-        if (!registered.has(path)) continue;
-        const res = await page.request.get(path);
+        const { pathname, hash } = new URL(href, "http://localhost");
+        // The guides ship in #42: their links are asserted above, and are
+        // followed once their routes are registered.
+        if (!registered.has(pathname)) continue;
+        const res = await page.request.get(pathname);
         expect(res.status(), href).toBe(200);
+        if (!hash) continue;
+        // Follow the fragment with JavaScript off: the target is in the HTML.
+        await page.goto(href);
+        await expect(page.locator(`[id="${hash.slice(1)}"]`)).toHaveCount(1);
       }
     });
   });
