@@ -19,7 +19,7 @@ Read by `/verify`, `/judge`, `/build`, `/ship`, `/ui` and `/release`.
   - `pnpm lint` (ESLint)
   - `pnpm typecheck`
   - `pnpm test` (Vitest: `src/**/*.test.ts` and `scripts/**/*.test.mjs`; includes the Copy deck parity, route coverage, token usage and `vercel.json` tests)
-  - `pnpm build` (`next build` with `output: 'export'` into `out/`; every route must be `○ Static`, and `scripts/check-static.mjs` runs after it and fails on dynamic routes, route handlers, server actions, proxy, or a page missing from `out/`)
+  - `pnpm build` (`next build` with `output: 'export'` into `out/`; every route must be `○ Static`, and `scripts/check-static.mjs` runs after it and fails on dynamic routes, route handlers, server actions, proxy, or a page missing from `out/`. Before it, `scripts/strip-reading-js.mjs` removes the Next client scripts from `reading` pages: they have no client component, so hydration would only blow the TBT budget. Showcase pages keep theirs.)
   - `pnpm check:budgets` (per-page ceilings of `docs/spec/budgets.md` for every page in `PAGES`, read from `out/`; run `pnpm build` first)
   - `pnpm check:copy` (copy-lint over the visible text of every exported page: canonical definition equal to the Snapshot's, banned phrases, "GUI" only where Copy deck rule 3 allows it; the footer definition's "GUI" is a pinned exception until getoxide/oxide#416, see `GUI_EXCEPTION_DEFINITION` in `scripts/copy-lint.mjs`)
   - `pnpm check:concept-links` (the first capitalised mention of each Concepts term in `<main>` links to `/docs/concepts#<term>`; derived Markdown gets the links from `seenBefore` + `<Markdown conceptLinks>`, site copy places them by hand)
