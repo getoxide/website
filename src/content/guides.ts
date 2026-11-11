@@ -67,7 +67,7 @@ The closing message comes from the same model that wrote the code, so it repeats
         heading: "1. Read one Turn at a time",
         body: `A Turn is one prompt and everything the agent did in response. Reviewing per Turn keeps each diff small enough to read; in Oxide, Checkpoints make each Turn's diff exact ([Diff by Turn](/features#diff-by-turn)).
 
-A diff of the whole Thread hides the order of events: a change that looked reasonable in one prompt can quietly become a wrong direction by the third. Per Turn, you can see which instruction produced which lines, and stop a bad direction before the next prompt builds on it. If a Turn went the wrong way, Restore puts the files back to the Checkpoint from before it and leaves the rest alone.`,
+A diff of the whole Thread hides the order of events: a change that looked reasonable in one prompt can quietly become a wrong direction by the third. Per Turn, you can see which instruction produced which lines, and stop a bad direction before the next prompt builds on it. If a Turn went the wrong way, Restore puts the files back to the Checkpoint from before it and leaves the rest alone. What ran, and whether that run still covers the change, is the Verification Dossier's job.`,
       },
       {
         id: "check-what-actually-ran",
