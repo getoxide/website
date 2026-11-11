@@ -1,5 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { CAPTURE_SLOTS } from "./captures";
+import { PAGES } from "./pages";
 import { PROVIDER_PAGES } from "./provider-pages";
 
 // The Provider landing pages are checked against the Copy deck itself, an
@@ -70,5 +72,16 @@ describe("landing page copy", () => {
       const windows = copy.faq.find((q) => q.id === "windows")!;
       expect(windows.answer).toContain("⟨platforms⟩");
     }
+  });
+
+  it("each page shows a capture slot that exists", () => {
+    for (const copy of Object.values(PROVIDER_PAGES)) {
+      expect(Object.keys(CAPTURE_SLOTS)).toContain(copy.captureSlot);
+    }
+  });
+
+  it("both pages are showcase pages in the registry (Budgets, classes)", () => {
+    expect(PAGES.claudeCodeGui.budgetClass).toBe("showcase");
+    expect(PAGES.codexGui.budgetClass).toBe("showcase");
   });
 });
