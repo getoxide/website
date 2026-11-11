@@ -21,14 +21,14 @@ import {
   OUT_DIR,
   registry,
 } from "./exported-pages.mjs";
-import { stripsClientScripts } from "./strip-reading-js.mjs";
+import {
+  attrOf,
+  isNextScriptResource,
+  stripsClientScripts,
+  TAG,
+} from "./strip-reading-js.mjs";
 
-const SCRIPT_TAG = /<script\b[^>]*><\/script>/g;
-const NEXT_SRC = /\bsrc="(\/_next\/[^"]+)"/;
-const MODULE_PRELOAD =
-  /<link\b[^>]*\brel="preload"[^>]*\bas="script"[^>]*\bhref="\/_next\/[^"]*"[^>]*>/g;
-const MODULE_PRELOAD_REVERSED =
-  /<link\b[^>]*\bhref="\/_next\/[^"]*"[^>]*\bas="script"[^>]*>/g;
+const NEXT_SRC = "/_next/";
 const NO_MODULE = /\bno[Mm]odule\b/;
 
 /**
@@ -61,17 +61,17 @@ export function loader(sources) {
 export function deferClientScripts(html) {
   /** @type {string[]} */
   const sources = [];
-  const withoutScripts = html.replace(SCRIPT_TAG, (tag) => {
-    const src = tag.match(NEXT_SRC)?.[1];
-    if (!src || NO_MODULE.test(tag)) return tag;
-    sources.push(src);
-    return "";
+  const moved = html.replace(TAG, (tag) => {
+    if (/^<script/i.test(tag)) {
+      const src = attrOf(tag, "src");
+      if (!src?.startsWith(NEXT_SRC) || NO_MODULE.test(tag)) return tag;
+      sources.push(src);
+      return "";
+    }
+    return isNextScriptResource(tag) ? "" : tag;
   });
   if (sources.length === 0) return html;
-  const withoutPreloads = withoutScripts
-    .replace(MODULE_PRELOAD, "")
-    .replace(MODULE_PRELOAD_REVERSED, "");
-  return withoutPreloads.replace("</body>", `${loader(sources)}</body>`);
+  return moved.replace("</body>", `${loader(sources)}</body>`);
 }
 
 async function main() {
