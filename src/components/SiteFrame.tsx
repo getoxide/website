@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { Page } from "@/content/pages";
+import { SiteFooter } from "./SiteFooter";
 import { SiteHeader } from "./SiteHeader";
 import styles from "./SiteFrame.module.css";
 
@@ -22,7 +23,7 @@ export function SiteFrame({
       <main id="main" className={styles.main}>
         {children}
       </main>
-      <footer className={styles.footer} />
+      <SiteFooter path={page.path} />
     </>
   );
 }

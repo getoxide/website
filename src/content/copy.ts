@@ -25,6 +25,52 @@ export const COPY = {
     menu: "Menu",
   },
 
+  /**
+   * Site footer: columns, trust line and disclaimers verbatim from Page
+   * inventory (#9), Footer. The canonical definition block joins it with the
+   * content snapshot (#32).
+   */
+  footer: {
+    columns: [
+      {
+        heading: "Product",
+        links: [
+          { label: "Features", href: "/features" },
+          { label: "Download", href: "/download" },
+          { label: "Changelog", href: "/changelog" },
+          { label: "FAQ", href: "/faq" },
+        ],
+      },
+      {
+        heading: "Use with",
+        links: [
+          { label: "Claude Code", href: "/claude-code-gui" },
+          { label: "Codex", href: "/codex-gui" },
+        ],
+      },
+      {
+        heading: "Resources",
+        links: [
+          { label: "Docs", href: "/docs/quick-start" },
+          { label: "Guides", href: "/guides" },
+          { label: "GitHub", href: GITHUB_REPO_URL },
+          { label: "llms.txt", href: "/llms.txt" },
+        ],
+      },
+    ] satisfies { heading: string; links: Link[] }[],
+    trustLine: "Free and open source (MIT) · Local · No account · No telemetry",
+    repo: { label: "getoxide/oxide", href: GITHUB_REPO_URL },
+    notAffiliated: "Not affiliated with Oxide Computer Company",
+    trademarks:
+      "Claude Code, Codex and Antigravity are trademarks of their respective owners; Oxide is not affiliated with or endorsed by Anthropic, OpenAI or Google",
+    madeBy: {
+      label: "Made by Lorenzo Cavallini",
+      href: "https://cavallinilorenzo.com",
+    },
+    privacy: { label: "Privacy", href: "/privacy" },
+    licence: "Licence",
+  },
+
   /** Copy deck, Home → Hero (frozen). */
   hero: {
     subheadline:
