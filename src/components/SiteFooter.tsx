@@ -3,7 +3,7 @@ import { COPY, type Link } from "@/content/copy";
 import { isCurrent } from "@/lib/nav";
 import { LICENCE_URL } from "@/lib/oxide";
 import { token } from "@/lib/snapshot";
-import { Markdown } from "./Markdown";
+import { InlineMarkdown } from "./InlineMarkdown";
 import styles from "./SiteFooter.module.css";
 
 function FooterLink({ link, path }: { link: Link; path: string }) {
@@ -39,7 +39,7 @@ export function SiteFooter({ path }: { path: string }) {
     <footer className={styles.footer}>
       <div className={styles.inner}>
         <p className={styles.definition} data-testid="definition">
-          <Markdown source={token("definition")!} inline />
+          <InlineMarkdown source={token("definition")!} />
         </p>
         <div className={styles.columns}>
           {footer.columns.map((column) => (

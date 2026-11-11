@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { CodeBlock } from "./CodeBlock";
@@ -33,29 +32,15 @@ const pre: Components["pre"] = ({ node }) => {
 
 const COMPONENTS: Components = { pre };
 
-/** Inline mode drops the paragraph, for a definition inside a `<p>`. */
-const INLINE: Components = {
-  ...COMPONENTS,
-  p: ({ children }: { children?: ReactNode }) => <>{children}</>,
-};
-
 /**
  * Renders derived Markdown from the Snapshot (GitHub-flavoured: tables) to
  * static HTML at build time. Raw HTML in the source is not rendered. Style it
- * by wrapping it in `<Prose>`.
+ * by wrapping it in `<Prose>`; for a single inline paragraph use
+ * `<InlineMarkdown>`.
  */
-export function Markdown({
-  source,
-  inline = false,
-}: {
-  source: string;
-  inline?: boolean;
-}) {
+export function Markdown({ source }: { source: string }) {
   return (
-    <ReactMarkdown
-      remarkPlugins={[remarkGfm]}
-      components={inline ? INLINE : COMPONENTS}
-    >
+    <ReactMarkdown remarkPlugins={[remarkGfm]} components={COMPONENTS}>
       {source}
     </ReactMarkdown>
   );
