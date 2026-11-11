@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Browser, type Page } from "@playwright/test";
 import { fixtureOrigin, type Fixture } from "./ports";
 
@@ -279,3 +280,21 @@ test.describe("closing CTA primary", () => {
     });
   }
 });
+
+// Budgets, Accessibility, in the states the committed Snapshot cannot show.
+for (const fixture of ["stable", "prerelease-only", "unresolved"] as const) {
+  for (const [platform, ua] of [
+    ["mac", UA.mac],
+    ["windows", UA.windows],
+  ] as const) {
+    test(`axe: ${fixture} on ${platform} has no WCAG 2.2 A/AA violations`, async ({
+      browser,
+    }) => {
+      const page = await open(browser, fixture, { ua });
+      const results = await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+        .analyze();
+      expect(results.violations).toEqual([]);
+    });
+  }
+}
