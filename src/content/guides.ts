@@ -126,7 +126,7 @@ Every agent has habits: the files it reaches for, the tests it trusts, the edge 
       {
         id: "why-the-reviewer-works-blind",
         heading: "Why the reviewer works blind",
-        body: `The reviewer should see what the change is meant to do and what it actually does, and nothing about how the writer got there: that is a Blind review. A reviewer that reads the original conversation inherits its assumptions. Given only the diff and the issue, it judges the change on its own terms. That is a [Blind review](/features#blind-review).
+        body: `The reviewer should see what the change is meant to do and what it actually does, and nothing about how the writer got there. A reviewer that reads the original conversation inherits its assumptions. Given only the diff and the issue, it judges the change on its own terms. That is a [Blind review](/features#blind-review).
 
 The conversation is where the writer explained away the shortcuts, so a reviewer that reads it starts from the same conclusions. Blind, it has to reconstruct the intent from the issue and check whether the diff delivers it.`,
       },

@@ -107,6 +107,16 @@ describe.each(GUIDES.map((guide) => [guide.page.path, guide] as const))(
       });
     });
 
+    it("does not restate the locked Blind review sentence", () => {
+      const section = guide.sections.find(
+        (s) => s.id === "why-the-reviewer-works-blind",
+      );
+      if (!section) return;
+      expect(section.body.match(/Blind review/g), section.heading).toHaveLength(
+        1,
+      );
+    });
+
     it("gives every section an anchor id and running text", () => {
       for (const section of guide.sections) {
         expect(section.id, section.heading).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/);

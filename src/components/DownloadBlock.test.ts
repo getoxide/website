@@ -73,7 +73,7 @@ describe("DownloadBlock, only a test pre-release", () => {
     expect(textOf(html)).toContain(
       "This is a test pre-release: it never reaches the in-app updater. Build from source for the latest code.",
     );
-    expect(links(html)[2]).toEqual({
+    expect(links(html)[3]).toEqual({
       href: readmeUrl("build-from-source"),
       text: "Build from source",
     });
@@ -108,7 +108,18 @@ describe("DownloadBlock, stable release", () => {
       href: "/changelog",
       text: "Release notes",
     });
-    expect(links(html)).toHaveLength(3);
+    expect(links(html)).toHaveLength(4);
+  });
+
+  it("carries the ghost GitHub button beside the installers", () => {
+    expect(links(render("stable"))).toContainEqual({
+      href: "https://github.com/getoxide/oxide",
+      text: "View on GitHub",
+    });
+    expect(links(render("prerelease-only"))).toContainEqual({
+      href: "https://github.com/getoxide/oxide",
+      text: "View on GitHub",
+    });
   });
 
   it("ties each sublabel to its button", () => {
@@ -147,10 +158,12 @@ describe("DownloadBlock, click events (Measurement plan #16)", () => {
     expect(eventsOf(render("stable"))).toEqual([
       "download-macos-arm",
       "download-windows",
+      "github-cta",
     ]);
     expect(eventsOf(render("prerelease-only"))).toEqual([
       "download-macos-arm",
       "download-windows",
+      "github-cta",
     ]);
   });
 

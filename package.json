@@ -4,6 +4,9 @@
   "private": true,
   "type": "module",
   "packageManager": "pnpm@11.2.2",
+  "engines": {
+    "node": ">=22.18"
+  },
   "scripts": {
     "predev": "node scripts/build-captures.mjs && node scripts/build-machine.mjs",
     "dev": "next dev",

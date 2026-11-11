@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
+import { PAGES } from "@/content/pages";
 import { pageMetadata } from "./metadata";
+import { SHARE_CARD } from "./share";
 import type { Page } from "@/content/pages";
 
 const guide: Page = {
@@ -71,16 +73,20 @@ describe("pageMetadata", () => {
           width: 1200,
           height: 630,
           type: "image/png",
-          alt: "Oxide: The complete desktop app for agentic coding.",
+          alt: SHARE_CARD.alt,
         },
       ]);
       expect(pageMetadata(page).twitter?.images).toEqual([
         {
           url: "https://oxide.cavallinilorenzo.com/og.png",
-          alt: "Oxide: The complete desktop app for agentic coding.",
+          alt: SHARE_CARD.alt,
         },
       ]);
     }
+  });
+
+  it("derives the share-card alt from the hero H1", () => {
+    expect(SHARE_CARD.alt).toBe(`Oxide: ${PAGES.home.h1}`);
   });
 
   it("keeps non-indexable pages out of search and without a canonical", () => {

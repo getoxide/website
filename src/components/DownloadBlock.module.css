@@ -7,7 +7,13 @@
 .buttons {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: var(--site-space-4);
+}
+
+/* The ghost GitHub CTA sits beside the platform options in every state. */
+.github {
+  display: grid;
 }
 
 /* One platform button and its sublabel. The detected platform comes first:

@@ -102,6 +102,18 @@ export function DownloadBlock({
             </div>
           );
         })}
+        {/* Design system, Download block: a ghost GitHub button in every
+            Release state, not only while there is no release. */}
+        <div className={styles.github}>
+          <Button
+            href={GITHUB_REPO_URL}
+            variant="ghost"
+            icon="mark-github"
+            event="github-cta"
+          >
+            {COPY.hero.github}
+          </Button>
+        </div>
       </div>
       <p className={styles.line}>
         <DeckText

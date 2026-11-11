@@ -12,9 +12,17 @@ type HeaderRule = {
 
 const vercel = JSON.parse(
   readFileSync(new URL("../../vercel.json", import.meta.url), "utf8"),
-) as { headers?: HeaderRule[]; redirects?: unknown[] };
+) as {
+  buildCommand?: string;
+  headers?: HeaderRule[];
+  redirects?: unknown[];
+};
 
 describe("vercel.json", () => {
+  it("pins the build command to the same one CI and Vercel run", () => {
+    expect(vercel.buildCommand).toBe("pnpm build");
+  });
+
   it("answers X-Robots-Tag: noindex on every host but production", () => {
     const rules = (vercel.headers ?? []).filter((r) =>
       r.headers.some(
@@ -47,8 +55,19 @@ describe("vercel.json", () => {
 
   it("every redirect lands on a page of the PAGES registry", () => {
     const paths = new Set<string>(Object.values(PAGES).map((p) => p.path));
-    for (const r of (vercel.redirects ?? []) as { destination: string }[]) {
+    for (const r of (vercel.redirects ?? []) as {
+      source: string;
+      destination: string;
+    }[]) {
       expect(paths.has(r.destination), r.destination).toBe(true);
+    }
+  });
+
+  it("never shadows a published page with a redirect source", () => {
+    const paths = new Set<string>(Object.values(PAGES).map((p) => p.path));
+    for (const r of (vercel.redirects ?? []) as { source: string }[]) {
+      // A redirect on a registered path would hide a page that exists.
+      expect(paths.has(r.source), r.source).toBe(false);
     }
   });
 
