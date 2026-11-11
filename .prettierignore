@@ -11,3 +11,4 @@ public
 docs/spec
 # Synced verbatim from the Oxide repo by `pnpm sync:oxide`: never reformat.
 content/oxide
+out-fixtures

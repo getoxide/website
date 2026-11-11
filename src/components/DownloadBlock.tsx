@@ -1,5 +1,6 @@
 import { COPY, GITHUB_REPO_URL } from "@/content/copy";
 import { readmeUrl } from "@/lib/oxide";
+import { OS_SCRIPT } from "@/lib/os";
 import { SNAPSHOT, tokensOf, type Snapshot } from "@/lib/snapshot";
 import { Button, type ClickEvent } from "./Button";
 import { DeckText } from "./DeckText";
@@ -69,6 +70,9 @@ export function DownloadBlock({
     );
   return (
     <div className={styles.block}>
+      {/* Runs while the page is parsed, before the buttons below exist, so
+          they are ordered and styled at first paint (Download experience #13). */}
+      <script dangerouslySetInnerHTML={{ __html: OS_SCRIPT }} />
       <div className={styles.buttons}>
         {PLATFORMS.map((platform, i) => {
           const size = token(`asset-size:${platform}`);

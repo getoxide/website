@@ -2,6 +2,7 @@
 // fact the site states about Oxide comes from the committed Snapshot written by
 // `pnpm sync:oxide`; nothing here is typed by hand.
 import data from "../../content/oxide/snapshot.json";
+import releaseFixtures from "../../e2e/fixtures/releases.json";
 
 export type ReleaseState = "stable" | "prerelease-only" | "none";
 
@@ -58,8 +59,24 @@ export type Snapshot = {
   changelog: ChangelogEntry[];
 };
 
+/**
+ * Test exports only: `SITE_RELEASE_FIXTURE=<key>` swaps the Release for one
+ * of e2e/fixtures/releases.json, so Playwright can see every Release state
+ * (`scripts/build-fixtures.mjs`). A deploy never sets it, and Vercel refuses.
+ */
+function withReleaseFixture(snapshot: Snapshot): Snapshot {
+  const key = process.env.SITE_RELEASE_FIXTURE;
+  if (!key) return snapshot;
+  if (process.env.VERCEL) {
+    throw new Error("SITE_RELEASE_FIXTURE is for local test exports only");
+  }
+  const fixtures = releaseFixtures as Record<string, Snapshot["release"]>;
+  if (!fixtures[key]) throw new Error(`No release fixture "${key}"`);
+  return { ...snapshot, release: fixtures[key] };
+}
+
 /** The committed Snapshot. */
-export const SNAPSHOT = data as Snapshot;
+export const SNAPSHOT = withReleaseFixture(data as Snapshot);
 
 export type TokenName =
   | "definition"
