@@ -161,7 +161,7 @@ export const COPY = {
       paragraphs: [
         "This site counts page views with GoatCounter, without cookies. GoatCounter keeps aggregate counts only: no IP address and no visitor ID are stored, so a count never points back to you.",
         "Clicks on the download and GitHub buttons are counted the same way, as aggregate events. The real number of downloads comes from GitHub's own release statistics, not from this site.",
-        "GoatCounter is the only third party the site contacts. Fonts and images are served from this site, and there are no embeds or other analytics.",
+        "The site contacts no third party other than GoatCounter. Fonts and images are served from this site, and there are no embeds or other analytics.",
       ],
     },
   },
