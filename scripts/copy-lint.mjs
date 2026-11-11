@@ -49,21 +49,6 @@ const GUI_PAGES = new Set(["/claude-code-gui", "/codex-gui"]);
 const GUI_FAQ = { path: "/faq", section: "what-is-oxide" };
 const GUI = /\bGUIs?\b/i;
 
-/**
- * Temporary exception to the GUI rule, tracked in getoxide/oxide#416.
- *
- * The canonical definition is Derived from the Oxide README and may not be
- * reworded (Copy deck rule 1), yet it says "desktop GUI" and renders in the
- * footer of every page. getoxide/oxide#416 rewrites it without "GUI". Until
- * then, this exact Snapshot text, and only it, may say "GUI" outside the
- * three places of rule 3. Any other definition text, including the next one
- * from the Snapshot, gets no exception: when #416 lands and `pnpm sync:oxide`
- * brings the new text, delete this constant (`pnpm check:copy` warns when it
- * no longer matches the Snapshot).
- */
-export const GUI_EXCEPTION_DEFINITION =
-  "Oxide is a free, open-source **desktop GUI for AI coding agents**, built with Rust and [Tauri](https://tauri.app). It doesn't ship an agent of its own: it drives the agent CLIs you already have installed and logged in (**Claude Code**, **OpenAI Codex** and **Antigravity CLI**) and puts Git, GitHub, a code editor and a terminal around the conversation.";
-
 /** The visible text of a line of Markdown: marks and link targets dropped. */
 export { markdownText };
 
@@ -109,10 +94,8 @@ export function lintCopy({ path, html, definition }) {
     const skip = (node) =>
       path === GUI_FAQ.path &&
       attrOf(node, "aria-labelledby") === GUI_FAQ.section;
-    const exempt = definition === GUI_EXCEPTION_DEFINITION ? canonical : null;
     for (const block of blocksOf(document, skip)) {
-      const checked = exempt ? block.replaceAll(exempt, "") : block;
-      if (GUI.test(checked)) {
+      if (GUI.test(block)) {
         violations.push(
           `${path}: "GUI" outside /claude-code-gui, /codex-gui and /faq#what-is-oxide in "${block}"`,
         );
@@ -128,11 +111,6 @@ async function main() {
   const violations = pages.flatMap(({ path, html }) =>
     lintCopy({ path, html, definition }),
   );
-  if (definition !== GUI_EXCEPTION_DEFINITION) {
-    console.warn(
-      "Warning: the Snapshot's definition no longer matches GUI_EXCEPTION_DEFINITION in scripts/copy-lint.mjs, so the getoxide/oxide#416 exception no longer applies: delete it.",
-    );
-  }
   if (violations.length > 0) {
     console.error(
       "copy-lint failed (Copy deck, Rules every string here follows):",
