@@ -17,7 +17,9 @@
   margin: 0;
 }
 
-.page a {
+.byoa a,
+.notes a,
+.question a {
   color: var(--ox-text-accent);
 }
 
