@@ -1,5 +1,18 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { buildIco, checkSnapshot, syncOxide } from "./sync-oxide.mjs";
+
+describe("the committed Snapshot", () => {
+  it("has every expected key", () => {
+    const committed = JSON.parse(
+      readFileSync(
+        new URL("../content/oxide/snapshot.json", import.meta.url),
+        "utf8",
+      ),
+    );
+    expect(() => checkSnapshot(committed)).not.toThrow();
+  });
+});
 
 /** A stand-in PNG: the signature and an IHDR chunk carrying the size. */
 function fakePng(size, filler = 0) {
