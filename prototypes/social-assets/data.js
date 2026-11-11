@@ -1,7 +1,18 @@
 // PROTOTYPE data. Strings are copied from docs/spec/copy.md (locked); the real build reads them from PAGES.
 export const HOST = "oxide.cavallinilorenzo.com";
 export const SITE_NAME = "Oxide";
-export const HERO = "Agentic coding, from prompt to merge.";
+export const HERO = "Agentic coding, from prompt to merge."; // rejected by Lorenzo, kept for /-page data only
+
+// Round 2: headline candidates for the B card (and the hero). Proposals, not locked copy.
+export const HEADLINES = [
+  { id: "1", angle: "What the agent did", text: "See what your coding agents actually did." },
+  { id: "2", angle: "What was checked", text: "Know what was checked before you merge." },
+  { id: "3", angle: "Who decides", text: "Your agents write the code. You decide what merges." },
+  { id: "4", angle: "Name the agents", text: "Claude Code and Codex, in one desktop app." },
+  { id: "5", angle: "One window", text: "One window for every coding agent you use." },
+  { id: "6", angle: "Review before it lands", text: "Review every agent change before it lands." },
+];
+export const PRODUCT_LINE = "Desktop app for Claude Code, Codex and Antigravity CLI";
 
 export const PAGES = [
   { path: "/", h1: HERO, title: "Oxide: the desktop app for Claude Code and Codex",

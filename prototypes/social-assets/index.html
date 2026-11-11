@@ -1,7 +1,8 @@
 <!doctype html>
 <!--
   PROTOTYPE · throwaway · getoxide/website#23 "Social and share assets".
-  Four card variants (A Plate, B Passivation, C Page title, D Capture) switchable via ?variant=,
+  Round 2: card B chosen; the bottom bar now cycles headline candidates (?copy=1..6, ?sub=1 adds a product line).
+  Four card variants (A Plate, B Passivation, C Page title, D Capture) still selectable via ?variant=,
   shown full size and inside approximate unfurl mocks; icon options via ?icons=; page via ?page=.
   Run: pnpm proto:social  →  http://localhost:4312/   (re-render PNGs: pnpm proto:social:render)
 -->
@@ -17,6 +18,8 @@
 <body>
 <header class="bar">
   <strong>PROTOTYPE · Social and share assets</strong>
+  <label>Card <select id="card"><option value="A">A · Plate</option><option value="B">B · Passivation</option><option value="C">C · Page title</option><option value="D">D · Capture</option></select></label>
+  <label class="tick" style="margin:0;color:inherit"><input type="checkbox" id="sub"> product line under the headline</label>
   <label>Page <select id="page"></select></label>
   <label>og:title <select id="mode">
     <option value="bare">&lt;title&gt; without “ · Oxide”</option>
@@ -39,7 +42,7 @@
   </section>
 
   <section>
-    <h2>2 · Pasted in a feed <small>approximate mocks, real proportions; text is og:title / og:description</small></h2>
+    <h2>2 · Pasted in a feed <small>approximate mocks, real proportions; og:title / og:description below the image are still the OLD copy deck, to be rewritten</small></h2>
     <div id="feeds" class="feeds"></div>
   </section>
 
@@ -57,10 +60,10 @@
   </section>
 </main>
 
-<nav class="switcher" aria-label="Prototype variant">
-  <button type="button" data-dir="-1" aria-label="Previous variant">←</button>
+<nav class="switcher" aria-label="Headline candidate">
+  <button type="button" data-dir="-1" aria-label="Previous headline">←</button>
   <output></output>
-  <button type="button" data-dir="1" aria-label="Next variant">→</button>
+  <button type="button" data-dir="1" aria-label="Next headline">→</button>
 </nav>
 <script type="module" src="app.js"></script>
 </body>

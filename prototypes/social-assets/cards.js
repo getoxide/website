@@ -1,5 +1,5 @@
 // PROTOTYPE: the four card designs, each a 1200×630 DOM node. render.py screenshots them to PNG.
-import { HOST, HERO, PAGES } from "./data.js";
+import { HOST, HEADLINES, PAGES, PRODUCT_LINE } from "./data.js";
 
 export const VARIANTS = {
   A: { name: "Plate", scope: "site-wide", how: "static file, committed", shader: false },
@@ -20,24 +20,25 @@ function sizeFor(text) {
 }
 
 const builders = {
-  A: () => `
+  A: (page, o) => `
     <div class="k k-a">
       <div class="k-a__top">${LOGO}</div>
-      <h1 class="k-a__h">${esc(HERO)}</h1>
+      <h1 class="k-a__h">${esc(o.hero)}</h1>
       <p class="k-a__host">${HOST}</p>
     </div>`,
 
-  B: () => `
+  B: (page, o) => `
     <div class="k k-b">
       <div class="k-shader"></div>
       <div class="k-b__in">
         ${MARK}
-        <h1 class="k-b__h">${esc(HERO)}</h1>
+        <h1 class="k-b__h">${esc(o.hero)}</h1>
+        ${o.sub ? `<p class="k-b__sub">${PRODUCT_LINE}</p>` : ""}
       </div>
     </div>`,
 
-  C: (page) => {
-    const h = page.path === "/" ? HERO : page.h1;
+  C: (page, o) => {
+    const h = page.path === "/" ? o.hero : page.h1;
     const path = page.path === "/" ? "" : page.path;
     return `
     <div class="k k-c">
@@ -48,26 +49,27 @@ const builders = {
     </div>`;
   },
 
-  D: () => `
+  D: (page, o) => `
     <div class="k k-d">
       <div class="k-shader"></div>
-      <div class="k-d__head">${MARK}<h1 class="k-d__h">${esc(HERO)}</h1></div>
+      <div class="k-d__head">${MARK}<h1 class="k-d__h">${esc(o.hero)}</h1></div>
       <div class="k-d__frame"><img src="assets/oxide-capture@1x.png" alt=""></div>
     </div>`,
 };
 
 /** Returns a fresh 1200×630 card element. */
-export function card(variant, page = PAGES[0]) {
+export function card(variant, page = PAGES[0], o = {}) {
+  o = { hero: HEADLINES[0].text, ...o };
   const t = document.createElement("template");
-  t.innerHTML = builders[variant](page).trim();
+  t.innerHTML = builders[variant](page, o).trim();
   return t.content.firstElementChild;
 }
 
 /** Wraps a card scaled to `width` CSS px. `crop: "square"` centre-crops like WhatsApp/Telegram thumbnails. */
-export function scaled(variant, page, width, { crop } = {}) {
+export function scaled(variant, page, width, { crop, ...o } = {}) {
   const box = document.createElement("div");
   box.className = "k-box";
-  const el = card(variant, page);
+  const el = card(variant, page, o);
   if (crop === "square") {
     const s = width / 630;
     box.style.cssText = `width:${width}px;height:${width}px`;

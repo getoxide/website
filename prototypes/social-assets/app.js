@@ -1,6 +1,6 @@
 // PROTOTYPE wiring: variant switcher, controls, mocks, icon set, state panel.
 import { VARIANTS, scaled } from "./cards.js";
-import { HOST, SITE_NAME, HERO, PAGES, ogTitle, slug } from "./data.js";
+import { HOST, SITE_NAME, HEADLINES, PAGES, ogTitle, slug } from "./data.js";
 
 const ORDER = Object.keys(VARIANTS);
 const $ = (s) => document.querySelector(s);
@@ -17,12 +17,15 @@ const ICONS = {
 };
 
 let sizes = null;
-const state = { variant: "A", page: "/", mode: "bare", theme: "dark", icons: "I1", guides: true };
+const state = { variant: "B", copy: "1", sub: "0", page: "/", mode: "bare", theme: "dark", icons: "I1", guides: true };
+const headline = () => HEADLINES.find((h) => h.id === state.copy);
 
 function readUrl() {
   const q = new URLSearchParams(location.search);
-  const v = (q.get("variant") || "A").toUpperCase();
-  state.variant = ORDER.includes(v) ? v : "A";
+  const v = (q.get("variant") || "B").toUpperCase();
+  state.variant = ORDER.includes(v) ? v : "B";
+  state.copy = HEADLINES.some((h) => h.id === q.get("copy")) ? q.get("copy") : "1";
+  state.sub = q.get("sub") === "1" ? "1" : "0";
   state.page = PAGES.some((p) => p.path === q.get("page")) ? q.get("page") : "/";
   state.mode = ["bare", "full", "h1"].includes(q.get("mode")) ? q.get("mode") : "bare";
   state.theme = q.get("theme") === "light" ? "light" : "dark";
@@ -31,7 +34,7 @@ function readUrl() {
 function writeUrl() {
   const u = new URL(location.href);
   u.search = "";
-  for (const k of ["variant", "page", "mode", "theme", "icons"]) u.searchParams.set(k, state[k]);
+  for (const k of ["variant", "copy", "sub", "page", "mode", "theme", "icons"]) u.searchParams.set(k, state[k]);
   history.replaceState(null, "", u);
 }
 
@@ -39,7 +42,7 @@ function imageUrl(page) {
   return state.variant === "C" ? `https://${HOST}/og/${slug(page.path)}.png` : `https://${HOST}/og.png`;
 }
 function imageAlt(page) {
-  return state.variant === "C" && page.path !== "/" ? page.h1 : `Oxide: ${HERO}`;
+  return state.variant === "C" && page.path !== "/" ? page.h1 : `Oxide: ${headline().text}`;
 }
 
 function render() {
@@ -48,12 +51,14 @@ function render() {
   const title = ogTitle(page, state.mode), desc = page.desc;
   const url = `${HOST}${page.path === "/" ? "" : page.path}`;
   document.body.classList.toggle("light", state.theme === "light");
-  $(".switcher output").textContent = `${v} · ${meta.name} — ${meta.scope}`;
-  for (const [id, val] of [["page", state.page], ["mode", state.mode], ["theme", state.theme], ["icons", state.icons]]) $(`#${id}`).value = val;
+  const hl = headline(), opts = { hero: hl.text, sub: state.sub === "1" };
+  $(".switcher output").textContent = `Headline ${hl.id}/${HEADLINES.length} · ${hl.angle}`;
+  $("#sub").checked = state.sub === "1";
+  for (const [id, val] of [["card", state.variant], ["page", state.page], ["mode", state.mode], ["theme", state.theme], ["icons", state.icons]]) $(`#${id}`).value = val;
 
   // 1 · full card
   const full = $("#full");
-  full.replaceChildren(scaled(v, page, Math.min(1200, innerWidth - 48)));
+  full.replaceChildren(scaled(v, page, Math.min(1200, innerWidth - 48), opts));
   full.insertAdjacentHTML("beforeend", `<div class="guide guide--sq" style="left:${(285 / 1200) * 100}%;right:${(285 / 1200) * 100}%"></div><div class="guide guide--x"></div>`);
   full.classList.toggle("show-guides", state.guides);
   const sz = sizes?.[v]?.[v === "C" ? slug(page.path) : "home"];
@@ -70,7 +75,7 @@ function render() {
     <div class="feed"><h3>Discord</h3><div class="disc"><div class="site">${SITE_NAME}</div><div class="t">${esc(title)}</div><div class="d clamp3">${esc(desc)}</div><div class="slot" data-w="400"></div></div></div>
     <div class="feed"><h3>WhatsApp · small preview (centre crop)</h3><div class="wa"><div class="prev"><div class="slot" data-w="88" data-crop="square"></div><div class="txt"><div class="t clamp2">${esc(title)}</div><div class="d clamp2">${esc(desc)}</div><div class="dom">${HOST}</div></div></div><div class="link">https://${url}</div></div></div>
     <div class="feed"><h3>Google Search · uses &lt;title&gt;, favicon (no SVG), WebSite name</h3><div class="serp"><div class="row"><div class="fav"><img src="${ic.png}" alt=""></div><div><div class="name">${SITE_NAME}</div><div class="url">https://${HOST}${page.path === "/" ? "" : " › " + page.path.slice(1).split("/").join(" › ")}</div></div></div><div class="t">${esc(page.title)}</div><div class="d clamp2">${esc(desc)}</div></div></div>`;
-  for (const slot of feeds.querySelectorAll(".slot")) slot.replaceWith(scaled(v, page, Number(slot.dataset.w), { crop: slot.dataset.crop }));
+  for (const slot of feeds.querySelectorAll(".slot")) slot.replaceWith(scaled(v, page, Number(slot.dataset.w), { crop: slot.dataset.crop, ...opts }));
 
   // 3 · icons
   $("#iconmeta").textContent = `${state.icons} · ${ic.name}`;
@@ -114,10 +119,12 @@ function render() {
 }
 
 function set(k, val) { state[k] = val; writeUrl(); render(); }
-function step(dir) { set("variant", ORDER[(ORDER.indexOf(state.variant) + dir + ORDER.length) % ORDER.length]); }
+function step(dir) { const i = HEADLINES.findIndex((h) => h.id === state.copy); set("copy", HEADLINES[(i + dir + HEADLINES.length) % HEADLINES.length].id); }
 
 $("#page").innerHTML = PAGES.map((p) => `<option value="${p.path}">${p.path}</option>`).join("");
 for (const id of ["page", "mode", "theme", "icons"]) $(`#${id}`).addEventListener("change", (e) => set(id, e.target.value));
+$("#card").addEventListener("change", (e) => set("variant", e.target.value));
+$("#sub").addEventListener("change", (e) => set("sub", e.target.checked ? "1" : "0"));
 $("#guides").addEventListener("change", (e) => { state.guides = e.target.checked; render(); });
 document.querySelectorAll(".switcher button").forEach((b) => b.addEventListener("click", () => step(+b.dataset.dir)));
 addEventListener("keydown", (e) => {
