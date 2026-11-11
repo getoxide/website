@@ -84,8 +84,8 @@ for (const { page: entry, copy } of LANDING) {
       for (const required of REQUIRED_LINKS) expect(hrefs).toContain(required);
       for (const href of new Set(hrefs)) {
         const { pathname, hash } = new URL(href, "http://localhost");
-        // The guides ship in #42: their links are asserted above, and are
-        // followed once their routes are registered.
+        // Only registered routes are followed: a route that ships in a
+        // sibling ticket is asserted by its href above until it registers.
         if (!registered.has(pathname)) continue;
         const res = await page.request.get(pathname);
         expect(res.status(), href).toBe(200);
