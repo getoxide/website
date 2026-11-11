@@ -9,7 +9,12 @@ for (const page of REGISTERED) {
   }) => {
     const withJs = await browser.newPage();
     await withJs.goto(urlOf(page));
-    const expected = await withJs.locator("body").innerText();
+    // The hero's "Pause animation" toggle is a JavaScript-only control, not
+    // content (ticket #39): it exists only once JavaScript runs.
+    const expected = (await withJs.locator("body").innerText()).replace(
+      /^(Pause|Play) animation\n/m,
+      "",
+    );
 
     const context = await browser.newContext({ javaScriptEnabled: false });
     const noJs = await context.newPage();
