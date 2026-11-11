@@ -148,6 +148,133 @@ export function extractConcepts(glossary) {
   return { concepts, unlisted };
 }
 
+/** GitHub's page listing every Oxide release. */
+export const RELEASES_URL = `https://github.com/${OXIDE_REPO}/releases`;
+
+/**
+ * The two installers the site links to, and the platform each one means
+ * (Copy deck, Tokens: `⟨platforms⟩`).
+ */
+const INSTALLERS = [
+  { key: "macos", suffix: "_aarch64.dmg", platform: "macOS on Apple Silicon" },
+  { key: "windows", suffix: "_x64-setup.exe", platform: "Windows x64" },
+];
+
+/** Release notes sections the changelog keeps (Content #12, Changelog). */
+const NOTE_SECTIONS = [
+  ["breaking", "Breaking changes"],
+  ["features", "Features"],
+  ["fixes", "Fixes"],
+];
+
+const STABLE_TAG = /^v\d+\.\d+\.\d+$/;
+
+const isStable = (r) =>
+  !r.draft && !r.prerelease && STABLE_TAG.test(r.tag_name);
+
+/** One `### <name>` section of release notes, up to the next heading or the
+ * "**Full changelog:**" line; `null` when the notes have none. */
+function noteSection(body, name) {
+  const lines = (body ?? "").replace(/\r\n/g, "\n").split("\n");
+  const start = lines.findIndex((l) => l.trim() === `### ${name}`);
+  if (start === -1) return null;
+  const section = [];
+  for (const line of lines.slice(start + 1)) {
+    if (
+      /^#{1,3} /.test(line) ||
+      /^\*\*Full (changelog|history):\*\*/.test(line)
+    ) {
+      break;
+    }
+    section.push(line);
+  }
+  return section.join("\n").trim() || null;
+}
+
+/** The exact installer asset of a release, or the release page instead. */
+function installer(release, version, { suffix }) {
+  const name = `Oxide_${version}${suffix}`;
+  const asset = release.assets?.find((a) => a.name === name);
+  return asset
+    ? { name, url: asset.browser_download_url, size: asset.size }
+    : { name: null, url: release.html_url, size: null };
+}
+
+/** Platforms named by the README Install table (`site:install`). */
+function readmePlatforms(install) {
+  const platforms = INSTALLERS.filter((i) =>
+    install.split("\n").some((row) => row.includes(i.suffix)),
+  ).map((i) => i.platform);
+  if (platforms.length === 0) {
+    throw new Error("README Install table names no known platform installer");
+  }
+  return platforms;
+}
+
+/**
+ * Release state, latest release, platforms and the stable-only changelog,
+ * from the GitHub Releases API (`GET /repos/{repo}/releases`).
+ * @param {any[]} releases
+ * @param {{ install: string }} readme the `site:install` section
+ */
+export function releaseData(releases, { install }) {
+  const published = releases
+    .filter((r) => !r.draft)
+    .sort((a, b) => b.published_at.localeCompare(a.published_at));
+  const stable = published.filter(isStable);
+  const newest = stable[0] ?? published[0] ?? null;
+  const state = stable.length
+    ? "stable"
+    : published.length
+      ? "prerelease-only"
+      : "none";
+
+  let latest = null;
+  let platforms = readmePlatforms(install);
+  let platformsFrom = "readme";
+  if (newest) {
+    const version = newest.tag_name.replace(/^v/, "");
+    const assets = Object.fromEntries(
+      INSTALLERS.map((i) => [i.key, installer(newest, version, i)]),
+    );
+    latest = {
+      version,
+      tag: newest.tag_name,
+      date: newest.published_at.slice(0, 10),
+      url: newest.html_url,
+      prerelease: !isStable(newest),
+      assets,
+    };
+    const shipped = INSTALLERS.filter((i) => assets[i.key].name !== null);
+    if (shipped.length) {
+      platforms = shipped.map((i) => i.platform);
+      platformsFrom = "release";
+    }
+  }
+
+  const changelog = stable.map((r) => ({
+    version: r.tag_name.replace(/^v/, ""),
+    tag: r.tag_name,
+    date: r.published_at.slice(0, 10),
+    url: r.html_url,
+    ...Object.fromEntries(
+      NOTE_SECTIONS.map(([key, name]) => [key, noteSection(r.body, name)]),
+    ),
+  }));
+
+  return {
+    stableTag: stable[0]?.tag_name ?? null,
+    release: {
+      state,
+      releasesUrl: RELEASES_URL,
+      latest,
+      platforms,
+      platformsFrom,
+    },
+    changelog,
+  };
+}
+
 /**
  * Fetches the brand files at `ref` and writes them into the site.
  * @param {{

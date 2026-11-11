@@ -1,5 +1,230 @@
 import { describe, expect, it } from "vitest";
-import { extractConcepts, extractSection } from "./sync-oxide.mjs";
+import { extractConcepts, extractSection, releaseData } from "./sync-oxide.mjs";
+
+const INSTALL = `| Platform | File | Notes |
+| --- | --- | --- |
+| macOS (Apple Silicon) | \`Oxide_<version>_aarch64.dmg\` | Drag \`Oxide.app\` into \`/Applications\`. |
+| Windows 10/11 (x64) | \`Oxide_<version>_x64-setup.exe\` | Includes CPU and GPU dictation. |`;
+
+const DL = "https://github.com/getoxide/oxide/releases/download";
+const PAGE = "https://github.com/getoxide/oxide/releases/tag";
+
+/** A GitHub Releases API entry, as `GET /repos/{repo}/releases` returns it. */
+function release(tag, { prerelease = false, assets, body = "", date } = {}) {
+  const version = tag.replace(/^v/, "");
+  return {
+    tag_name: tag,
+    name: `Oxide ${version}`,
+    draft: false,
+    prerelease,
+    published_at: date ?? "2026-12-01T09:30:00Z",
+    html_url: `${PAGE}/${tag}`,
+    body,
+    assets: (
+      assets ?? [
+        [`Oxide_${version}_aarch64.dmg`, 101_234_567],
+        [`Oxide_${version}_aarch64.app.tar.gz`, 99_000_000],
+        [`Oxide_${version}_x64-setup.exe`, 88_765_432],
+        ["latest.json", 1_234],
+        ["SHA256SUMS.txt", 900],
+      ]
+    ).map(([name, size]) => ({
+      name,
+      size,
+      browser_download_url: `${DL}/${tag}/${name}`,
+    })),
+  };
+}
+
+const NOTES = `### Breaking changes
+
+- **core:** drop the old Transcript format ([#501](https://github.com/getoxide/oxide/pull/501))
+
+### Features
+
+- **diff:** Turn scope for worktrees ([#498](https://github.com/getoxide/oxide/pull/498))
+- Line comments on deleted lines
+
+### Fixes
+
+- **terminal:** keep the cwd after a restart
+
+### Dependencies
+
+- bump tauri to 2.9
+
+**Full changelog:** https://github.com/getoxide/oxide/compare/v1.0.0...v1.1.0
+
+### Platform signing
+
+- macOS: ad-hoc signed.
+`;
+
+describe("releaseData", () => {
+  it("no release: state none, platforms from the README Install table, no changelog", () => {
+    const data = releaseData([], { install: INSTALL });
+    expect(data.release).toEqual({
+      state: "none",
+      releasesUrl: "https://github.com/getoxide/oxide/releases",
+      latest: null,
+      platforms: ["macOS on Apple Silicon", "Windows x64"],
+      platformsFrom: "readme",
+    });
+    expect(data.changelog).toEqual([]);
+    expect(data.stableTag).toBeNull();
+  });
+
+  it("only a release candidate: state prerelease-only, the candidate as latest, no changelog", () => {
+    const data = releaseData(
+      [
+        release("v1.0.0-rc.1", {
+          prerelease: true,
+          date: "2026-11-20T08:00:00Z",
+        }),
+      ],
+      { install: INSTALL },
+    );
+    expect(data.release.state).toBe("prerelease-only");
+    expect(data.release.latest).toEqual({
+      version: "1.0.0-rc.1",
+      tag: "v1.0.0-rc.1",
+      date: "2026-11-20",
+      url: `${PAGE}/v1.0.0-rc.1`,
+      prerelease: true,
+      assets: {
+        macos: {
+          name: "Oxide_1.0.0-rc.1_aarch64.dmg",
+          url: `${DL}/v1.0.0-rc.1/Oxide_1.0.0-rc.1_aarch64.dmg`,
+          size: 101_234_567,
+        },
+        windows: {
+          name: "Oxide_1.0.0-rc.1_x64-setup.exe",
+          url: `${DL}/v1.0.0-rc.1/Oxide_1.0.0-rc.1_x64-setup.exe`,
+          size: 88_765_432,
+        },
+      },
+    });
+    expect(data.release.platforms).toEqual([
+      "macOS on Apple Silicon",
+      "Windows x64",
+    ]);
+    expect(data.release.platformsFrom).toBe("release");
+    expect(data.changelog).toEqual([]);
+    expect(data.stableTag).toBeNull();
+  });
+
+  it("stable: the newest stable release wins over a newer candidate and older stables", () => {
+    const data = releaseData(
+      [
+        release("v1.2.0-rc.1", {
+          prerelease: true,
+          date: "2026-12-20T00:00:00Z",
+        }),
+        release("v1.1.0", { body: NOTES, date: "2026-12-10T00:00:00Z" }),
+        release("v1.0.0", {
+          body: "No changes since v1.0.0-rc.1.\n\n**Full changelog:** x\n",
+          date: "2026-12-01T00:00:00Z",
+        }),
+        release("v1.0.0-rc.1", {
+          prerelease: true,
+          date: "2026-11-20T00:00:00Z",
+        }),
+      ],
+      { install: INSTALL },
+    );
+    expect(data.release.state).toBe("stable");
+    expect(data.stableTag).toBe("v1.1.0");
+    expect(data.release.latest?.version).toBe("1.1.0");
+    expect(data.release.latest?.date).toBe("2026-12-10");
+    expect(data.release.latest?.prerelease).toBe(false);
+    expect(data.release.latest?.assets.windows.size).toBe(88_765_432);
+  });
+
+  it("the changelog lists stable releases only, newest first, with Breaking, Features and Fixes", () => {
+    const { changelog } = releaseData(
+      [
+        release("v1.2.0-rc.1", { prerelease: true }),
+        release("v1.1.0", { body: NOTES, date: "2026-12-10T00:00:00Z" }),
+        release("v1.0.0", {
+          body: "No changes.\n\n**Full history:** x\n",
+          date: "2026-12-01T00:00:00Z",
+        }),
+      ],
+      { install: INSTALL },
+    );
+    expect(changelog).toEqual([
+      {
+        version: "1.1.0",
+        tag: "v1.1.0",
+        date: "2026-12-10",
+        url: `${PAGE}/v1.1.0`,
+        breaking:
+          "- **core:** drop the old Transcript format ([#501](https://github.com/getoxide/oxide/pull/501))",
+        features:
+          "- **diff:** Turn scope for worktrees ([#498](https://github.com/getoxide/oxide/pull/498))\n- Line comments on deleted lines",
+        fixes: "- **terminal:** keep the cwd after a restart",
+      },
+      {
+        version: "1.0.0",
+        tag: "v1.0.0",
+        date: "2026-12-01",
+        url: `${PAGE}/v1.0.0`,
+        breaking: null,
+        features: null,
+        fixes: null,
+      },
+    ]);
+  });
+
+  it("ignores drafts and treats a -rc tag as a pre-release even if not flagged", () => {
+    const draft = { ...release("v2.0.0"), draft: true };
+    const data = releaseData([draft, release("v1.0.0-rc.2")], {
+      install: INSTALL,
+    });
+    expect(data.release.state).toBe("prerelease-only");
+    expect(data.release.latest?.tag).toBe("v1.0.0-rc.2");
+  });
+
+  it("an asset it cannot resolve falls back to the release page", () => {
+    const data = releaseData(
+      [
+        release("v1.0.0", {
+          assets: [
+            ["Oxide_1.0.0_aarch64.dmg", 101],
+            ["Oxide_0.9.0_x64-setup.exe", 88],
+          ],
+        }),
+      ],
+      { install: INSTALL },
+    );
+    expect(data.release.latest?.assets).toEqual({
+      macos: {
+        name: "Oxide_1.0.0_aarch64.dmg",
+        url: `${DL}/v1.0.0/Oxide_1.0.0_aarch64.dmg`,
+        size: 101,
+      },
+      windows: { name: null, url: `${PAGE}/v1.0.0`, size: null },
+    });
+    // Platforms follow the assets the release actually ships.
+    expect(data.release.platforms).toEqual(["macOS on Apple Silicon"]);
+    expect(data.release.platformsFrom).toBe("release");
+  });
+
+  it("a release with no installer at all keeps the README platforms", () => {
+    const data = releaseData([release("v1.0.0", { assets: [] })], {
+      install: INSTALL,
+    });
+    expect(data.release.platforms).toEqual([
+      "macOS on Apple Silicon",
+      "Windows x64",
+    ]);
+    expect(data.release.platformsFrom).toBe("readme");
+  });
+
+  it("fails when the README Install table names no known installer", () => {
+    expect(() => releaseData([], { install: "| a | b |" })).toThrow(/platform/);
+  });
+});
 
 const GLOSSARY = `# Oxide
 
