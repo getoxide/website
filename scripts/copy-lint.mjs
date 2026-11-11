@@ -4,6 +4,12 @@
 // so the inline RSC payload and `href`s never count.
 import { fileURLToPath } from "node:url";
 import { parse } from "parse5";
+import {
+  OUT_DIR,
+  exportedPages,
+  registry,
+  snapshot,
+} from "./exported-pages.mjs";
 
 /** Elements whose content is never visible text. */
 const INVISIBLE = new Set(["head", "script", "style", "template", "noscript"]);
@@ -163,3 +169,26 @@ export function lintCopy({ path, html, definition }) {
   }
   return violations;
 }
+
+async function main() {
+  const { definition } = (await snapshot()).readme;
+  const pages = exportedPages(OUT_DIR, await registry());
+  const violations = pages.flatMap(({ path, html }) =>
+    lintCopy({ path, html, definition }),
+  );
+  if (definition !== GUI_EXCEPTION_DEFINITION) {
+    console.warn(
+      "Warning: the Snapshot's definition no longer matches GUI_EXCEPTION_DEFINITION in scripts/copy-lint.mjs, so the getoxide/oxide#416 exception no longer applies: delete it.",
+    );
+  }
+  if (violations.length > 0) {
+    console.error(
+      "copy-lint failed (Copy deck, Rules every string here follows):",
+    );
+    for (const v of violations) console.error(`  - ${v}`);
+    process.exit(1);
+  }
+  console.log(`copy-lint passed: ${pages.length} pages.`);
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) await main();

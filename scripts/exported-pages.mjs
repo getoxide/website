@@ -35,6 +35,12 @@ export function readerOf(outDir) {
   return (src) => readFileSync(join(outDir, new URL(src, "http://x").pathname));
 }
 
+/** The committed content Snapshot (ADR-0003). */
+export async function snapshot() {
+  const file = new URL("../content/oxide/snapshot.json", import.meta.url);
+  return JSON.parse(readFileSync(file, "utf8"));
+}
+
 /** The PAGES registry, read from its TypeScript source (Node strips types). */
 export async function registry() {
   const { PAGES } = await import("../src/content/pages.ts");
