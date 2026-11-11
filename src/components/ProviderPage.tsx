@@ -49,17 +49,23 @@ export function ProviderPage({
         {copy.sections.map(({ id, heading, paragraphs }, i) => (
           <Reveal key={id} className={styles.section}>
             <section aria-labelledby={id}>
-              <AnchoredHeading id={id} label={COPY.anchorLabel(heading)}>
-                {heading}
-              </AnchoredHeading>
-              <Prose>
-                {paragraphs.map((p) => (
-                  <p key={p}>
-                    <DeckText source={p} conceptLinks={seen[n++]} />
-                  </p>
-                ))}
-              </Prose>
-              {i === 0 ? <Capture slot={copy.captureSlot} /> : null}
+              <div className={styles.text}>
+                <AnchoredHeading id={id} label={COPY.anchorLabel(heading)}>
+                  {heading}
+                </AnchoredHeading>
+                <Prose>
+                  {paragraphs.map((p) => (
+                    <p key={p}>
+                      <DeckText source={p} conceptLinks={seen[n++]} />
+                    </p>
+                  ))}
+                </Prose>
+              </div>
+              {i === 0 ? (
+                <div className={styles.capture}>
+                  <Capture slot={copy.captureSlot} />
+                </div>
+              ) : null}
             </section>
           </Reveal>
         ))}
