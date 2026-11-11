@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildIco, syncBrand } from "./sync-oxide.mjs";
+import { buildIco, checkSnapshot, syncOxide } from "./sync-oxide.mjs";
 
 /** A stand-in PNG: the signature and an IHDR chunk carrying the size. */
 function fakePng(size, filler = 0) {
@@ -50,6 +50,91 @@ const BRAND = "assets/brand/oxide";
 const TOKENS = ":root { --ox-background: #1C1C1E; }\n";
 const LOGO = '<svg viewBox="0 0 570 192"><title>Oxide</title></svg>';
 
+/** A README with every site marker, shaped like the Oxide one. */
+const README = `<!-- The site:* markers below feed the Oxide website. Do not remove them. -->
+
+<h1 align="center">Oxide</h1>
+
+## What is Oxide?
+
+<!-- site:definition -->
+
+Oxide is a free, open-source **desktop app**, built with [Tauri](https://tauri.app). See the [licence](LICENSE).
+
+<!-- /site:definition -->
+
+## Features
+
+<!-- site:features -->
+
+### One app, every agent CLI
+
+- **Multiple Providers.** Use them side by side.
+
+### Review before you merge
+
+- **Blind review.** A second Provider reviews the diff.
+
+<!-- /site:features -->
+
+## Install
+
+<!-- site:install -->
+
+| Platform | File | Notes |
+| --- | --- | --- |
+| macOS (Apple Silicon) | \`Oxide_<version>_aarch64.dmg\` | Drag it. |
+| Windows 10/11 (x64) | \`Oxide_<version>_x64-setup.exe\` | Run it. |
+
+<!-- /site:install -->
+
+### Requirements
+
+<!-- site:requirements -->
+
+| Provider | Command | Install |
+| --- | --- | --- |
+| Claude Code | \`claude\` | [docs.claude.com](https://docs.claude.com/en/docs/claude-code) |
+
+\`git\` is required.
+
+<!-- /site:requirements -->
+
+## Quick start
+
+<!-- site:quick-start -->
+
+1. Install a Provider.
+2. Launch Oxide. See [Requirements](#requirements).
+
+<!-- /site:quick-start -->
+
+## FAQ
+
+<!-- site:faq -->
+
+**Is Oxide an AI coding agent?**
+No. [Build it yourself](#build-from-source).
+
+<!-- /site:faq -->
+`;
+
+const TERMS = [
+  "Project",
+  "Thread",
+  "Turn",
+  "Provider",
+  "Surface",
+  "Checkpoint",
+  "Verification Dossier",
+  "Blind review",
+  "Restore",
+];
+const GLOSSARY =
+  "# Oxide\n\n## Language\n\n" +
+  TERMS.map((t) => `**${t}**:\nThe ${t} definition.\n_Avoid_: x\n`).join("\n") +
+  "\n**Board Thread**:\nA Thread in a worktree. See [ADR-0011](docs/adr/0011.md).\n";
+
 function source() {
   return new Map([
     [`${BRAND}/palette/oxide-tokens.css`, Buffer.from(TOKENS)],
@@ -60,28 +145,63 @@ function source() {
     [`${BRAND}/png/favicon/48x48.png`, fakePng(48)],
     [`${BRAND}/png/favicon/64x64.png`, fakePng(64)],
     [`${BRAND}/png/avatar/180x180.png`, fakePng(180)],
+    ["README.md", Buffer.from(README)],
+    ["GLOSSARY.md", Buffer.from(GLOSSARY)],
   ]);
 }
 
-async function run(files, ref = "main") {
+const STABLE = {
+  tag_name: "v1.1.0",
+  draft: false,
+  prerelease: false,
+  published_at: "2026-12-10T10:00:00Z",
+  html_url: "https://github.com/getoxide/oxide/releases/tag/v1.1.0",
+  body: "### Fixes\n\n- a fix\n",
+  assets: [
+    {
+      name: "Oxide_1.1.0_aarch64.dmg",
+      size: 100,
+      browser_download_url: "https://example.test/mac.dmg",
+    },
+    {
+      name: "Oxide_1.1.0_x64-setup.exe",
+      size: 90,
+      browser_download_url: "https://example.test/win.exe",
+    },
+  ],
+};
+
+async function run(
+  files,
+  { ref, releases = [], releasesError, local, logs = [] } = {},
+) {
   const fetched = [];
   const written = new Map();
-  await syncBrand({
+  const result = await syncOxide({
     ref,
+    local,
     fetchFile: async (r, path) => {
       fetched.push(`${r}:${path}`);
       const file = files.get(path);
       if (!file) throw new Error(`404 ${path}`);
       return file;
     },
+    fetchReleases: async () => {
+      if (releasesError) throw new Error(releasesError);
+      return releases;
+    },
     writeFile: async (path, data) => written.set(path, Buffer.from(data)),
+    log: (line) => logs.push(line),
   });
-  return { fetched, written };
+  const snapshot = written.has("content/oxide/snapshot.json")
+    ? JSON.parse(written.get("content/oxide/snapshot.json").toString())
+    : null;
+  return { fetched, written, snapshot, result, logs };
 }
 
-describe("syncBrand", () => {
+describe("syncOxide: brand kit", () => {
   it("copies the tokens CSS verbatim and the icon set at the pinned ref", async () => {
-    const { fetched, written } = await run(source(), "v1.2.3");
+    const { fetched, written } = await run(source(), { ref: "v1.2.3" });
 
     expect(fetched.every((f) => f.startsWith("v1.2.3:"))).toBe(true);
     expect(
@@ -109,22 +229,192 @@ describe("syncBrand", () => {
     files.delete(`${BRAND}/oxide-logo.svg`);
     await expect(run(files)).rejects.toThrow(/oxide-logo\.svg/);
   });
+});
 
-  it("writes nothing when a file is missing", async () => {
+describe("syncOxide: ref", () => {
+  it("reads the latest stable tag when no ref is given", async () => {
+    const { fetched, snapshot } = await run(source(), { releases: [STABLE] });
+    expect(fetched.every((f) => f.startsWith("v1.1.0:"))).toBe(true);
+    expect(snapshot.source).toEqual({ repo: "getoxide/oxide", ref: "v1.1.0" });
+  });
+
+  it("reads main while no stable tag exists", async () => {
+    const { fetched } = await run(source(), {
+      releases: [{ ...STABLE, tag_name: "v1.1.0-rc.1", prerelease: true }],
+    });
+    expect(fetched.every((f) => f.startsWith("main:"))).toBe(true);
+  });
+
+  it("records a local source's ref and commit, while links use the pinned ref", async () => {
+    const { snapshot } = await run(source(), {
+      local: { ref: "docs/site-markers", commit: "3719414abc" },
+    });
+    expect(snapshot.source).toEqual({
+      repo: "getoxide/oxide",
+      ref: "main",
+      local: { ref: "docs/site-markers", commit: "3719414abc" },
+    });
+    expect(snapshot.readme.definition).toContain(
+      "(https://github.com/getoxide/oxide/blob/main/LICENSE)",
+    );
+  });
+});
+
+describe("syncOxide: snapshot", () => {
+  it("writes the marked README sections, links rewritten", async () => {
+    const { snapshot } = await run(source(), { ref: "v1.2.3" });
+    expect(snapshot.readme.definition).toBe(
+      "Oxide is a free, open-source **desktop app**, built with [Tauri](https://tauri.app). See the [licence](https://github.com/getoxide/oxide/blob/v1.2.3/LICENSE).",
+    );
+    expect(snapshot.readme.quickStart).toBe(
+      "1. Install a Provider.\n2. Launch Oxide. See [Requirements](/docs/quick-start#requirements).",
+    );
+    expect(snapshot.readme.requirements).toContain(
+      "| Claude Code | `claude` |",
+    );
+    expect(snapshot.readme.requirements).toContain("`git` is required.");
+    expect(snapshot.readme.install).toContain("Oxide_<version>_aarch64.dmg");
+    expect(snapshot.readme.faq).toBe(
+      "**Is Oxide an AI coding agent?**\nNo. [Build it yourself](https://github.com/getoxide/oxide/blob/v1.2.3/README.md#build-from-source).",
+    );
+    expect(snapshot.readme.features).toEqual([
+      { group: "One app, every agent CLI", leadIns: ["Multiple Providers"] },
+      { group: "Review before you merge", leadIns: ["Blind review"] },
+    ]);
+  });
+
+  it("writes the nine Concepts and lists the glossary terms left out", async () => {
+    const logs = [];
+    const { snapshot, result } = await run(source(), { logs });
+    expect(snapshot.concepts).toHaveLength(9);
+    expect(snapshot.concepts[2]).toEqual({
+      term: "Turn",
+      id: "turn",
+      definition: "The Turn definition.",
+    });
+    expect(result.unlisted).toEqual(["Board Thread"]);
+    expect(logs).toContain("New glossary terms not on the site: Board Thread");
+  });
+
+  it("writes the release state and the changelog", async () => {
+    const { snapshot } = await run(source(), { releases: [STABLE] });
+    expect(snapshot.release.state).toBe("stable");
+    expect(snapshot.release.latest.assets.macos.url).toBe(
+      "https://example.test/mac.dmg",
+    );
+    expect(snapshot.changelog).toEqual([
+      {
+        version: "1.1.0",
+        tag: "v1.1.0",
+        date: "2026-12-10",
+        url: STABLE.html_url,
+        breaking: null,
+        features: null,
+        fixes: "- a fix",
+      },
+    ]);
+  });
+
+  it("writes byte-identical output for an unchanged source: no timestamps", async () => {
+    const a = await run(source(), { releases: [STABLE] });
+    await new Promise((r) => setTimeout(r, 5));
+    const b = await run(source(), { releases: [STABLE] });
+    expect(b.written).toEqual(a.written);
+    expect(a.written.get("content/oxide/snapshot.json").toString()).not.toMatch(
+      /T\d\d:\d\d/,
+    );
+  });
+
+  it("passes its own schema check", async () => {
+    const { snapshot } = await run(source());
+    expect(() => checkSnapshot(snapshot)).not.toThrow();
+  });
+});
+
+describe("syncOxide: failures write nothing", () => {
+  async function expectNothingWritten(files, options, message) {
+    const written = new Map();
+    await expect(
+      syncOxide({
+        ...options,
+        fetchFile: async (_r, path) => {
+          const file = files.get(path);
+          if (!file) throw new Error(`404 ${path}`);
+          return file;
+        },
+        fetchReleases:
+          options.fetchReleases ??
+          (async () => {
+            return [];
+          }),
+        writeFile: async (path, data) => written.set(path, data),
+        log: () => {},
+      }),
+    ).rejects.toThrow(message);
+    expect(written.size).toBe(0);
+  }
+
+  it("a missing brand file", async () => {
     const files = source();
     files.delete(`${BRAND}/palette/oxide-tokens.css`);
-    await expect(run(files)).rejects.toThrow(/oxide-tokens\.css/);
+    await expectNothingWritten(files, {}, /oxide-tokens\.css/);
+  });
 
-    const written = new Map();
-    await syncBrand({
-      ref: "main",
-      fetchFile: async (_r, path) => {
-        const file = files.get(path);
-        if (!file) throw new Error(`404 ${path}`);
-        return file;
+  it("a missing marker", async () => {
+    const files = source();
+    files.set(
+      "README.md",
+      Buffer.from(
+        README.replace("<!-- /site:requirements -->", "").replace(
+          "<!-- site:requirements -->",
+          "",
+        ),
+      ),
+    );
+    await expectNothingWritten(files, {}, /site:requirements/);
+  });
+
+  it("a missing allowlisted term", async () => {
+    const files = source();
+    files.set(
+      "GLOSSARY.md",
+      Buffer.from(GLOSSARY.replace("**Restore**:", "**Rewind**:")),
+    );
+    await expectNothingWritten(files, {}, /Restore/);
+  });
+
+  it("an unreachable Releases API", async () => {
+    await expectNothingWritten(
+      source(),
+      {
+        fetchReleases: async () => {
+          throw new Error("GitHub Releases API: 503");
+        },
       },
-      writeFile: async (path, data) => written.set(path, data),
-    }).catch(() => {});
-    expect(written.size).toBe(0);
+      /Releases API/,
+    );
+  });
+});
+
+describe("checkSnapshot", () => {
+  it("names every missing key", async () => {
+    const { snapshot } = await run(source());
+    delete snapshot.readme.quickStart;
+    delete snapshot.release.state;
+    expect(() => checkSnapshot(snapshot)).toThrow(
+      /readme\.quickStart.*release\.state/s,
+    );
+  });
+
+  it("rejects a release state outside stable, prerelease-only and none", async () => {
+    const { snapshot } = await run(source());
+    snapshot.release.state = "beta";
+    expect(() => checkSnapshot(snapshot)).toThrow(/release\.state/);
+  });
+
+  it("rejects a Concepts list that is not the nine allowlisted terms", async () => {
+    const { snapshot } = await run(source());
+    snapshot.concepts.pop();
+    expect(() => checkSnapshot(snapshot)).toThrow(/concepts/);
   });
 });

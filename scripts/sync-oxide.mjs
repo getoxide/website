@@ -1,9 +1,18 @@
-// `pnpm sync:oxide [--ref <ref>]`: copies the Oxide brand kit into the site at
-// a pinned ref of getoxide/oxide (Design system, Tokens). First version: the
-// tokens CSS verbatim, the logo and the icon set. The content snapshot joins it later.
+// `pnpm sync:oxide [--ref <ref>]`: copies the Oxide brand kit (Design system,
+// Tokens) and writes the content Snapshot (ADR-0003; Content sourced from the
+// Oxide repo #12) from getoxide/oxide at one ref: the latest stable tag, `main`
+// while none exists, or `--ref`. The Snapshot holds the README sections inside
+// the `site:*` markers, the Concepts terms of GLOSSARY.md and the release data
+// of the GitHub Releases API, with no timestamps.
 //
-// Every file is fetched before anything is written, so a missing file fails
-// the sync and leaves the last good copy in place.
+// Every file is fetched and checked before anything is written, so a missing
+// file, marker or term, or an unreachable API, fails the sync and leaves the
+// last good copy in place.
+//
+// DEV ONLY: `--local-source <git-dir>:<ref>` reads the Oxide files from a local
+// clone (for a ref not pushed yet) and records that ref and commit in the
+// Snapshot. Production runs never pass it.
+import { execFileSync } from "node:child_process";
 import { mkdir, writeFile as fsWriteFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -189,14 +198,14 @@ export const SITE_ANCHORS = {
   faq: "/faq",
 };
 
-/** Where a link target of the Oxide README points once on the site. */
-function resolveTarget(target, ref, { image }) {
+/** Where a link target of an Oxide root file points once on the site. */
+function resolveTarget(target, ref, { image, file }) {
   if (/^([a-z][a-z\d+.-]*:|\/\/)/i.test(target)) return target;
   if (target.startsWith("#")) {
     const anchor = target.slice(1);
+    const hosted = file === "README.md" ? SITE_ANCHORS[anchor] : undefined;
     return (
-      SITE_ANCHORS[anchor] ??
-      `https://github.com/${OXIDE_REPO}/blob/${ref}/README.md${target}`
+      hosted ?? `https://github.com/${OXIDE_REPO}/blob/${ref}/${file}${target}`
     );
   }
   const path = target.replace(/^(\.\/|\/)+/, "");
@@ -212,8 +221,10 @@ function resolveTarget(target, ref, { image }) {
  * URLs. Code spans and fenced code are left untouched.
  * @param {string} markdown
  * @param {string} ref
+ * @param {string} [file] the root file the Markdown comes from; only README
+ *   anchors can map to site URLs
  */
-export function rewriteLinks(markdown, ref) {
+export function rewriteLinks(markdown, ref, file = "README.md") {
   return markdown
     .split(/(```[\s\S]*?```|`[^`\n]*`)/)
     .map((part, i) => {
@@ -222,12 +233,12 @@ export function rewriteLinks(markdown, ref) {
         .replace(
           /(!?)\[([^\]]*)\]\(\s*([^)\s]+)((?:\s+"[^"]*")?)\s*\)/g,
           (_m, bang, text, target, title) =>
-            `${bang}[${text}](${resolveTarget(target, ref, { image: !!bang })}${title})`,
+            `${bang}[${text}](${resolveTarget(target, ref, { image: !!bang, file })}${title})`,
         )
         .replace(
           /\b(href|src)="([^"]+)"/g,
           (_m, attr, target) =>
-            `${attr}="${resolveTarget(target, ref, { image: attr === "src" })}"`,
+            `${attr}="${resolveTarget(target, ref, { image: attr === "src", file })}"`,
         );
     })
     .join("");
@@ -253,6 +264,16 @@ const NOTE_SECTIONS = [
 ];
 
 const STABLE_TAG = /^v\d+\.\d+\.\d+$/;
+
+/** Tag of the newest stable release, `null` while there is none. */
+export function latestStableTag(releases) {
+  return (
+    releases
+      .filter((r) => isStable(r))
+      .sort((a, b) => b.published_at.localeCompare(a.published_at))[0]
+      ?.tag_name ?? null
+  );
+}
 
 const isStable = (r) =>
   !r.draft && !r.prerelease && STABLE_TAG.test(r.tag_name);
@@ -360,15 +381,132 @@ export function releaseData(releases, { install }) {
   };
 }
 
+const STATES = ["stable", "prerelease-only", "none"];
+
 /**
- * Fetches the brand files at `ref` and writes them into the site.
- * @param {{
- *   ref: string,
- *   fetchFile: (ref: string, path: string) => Promise<Buffer>,
- *   writeFile: (path: string, data: Buffer | string) => Promise<void>,
- * }} io
+ * The Snapshot schema: throws naming every missing or malformed key, so a
+ * sync never writes, and the site never builds from, a partial Snapshot.
+ * @param {any} s
  */
-export async function syncBrand({ ref, fetchFile, writeFile }) {
+export function checkSnapshot(s) {
+  const problems = [];
+  const at = (path) =>
+    path.split(".").reduce((o, k) => (o == null ? undefined : o[k]), s);
+  const text = (path) => {
+    const v = at(path);
+    if (typeof v !== "string" || !v.trim()) problems.push(path);
+  };
+  const textOrNull = (path) => {
+    const v = at(path);
+    if (v !== null && (typeof v !== "string" || !v.trim())) problems.push(path);
+  };
+  const number = (path) => {
+    if (typeof at(path) !== "number") problems.push(path);
+  };
+
+  text("source.repo");
+  text("source.ref");
+  if (at("source.local") !== undefined) {
+    text("source.local.ref");
+    text("source.local.commit");
+  }
+
+  for (const key of [
+    "definition",
+    "install",
+    "requirements",
+    "quickStart",
+    "faq",
+  ]) {
+    text(`readme.${key}`);
+  }
+  const features = at("readme.features");
+  if (
+    !Array.isArray(features) ||
+    !features.length ||
+    features.some(
+      (g) =>
+        typeof g?.group !== "string" ||
+        !Array.isArray(g.leadIns) ||
+        !g.leadIns.length ||
+        g.leadIns.some((l) => typeof l !== "string" || !l),
+    )
+  ) {
+    problems.push("readme.features");
+  }
+
+  const concepts = at("concepts");
+  if (
+    !Array.isArray(concepts) ||
+    concepts.map((c) => c?.term).join("|") !== CONCEPTS.join("|") ||
+    concepts.some(
+      (c) =>
+        c.id !== conceptId(c.term) ||
+        typeof c.definition !== "string" ||
+        !c.definition,
+    )
+  ) {
+    problems.push("concepts");
+  }
+
+  if (!STATES.includes(at("release.state"))) problems.push("release.state");
+  text("release.releasesUrl");
+  const latest = at("release.latest");
+  if (
+    latest === undefined ||
+    (latest === null) !== (at("release.state") === "none")
+  ) {
+    problems.push("release.latest");
+  } else if (latest !== null) {
+    for (const key of ["version", "tag", "date", "url"])
+      text(`release.latest.${key}`);
+    if (typeof latest.prerelease !== "boolean")
+      problems.push("release.latest.prerelease");
+    for (const { key } of INSTALLERS) {
+      const asset = latest.assets?.[key];
+      text(`release.latest.assets.${key}.url`);
+      if (asset?.name === null) {
+        if (asset.size !== null)
+          problems.push(`release.latest.assets.${key}.size`);
+      } else {
+        text(`release.latest.assets.${key}.name`);
+        number(`release.latest.assets.${key}.size`);
+      }
+    }
+  }
+  const platforms = at("release.platforms");
+  if (
+    !Array.isArray(platforms) ||
+    !platforms.length ||
+    platforms.some((p) => !INSTALLERS.some((i) => i.platform === p))
+  ) {
+    problems.push("release.platforms");
+  }
+  if (!["readme", "release"].includes(at("release.platformsFrom"))) {
+    problems.push("release.platformsFrom");
+  }
+
+  const changelog = at("changelog");
+  if (!Array.isArray(changelog)) {
+    problems.push("changelog");
+  } else {
+    changelog.forEach((_, i) => {
+      for (const key of ["version", "tag", "date", "url"])
+        text(`changelog.${i}.${key}`);
+      for (const [key] of NOTE_SECTIONS) textOrNull(`changelog.${i}.${key}`);
+    });
+  }
+
+  if (problems.length) {
+    throw new Error(
+      `Snapshot is missing or has malformed keys: ${problems.join(", ")}`,
+    );
+  }
+  return s;
+}
+
+/** The brand kit files at `ref`, as `[site path, contents]` pairs. */
+async function brandOutputs(ref, fetchFile) {
   const get = (path) => fetchFile(ref, `${BRAND}/${path}`);
   const [tokens, logo, iconSvg, appleIcon, ...favicons] = await Promise.all([
     get("palette/oxide-tokens.css"),
@@ -377,21 +515,110 @@ export async function syncBrand({ ref, fetchFile, writeFile }) {
     get("png/avatar/180x180.png"),
     ...FAVICON_SIZES.map((s) => get(`png/favicon/${s}x${s}.png`)),
   ]);
-  const ico = buildIco(favicons);
-
-  const outputs = [
+  return [
     ["content/oxide/brand/oxide-tokens.css", tokens],
     ["content/oxide/brand/oxide-logo.svg", logo],
     ["src/app/icon.svg", iconSvg],
-    ["src/app/favicon.ico", ico],
+    ["src/app/favicon.ico", buildIco(favicons)],
     ["src/app/apple-icon.png", appleIcon],
+  ];
+}
+
+/** README sections the Snapshot carries, by marker key. */
+const SECTIONS = {
+  definition: "definition",
+  install: "install",
+  requirements: "requirements",
+  quickStart: "quick-start",
+  faq: "faq",
+};
+
+/**
+ * Builds the Snapshot from the Oxide README and glossary at `ref` and the
+ * Releases API payload. Throws on a missing marker or allowlisted term.
+ */
+export function buildSnapshot({ ref, readme, glossary, releases, local }) {
+  const readmeData = Object.fromEntries(
+    Object.entries(SECTIONS).map(([key, marker]) => [
+      key,
+      rewriteLinks(extractSection(readme, marker), ref),
+    ]),
+  );
+  readmeData.features = extractFeatures(extractSection(readme, "features"));
+  const { concepts, unlisted } = extractConcepts(glossary);
+  const { release, changelog } = releaseData(releases, {
+    install: readmeData.install,
+  });
+  const snapshot = {
+    source: { repo: OXIDE_REPO, ref, ...(local ? { local } : {}) },
+    readme: {
+      definition: readmeData.definition,
+      features: readmeData.features,
+      install: readmeData.install,
+      requirements: readmeData.requirements,
+      quickStart: readmeData.quickStart,
+      faq: readmeData.faq,
+    },
+    concepts: concepts.map((c) => ({
+      ...c,
+      definition: rewriteLinks(c.definition, ref, "GLOSSARY.md"),
+    })),
+    release,
+    changelog,
+  };
+  return { snapshot: checkSnapshot(snapshot), unlisted };
+}
+
+/**
+ * `pnpm sync:oxide`: the brand kit and the content Snapshot from
+ * getoxide/oxide, at `ref` or, without one, at the latest stable tag (`main`
+ * while none exists). Everything is fetched and checked before the first
+ * write, so any failure leaves the last good copy in place.
+ * @param {{
+ *   ref?: string,
+ *   local?: { ref: string, commit: string },
+ *   fetchFile: (ref: string, path: string) => Promise<Buffer>,
+ *   fetchReleases: () => Promise<any[]>,
+ *   writeFile: (path: string, data: Buffer | string) => Promise<void>,
+ *   log?: (line: string) => void,
+ * }} io
+ */
+export async function syncOxide({
+  ref: requested,
+  local,
+  fetchFile,
+  fetchReleases,
+  writeFile,
+  log = () => {},
+}) {
+  const releases = await fetchReleases();
+  const ref = requested ?? latestStableTag(releases) ?? OXIDE_REF;
+  const [brand, readme, glossary] = await Promise.all([
+    brandOutputs(ref, fetchFile),
+    fetchFile(ref, "README.md"),
+    fetchFile(ref, "GLOSSARY.md"),
+  ]);
+  const { snapshot, unlisted } = buildSnapshot({
+    ref,
+    readme: readme.toString("utf8"),
+    glossary: glossary.toString("utf8"),
+    releases,
+    local,
+  });
+
+  const outputs = [
+    ...brand,
+    ["content/oxide/snapshot.json", JSON.stringify(snapshot, null, 2) + "\n"],
     [
       "content/oxide/source.json",
       JSON.stringify({ repo: OXIDE_REPO, ref }, null, 2) + "\n",
     ],
   ];
   for (const [path, data] of outputs) await writeFile(path, data);
-  return outputs.map(([path]) => path);
+  if (unlisted.length) {
+    log(`New glossary terms not on the site: ${unlisted.join(", ")}`);
+  }
+  return { ref, written: outputs.map(([path]) => path), unlisted };
 }
 
 async function fetchRaw(ref, path) {
@@ -401,28 +628,87 @@ async function fetchRaw(ref, path) {
   return Buffer.from(await res.arrayBuffer());
 }
 
-function parseRef(argv) {
-  const i = argv.indexOf("--ref");
-  if (i === -1) return OXIDE_REF;
-  const ref = argv[i + 1];
-  if (!ref) throw new Error("--ref needs a value");
-  return ref;
+/** Every release of the Oxide repo (public; `GITHUB_TOKEN` only lifts the
+ * rate limit when the environment provides one). */
+async function fetchReleases() {
+  const headers = {
+    accept: "application/vnd.github+json",
+    "user-agent": "oxide-website-sync",
+    "x-github-api-version": "2022-11-28",
+  };
+  if (process.env.GITHUB_TOKEN) {
+    headers.authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+  }
+  const res = await fetch(
+    `https://api.github.com/repos/${OXIDE_REPO}/releases?per_page=100`,
+    { headers },
+  );
+  if (!res.ok) throw new Error(`GitHub Releases API answered ${res.status}`);
+  return res.json();
+}
+
+/**
+ * DEV ONLY: reads Oxide files from a local clone at `ref` instead of raw
+ * GitHub, for a ref not pushed yet. The Snapshot records the local ref and
+ * commit; release data still comes from the GitHub API.
+ */
+function localSource(spec) {
+  const at = spec.lastIndexOf(":");
+  if (at <= 0) throw new Error("--local-source needs <git-dir>:<ref>");
+  const dir = spec.slice(0, at);
+  const ref = spec.slice(at + 1);
+  const git = (args, encoding) =>
+    execFileSync("git", ["-C", dir, ...args], {
+      encoding,
+      maxBuffer: 64 * 1024 * 1024,
+    });
+  const commit = git(
+    ["rev-parse", "--verify", `${ref}^{commit}`],
+    "utf8",
+  ).trim();
+  return {
+    local: { ref, commit },
+    fetchFile: async (_ref, path) => {
+      try {
+        return git(["show", `${commit}:${path}`]);
+      } catch {
+        throw new Error(`${path} missing at ${ref} in ${dir}`);
+      }
+    },
+  };
+}
+
+function option(argv, name) {
+  const i = argv.indexOf(name);
+  if (i === -1) return undefined;
+  const value = argv[i + 1];
+  if (!value || value.startsWith("--"))
+    throw new Error(`${name} needs a value`);
+  return value;
 }
 
 async function main() {
   const root = fileURLToPath(new URL("..", import.meta.url));
-  const ref = parseRef(process.argv.slice(2));
-  const written = await syncBrand({
-    ref,
-    fetchFile: fetchRaw,
+  const argv = process.argv.slice(2);
+  const localSpec = option(argv, "--local-source");
+  const local = localSpec ? localSource(localSpec) : null;
+  const result = await syncOxide({
+    ref: option(argv, "--ref"),
+    local: local?.local,
+    fetchFile: local?.fetchFile ?? fetchRaw,
+    fetchReleases,
     writeFile: async (path, data) => {
       const target = join(root, path);
       await mkdir(dirname(target), { recursive: true });
       await fsWriteFile(target, data);
     },
+    log: (line) => console.log(line),
   });
-  console.log(`Synced ${OXIDE_REPO}@${ref}:`);
-  for (const path of written) console.log(`  ${path}`);
+  const from = local
+    ? ` (files from ${local.local.ref}@${local.local.commit.slice(0, 7)}, local)`
+    : "";
+  console.log(`Synced ${OXIDE_REPO}@${result.ref}${from}:`);
+  for (const path of result.written) console.log(`  ${path}`);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
