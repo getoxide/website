@@ -67,14 +67,16 @@ test.describe("every registered page", () => {
       page: tab,
     }) => {
       await tab.goto(urlOf(page));
-      for (const role of [
-        "banner",
-        "navigation",
-        "main",
-        "contentinfo",
-      ] as const) {
+      for (const role of ["banner", "main", "contentinfo"] as const) {
         await expect(tab.getByRole(role)).toHaveCount(1);
       }
+      // The site nav once; docs pages add their named sub-nav.
+      await expect(
+        tab.getByRole("navigation", { name: "Main", exact: true }),
+      ).toHaveCount(1);
+      await expect(tab.getByRole("navigation")).toHaveCount(
+        page.path.startsWith("/docs/") ? 2 : 1,
+      );
       await expect(tab.locator("html")).toHaveCSS("color-scheme", "dark");
 
       await tab.keyboard.press("Tab");

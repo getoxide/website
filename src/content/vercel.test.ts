@@ -46,7 +46,7 @@ describe("vercel.json", () => {
   });
 
   it("every redirect lands on a page of the PAGES registry", () => {
-    const paths = new Set(Object.values(PAGES).map((p) => p.path));
+    const paths = new Set<string>(Object.values(PAGES).map((p) => p.path));
     for (const r of (vercel.redirects ?? []) as { destination: string }[]) {
       expect(paths.has(r.destination), r.destination).toBe(true);
     }

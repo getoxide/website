@@ -72,3 +72,26 @@
   align-items: center;
   column-gap: var(--site-space-2);
 }
+
+/* The canonical definition (Copy #18): derived text, so its inline links are
+   underlined to stand out from the sentence without relying on colour. */
+.definition {
+  max-width: var(--site-w-text);
+  font: 400 var(--site-text-small) var(--site-font-body);
+  color: var(--ox-text-muted);
+}
+
+.definition a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.definition a:hover {
+  color: var(--ox-text);
+}
+
+.definition strong {
+  font-weight: 500;
+  color: var(--ox-text);
+}

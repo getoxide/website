@@ -71,6 +71,31 @@ export const COPY = {
     licence: "Licence",
   },
 
+  /**
+   * `/docs/*`. Sub-nav labels from the Design system (Prose); the leads, the
+   * section headings and the anchor-link names are build-written drafts
+   * Lorenzo approves in review. Everything else on these pages is derived.
+   */
+  docs: {
+    nav: {
+      label: "Docs",
+      links: [
+        { label: "Quick start", href: "/docs/quick-start" },
+        { label: "Concepts", href: "/docs/concepts" },
+      ] satisfies Link[],
+    },
+    quickStart: {
+      lead: "What Oxide needs on your machine, then the steps from a first prompt to a pull request.",
+      requirements: "Requirements",
+      steps: "Steps",
+    },
+    concepts: {
+      leadBefore: "The words Oxide uses, defined in the Oxide",
+      glossary: "glossary",
+      anchorLabel: (term: string) => `Link to ${term}`,
+    },
+  },
+
   /** Copy deck, Home → Hero (frozen). */
   hero: {
     subheadline:

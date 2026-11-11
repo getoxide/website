@@ -2,6 +2,8 @@ import { Fragment } from "react";
 import { COPY, type Link } from "@/content/copy";
 import { isCurrent } from "@/lib/nav";
 import { LICENCE_URL } from "@/lib/oxide";
+import { token } from "@/lib/snapshot";
+import { Markdown } from "./Markdown";
 import styles from "./SiteFooter.module.css";
 
 function FooterLink({ link, path }: { link: Link; path: string }) {
@@ -20,8 +22,11 @@ const headingId = (heading: string) =>
   `footer-${heading.toLowerCase().replace(/\s+/g, "-")}`;
 
 /**
- * The site footer (Design system, Footer; Page inventory, Footer): three link
- * columns, then the trust line, the repo, the disclaimers and the credits.
+ * The site footer (Design system, Footer; Page inventory, Footer): the
+ * canonical definition, three link columns, then the trust line, the repo,
+ * the disclaimers and the credits. The definition renders from the Snapshot
+ * here and only here, so it is verbatim on every page by construction
+ * (Copy #18, Canonical definition placement).
  */
 export function SiteFooter({ path }: { path: string }) {
   const { footer } = COPY;
@@ -33,6 +38,9 @@ export function SiteFooter({ path }: { path: string }) {
   return (
     <footer className={styles.footer}>
       <div className={styles.inner}>
+        <p className={styles.definition} data-testid="definition">
+          <Markdown source={token("definition")!} inline />
+        </p>
         <div className={styles.columns}>
           {footer.columns.map((column) => (
             <div key={column.heading}>

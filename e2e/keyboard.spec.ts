@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { SNAPSHOT } from "./snapshot";
 import { REGISTERED, urlOf } from "./pages";
 
 // Budgets, Accessibility (Focus, Keyboard, Targets); Design system, Focus and
@@ -36,7 +37,11 @@ async function tab(page: Page): Promise<Focused> {
   });
 }
 
-/** Every visible control in the header and footer, with its size. */
+/**
+ * Every visible control in the header and footer, with its size. Links
+ * inside the footer's canonical definition are exempt: they sit in a
+ * sentence, WCAG 2.5.8's "inline" exception.
+ */
 function controlSizes(page: Page) {
   return page
     .locator("header, footer")
@@ -44,6 +49,7 @@ function controlSizes(page: Page) {
     .evaluateAll((els) =>
       els
         .filter((el) => el.getClientRects().length > 0)
+        .filter((el) => !el.closest('[data-testid="definition"]'))
         .map((el) => {
           const box = el.getBoundingClientRect();
           return {
@@ -118,6 +124,10 @@ test.describe("at 1280px", () => {
       outlines.push(stop.outline.split(" ")[0]);
     }
     expect(names).toEqual([
+      // Links in the canonical definition, which opens the footer.
+      ...[
+        ...SNAPSHOT.readme.definition.matchAll(/(?<!!)\[([^\]]+)\]\(/g),
+      ].map((m) => m[1]),
       "Features",
       "Download",
       "Changelog",

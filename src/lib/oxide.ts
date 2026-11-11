@@ -15,3 +15,6 @@ export function readmeUrl(anchor: string): string {
 
 /** Oxide's MIT licence, the footer's Licence link. */
 export const LICENCE_URL = fileUrl("LICENSE");
+
+/** Oxide's GLOSSARY.md, the source of /docs/concepts. */
+export const GLOSSARY_URL = fileUrl("GLOSSARY.md");
