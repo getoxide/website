@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { COPY } from "@/content/copy";
-import { seenBefore } from "@/lib/concept-links";
+import { mentionedIn, seenBefore } from "@/lib/concept-links";
 import { formatDate, type Snapshot } from "@/lib/snapshot";
 import { AnchoredHeading } from "./AnchoredHeading";
 import { Markdown } from "./Markdown";
@@ -32,20 +32,35 @@ const anchorOf = (version: string) => `v${version.replace(/\./g, "-")}`;
  * The releases on `/changelog` (Content #12, Changelog; Design system,
  * Changelog entry), derived from a Snapshot.
  */
-export function Changelog({ snapshot }: { snapshot: Snapshot }) {
-  const copy = COPY.changelog;
-  const stable = snapshot.changelog
+/** Stable releases, newest first. */
+const stableOf = (snapshot: Snapshot) =>
+  snapshot.changelog
     .filter((entry) => STABLE.test(entry.version))
     .sort((a, b) => byVersionDesc(a.version, b.version));
+
+/** The release notes the page shows, in reading order. */
+function sectionsOf(snapshot: Snapshot) {
+  return stableOf(snapshot)
+    .slice(0, LATEST)
+    .flatMap((entry) =>
+      GROUPS.flatMap((group) =>
+        entry[group]
+          ? [{ key: `${entry.version}/${group}`, notes: entry[group] }]
+          : [],
+      ),
+    );
+}
+
+/** The Concepts terms the page's release notes mention (`mentionedIn`). */
+export const changelogConcepts = (snapshot: Snapshot) =>
+  mentionedIn(sectionsOf(snapshot).map((s) => s.notes));
+
+export function Changelog({ snapshot }: { snapshot: Snapshot }) {
+  const copy = COPY.changelog;
+  const stable = stableOf(snapshot);
   const entries = stable.slice(0, LATEST);
   // Release notes in reading order, for the first-mention Concept links.
-  const sections = entries.flatMap((entry) =>
-    GROUPS.flatMap((group) =>
-      entry[group]
-        ? [{ key: `${entry.version}/${group}`, notes: entry[group] }]
-        : [],
-    ),
-  );
+  const sections = sectionsOf(snapshot);
   const seen = new Map(
     seenBefore(sections.map((s) => s.notes)).map((before, i) => [
       sections[i].key,

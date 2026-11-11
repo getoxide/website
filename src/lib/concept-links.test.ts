@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { Markdown } from "@/components/Markdown";
 // The gate this module exists to satisfy (Content #12 addendum, point 4).
 import { checkConceptLinks } from "../../scripts/concept-links.mjs";
-import { seenBefore } from "./concept-links";
+import { mentionedIn, seenBefore } from "./concept-links";
 import { SNAPSHOT } from "./snapshot";
 
 /** Derived Markdown rendered as a page's main content, linking Concepts. */
@@ -57,6 +57,15 @@ describe("Concept links in derived Markdown", () => {
     expect(gate(html)).toEqual([
       expect.stringContaining('"Thread" is not a link'),
     ]);
+  });
+
+  it("tells what a page mentioned, for the blocks rendered after it", () => {
+    expect(
+      mentionedIn(
+        ["A Turn in `Thread`.", "A [Provider](https://x.y)."],
+        ["Project"],
+      ),
+    ).toEqual(new Set(["Project", "Turn", "Provider"]));
   });
 
   it("renders no links without the option", () => {

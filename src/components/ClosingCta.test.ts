@@ -5,13 +5,17 @@ import releases from "../../e2e/fixtures/releases.json";
 import { SNAPSHOT, type Snapshot } from "@/lib/snapshot";
 import { ClosingCta } from "./ClosingCta";
 
-const render = (key: keyof typeof releases) =>
+const render = (
+  key: keyof typeof releases,
+  conceptsSeen?: ReadonlySet<string>,
+) =>
   renderToStaticMarkup(
     createElement(ClosingCta, {
       snapshot: {
         ...SNAPSHOT,
         release: releases[key] as Snapshot["release"],
       },
+      conceptsSeen,
     }),
   );
 
@@ -21,19 +25,27 @@ const textOf = (html: string) =>
     .replace(/\s+/g, " ")
     .trim();
 
-const links = (html: string) =>
+const allLinks = (html: string) =>
   [...html.matchAll(/<a [^>]*href="([^"]+)"[^>]*>(.*?)<\/a>/g)].map(
     ([, href, inner]) => ({ href, text: textOf(inner) }),
   );
+const CONCEPT = "/docs/concepts#";
+/** The CTA's buttons, without the Concept links in its copy. */
+const links = (html: string) =>
+  allLinks(html).filter((l) => !l.href.startsWith(CONCEPT));
+const conceptLinks = (html: string) =>
+  allLinks(html).filter((l) => l.href.startsWith(CONCEPT));
 
 // Copy deck, Closing CTA block (locked).
 describe("ClosingCta", () => {
   it("states the heading and the sentence", () => {
     const html = render("stable");
-    expect(html).toMatch(
-      /<h2[^>]*>Take your next Turn all the way to the merge\.<\/h2>/,
+    const heading = html.match(/<h2[^>]*>(.*?)<\/h2>/)![1];
+    expect(textOf(heading)).toBe(
+      "Take your next Turn all the way to the merge.",
     );
-    expect(textOf(html)).toContain(
+    const sentence = html.match(/<p[^>]*>(.*?)<\/p>/)![1];
+    expect(sentence.replace(/<[^>]+>/g, "")).toBe(
       "Oxide drives the Claude Code, Codex or Antigravity CLI you already use. Open a Project, start a Thread and review what comes back.",
     );
   });
@@ -52,6 +64,23 @@ describe("ClosingCta", () => {
     expect(links(render("none"))).toEqual([
       { href: "/download", text: "Get Oxide" },
       { href: "https://github.com/getoxide/oxide", text: "View on GitHub" },
+    ]);
+  });
+
+  // Content #12 addendum, point 4: the CTA closes every page, so it links
+  // the terms the page has not mentioned before it.
+  it("links the first mention of Turn, Project and Thread", () => {
+    expect(conceptLinks(render("stable"))).toEqual([
+      { href: "/docs/concepts#turn", text: "Turn" },
+      { href: "/docs/concepts#project", text: "Project" },
+      { href: "/docs/concepts#thread", text: "Thread" },
+    ]);
+  });
+
+  it("leaves unlinked the terms the page mentioned before it", () => {
+    const html = render("stable", new Set(["Turn", "Thread"]));
+    expect(conceptLinks(html)).toEqual([
+      { href: "/docs/concepts#project", text: "Project" },
     ]);
   });
 

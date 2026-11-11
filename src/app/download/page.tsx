@@ -8,6 +8,7 @@ import { SiteFrame } from "@/components/SiteFrame";
 import { COPY } from "@/content/copy";
 import { PAGES } from "@/content/pages";
 import { pageMetadata } from "@/lib/metadata";
+import { seenBefore } from "@/lib/concept-links";
 import { providerInstalls, token } from "@/lib/snapshot";
 import styles from "./download.module.css";
 
@@ -22,6 +23,16 @@ export const metadata = pageMetadata(PAGES.download);
 export default function DownloadPage() {
   const page = PAGES.download;
   const copy = COPY.download;
+  // Site copy below the buttons, in reading order: the first mention of each
+  // Concepts term in it links to its Concept (Copy deck rule 4).
+  const { macos, windows, verify } = copy.signing;
+  const seen = seenBefore([
+    macos,
+    windows,
+    verify,
+    copy.unsupported,
+    ...copy.faq.map((q) => q.answer),
+  ]);
   return (
     <SiteFrame page={page}>
       <div className={styles.page}>
@@ -43,21 +54,21 @@ export default function DownloadPage() {
         <DownloadBlock />
         <div className={styles.notes}>
           <p>
-            <DeckText source={copy.signing.macos} />
+            <DeckText source={macos} conceptLinks={seen[0]} />
           </p>
           <p>
-            <DeckText source={copy.signing.windows} />
+            <DeckText source={windows} conceptLinks={seen[1]} />
           </p>
           <p>
-            <DeckText source={copy.signing.verify} />
+            <DeckText source={verify} conceptLinks={seen[2]} />
           </p>
           <p className={styles.unsupported}>
-            <DeckText source={copy.unsupported} />
+            <DeckText source={copy.unsupported} conceptLinks={seen[3]} />
           </p>
         </div>
         <section className={styles.faq} aria-labelledby="questions">
           <h2 id="questions">{copy.faqHeading}</h2>
-          {copy.faq.map(({ id, question, answer }) => (
+          {copy.faq.map(({ id, question, answer }, i) => (
             <section key={id} aria-labelledby={id}>
               <AnchoredHeading
                 id={id}
@@ -68,7 +79,7 @@ export default function DownloadPage() {
               </AnchoredHeading>
               <Prose>
                 <p>
-                  <DeckText source={answer} />
+                  <DeckText source={answer} conceptLinks={seen[4 + i]} />
                 </p>
               </Prose>
             </section>

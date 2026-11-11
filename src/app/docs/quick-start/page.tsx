@@ -6,7 +6,7 @@ import { SiteFrame } from "@/components/SiteFrame";
 import { COPY } from "@/content/copy";
 import { PAGES } from "@/content/pages";
 import { pageMetadata } from "@/lib/metadata";
-import { seenBefore } from "@/lib/concept-links";
+import { mentionedIn, seenBefore } from "@/lib/concept-links";
 import { SNAPSHOT, token } from "@/lib/snapshot";
 import styles from "../../reading.module.css";
 
@@ -22,7 +22,7 @@ export default function QuickStartPage() {
   ];
   const seen = seenBefore([requirements, steps]);
   return (
-    <SiteFrame page={page}>
+    <SiteFrame page={page} conceptsSeen={mentionedIn([requirements, steps])}>
       <div className={styles.page}>
         <PageHeader title={page.h1} lead={copy.lead} />
         <DocsNav path={page.path} />
