@@ -141,6 +141,8 @@ export const COPY = {
     /** Hand-written exception to the Copy deck's rule 5. */
     unsupported:
       "Linux, Intel Macs and Windows on ARM aren't packaged yet. [Build from source](README#build-from-source).",
+    /** Build-written: the H2 over the page FAQ, a draft for Lorenzo. */
+    faqHeading: "Questions",
     faq: [
       {
         id: "macos-cant-be-opened",

@@ -64,6 +64,17 @@ export const PAGES = {
     indexable: true,
     llmsSection: "Docs",
   },
+  download: {
+    path: "/download",
+    h1: "Download Oxide",
+    title: "Download · Oxide",
+    description:
+      "Download the Oxide desktop app from GitHub Releases, verify the file, and connect the Claude Code, Codex or Antigravity CLI you already have installed.",
+    budgetClass: "reading",
+    structuredData: "WebPage",
+    indexable: true,
+    llmsSection: "Pages",
+  },
   // Not in the Copy deck: build-written, approved by Lorenzo in review.
   privacy: {
     path: "/privacy",
