@@ -110,6 +110,7 @@ export const COPY = {
       fixes: "Fixes",
     },
     fullNotes: "Full release notes on GitHub",
+    maintenance: "Maintenance release: dependency and documentation updates.",
     anchorLabel: (version: string) => `Link to version ${version}`,
     empty: {
       before: "No stable release yet. New versions will be listed here and on",

@@ -85,4 +85,27 @@ describe("Changelog", () => {
     );
     expect(text(markup)).not.toContain("No stable release yet");
   });
+
+  it("lists stable releases only, newest first, and a release without groups as a maintenance release", () => {
+    const markup = html(
+      withChangelog([
+        release("0.9.0", "2026-12-01", { fixes: "- A fix." }),
+        release("0.10.0-rc.1", "2027-01-20", { features: "- Not yet." }),
+        release("0.10.0", "2027-02-03", { features: "- New." }),
+        release("0.9.1", "2026-12-15"),
+      ]),
+    );
+    const ids = [...markup.matchAll(/<h2 id="([^"]+)"/g)].map((m) => m[1]);
+    expect(ids).toEqual(["v0-10-0", "v0-9-1", "v0-9-0"]);
+    expect(markup).not.toContain("-rc");
+    expect(text(markup)).not.toContain("Not yet.");
+
+    const maintenance = markup.split('<h2 id="v0-9-1"')[1].split("<h2 ")[0];
+    expect(maintenance).not.toMatch(/<h3/);
+    expect(text(maintenance)).toContain(
+      "Maintenance release: dependency and documentation updates. Full release notes on GitHub",
+    );
+    expect(maintenance).toContain(`href="${RELEASES}/tag/v0.9.1"`);
+    expect(markup.match(/Maintenance release/g)).toHaveLength(1);
+  });
 });

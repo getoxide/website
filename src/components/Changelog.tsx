@@ -8,6 +8,15 @@ import styles from "./Changelog.module.css";
 
 const GROUPS = ["breaking", "features", "fixes"] as const;
 
+/** A stable version (Content #12: stable only, no `-rc`, like the updater). */
+const STABLE = /^\d+\.\d+\.\d+$/;
+
+/** Newest first, by version number. */
+const byVersionDesc = (a: string, b: string) => {
+  const [x, y] = [a, b].map((v) => v.split(".").map(Number));
+  return y[0] - x[0] || y[1] - x[1] || y[2] - x[2];
+};
+
 /** Anchor of a version's heading: `0.4.0` → `v0-4-0`. */
 const anchorOf = (version: string) => `v${version.replace(/\./g, "-")}`;
 
@@ -17,7 +26,9 @@ const anchorOf = (version: string) => `v${version.replace(/\./g, "-")}`;
  */
 export function Changelog({ snapshot }: { snapshot: Snapshot }) {
   const copy = COPY.changelog;
-  const entries = snapshot.changelog;
+  const entries = snapshot.changelog
+    .filter((entry) => STABLE.test(entry.version))
+    .sort((a, b) => byVersionDesc(a.version, b.version));
   if (!entries.length) {
     return (
       <Prose>
@@ -40,6 +51,9 @@ export function Changelog({ snapshot }: { snapshot: Snapshot }) {
               <time dateTime={entry.date}>{formatDate(entry.date)}</time>
             </AnchoredHeading>
             <Prose>
+              {GROUPS.every((group) => !entry[group]) ? (
+                <p>{copy.maintenance}</p>
+              ) : null}
               {GROUPS.map((group) => {
                 const notes = entry[group];
                 return notes ? (
