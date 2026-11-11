@@ -1,0 +1,45 @@
+/* Design system, Capture frame: --site-w-frame, the frame radius, surface
+   fill, element border with a lighter top edge and a deep drop shadow. */
+.frame {
+  position: relative;
+  width: 100%;
+  max-width: var(--site-w-frame);
+  margin: 0 auto;
+  overflow: hidden;
+  background: var(--ox-surface-background);
+  border: 1px solid var(--ox-element-border);
+  border-top-color: color-mix(in srgb, var(--ox-text) 35%, transparent);
+  border-radius: var(--site-radius-frame);
+  box-shadow:
+    0 -1px 0 color-mix(in srgb, var(--ox-text-bright) 6%, transparent),
+    0 50px 120px -30px color-mix(in srgb, black 80%, transparent);
+}
+
+/* The width and height attributes reserve the box; CSS scales it. */
+.media {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.toggle {
+  position: absolute;
+  right: var(--site-space-3);
+  bottom: var(--site-space-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  color: var(--ox-text);
+  background: color-mix(in srgb, var(--ox-background) 70%, transparent);
+  border: 1px solid var(--ox-element-border);
+  border-radius: var(--site-radius-pill);
+  cursor: pointer;
+  transition: background-color var(--site-dur-fast) var(--site-ease-fade);
+}
+
+.toggle:hover {
+  background: var(--ox-element-background);
+}
