@@ -1,0 +1,33 @@
+/* `/guides`: two guide entries, separated by hairlines (Design system,
+   Prose: Guides). No cards, no dates. */
+.list {
+  border-top: 1px solid var(--ox-border);
+}
+
+.item {
+  padding: var(--site-space-6) 0;
+  border-bottom: 1px solid var(--ox-border);
+}
+
+.title {
+  font: 500 var(--site-text-h3) var(--site-font-heading);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.title a {
+  color: var(--ox-text-bright);
+  text-decoration: none;
+  transition: color var(--site-dur-fast) var(--site-ease-fade);
+}
+
+.title a:hover {
+  color: var(--ox-text-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.summary {
+  margin-top: var(--site-space-2);
+  color: var(--ox-text-muted);
+}

@@ -53,6 +53,39 @@ export const PAGES = {
     indexable: true,
     llmsSection: "Pages",
   },
+  guides: {
+    path: "/guides",
+    h1: "Guides",
+    title: "Guides · Oxide",
+    description:
+      "Practical guides to reviewing what coding agents write: a method for AI-generated code, and using Claude Code and Codex together as writer and reviewer.",
+    budgetClass: "reading",
+    structuredData: "WebPage",
+    indexable: true,
+    llmsSection: "Guides",
+  },
+  guidesReview: {
+    path: "/guides/review-ai-generated-code",
+    h1: "How to review AI-generated code before you merge",
+    title: "How to review AI-generated code · Oxide",
+    description:
+      "A four-step method to review AI-generated code: read one Turn at a time, check what actually ran, send feedback where it belongs, undo what you don't want.",
+    budgetClass: "reading",
+    structuredData: "TechArticle",
+    indexable: true,
+    llmsSection: "Guides",
+  },
+  guidesCodex: {
+    path: "/guides/claude-code-and-codex-together",
+    h1: "Claude Code and Codex together: one writes, the other reviews",
+    title: "Claude Code and Codex together, with Blind review · Oxide",
+    description:
+      "Use Claude Code and Codex together: let one agent write the change and have the other review only the diff and the issue, never the original conversation.",
+    budgetClass: "reading",
+    structuredData: "TechArticle",
+    indexable: true,
+    llmsSection: "Guides",
+  },
   docsQuickStart: {
     path: "/docs/quick-start",
     h1: "Quick start",
