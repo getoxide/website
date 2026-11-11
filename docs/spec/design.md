@@ -187,7 +187,7 @@ Highlighted **at build time** with Shiki, using a theme generated from the `--ox
 
 ### FAQ
 
-Native `<details>`/`<summary>`, no JS. Questions are `<summary>` elements; answers are Prose.
+Headings and visible answers, no JS. Each question is a heading with an `id` and an anchor link, revealed on hover and focus as on Concepts; each answer is Prose, visible text in the HTML, never collapsed (no `<details>`). Decided on [Oxide website v1](https://github.com/getoxide/website/issues/29); the page FAQs in the Copy deck follow the same rule.
 
 ### Changelog entry
 
