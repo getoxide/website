@@ -64,6 +64,17 @@ export const PAGES = {
     indexable: true,
     llmsSection: "Pages",
   },
+  features: {
+    path: "/features",
+    h1: "Everything between the prompt and the merge",
+    title: "Features: from the prompt to the merge · Oxide",
+    description:
+      "Every Oxide feature, from the prompt to the merge: drive three agent CLIs, review each Turn and what actually ran, then open the pull request and merge it.",
+    budgetClass: "showcase",
+    structuredData: "WebPage",
+    indexable: true,
+    llmsSection: "Pages",
+  },
   docsQuickStart: {
     path: "/docs/quick-start",
     h1: "Quick start",

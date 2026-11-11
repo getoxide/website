@@ -7,6 +7,8 @@
 // (getoxide/website#15); the hero's still seeds from the visual-direction
 // prototype.
 
+import { FEATURE_GROUPS, featureSlot } from "./features.ts";
+
 export type CaptureSlot = {
   kind: "image" | "video";
   /** Says what the app shows, never "screenshot" (Budgets, Accessibility). */
@@ -20,7 +22,20 @@ export type CaptureSlot = {
   ceiling?: { width: number; bytes: number };
 };
 
+/**
+ * One slot per `/features` section, `feature-<anchor>` (Copy deck,
+ * `/features`). The pending Pull requests section has its slot too: empty
+ * slots render nothing, so a capture dropped in early waits for its section.
+ */
+const FEATURE_SLOTS: Record<string, CaptureSlot> = Object.fromEntries(
+  FEATURE_GROUPS.flatMap((group) => group.features).map((feature) => [
+    featureSlot(feature.anchor),
+    { kind: "image", alt: feature.captureAlt, quality: 60 },
+  ]),
+);
+
 export const CAPTURE_SLOTS = {
+  ...FEATURE_SLOTS,
   hero: {
     kind: "image",
     alt: "Oxide: a Thread with Claude Code in the centre, the Project's Threads on the left and the Diff Surface on the right",
@@ -40,6 +55,6 @@ export const CAPTURE_SLOTS = {
     alt: "Oxide's Verification Dossier for a Codex Turn: the closing message kept apart from the checks that actually ran",
     quality: 60,
   },
-} as const satisfies Record<string, CaptureSlot>;
+} satisfies Record<string, CaptureSlot>;
 
 export type SlotId = keyof typeof CAPTURE_SLOTS;
