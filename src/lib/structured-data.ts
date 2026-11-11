@@ -17,8 +17,13 @@ const FOUNDER_URL = "https://cavallinilorenzo.com";
 
 /** Schema.org application category of a desktop developer tool. */
 const APPLICATION_CATEGORY = "DeveloperApplication";
-/** Machine-readable layer #14, decision 6. */
-const OPERATING_SYSTEM = "macOS (Apple Silicon), Windows 10/11 x64";
+
+/**
+ * Whether the Snapshot's canonical definition calls Oxide free. The price
+ * fact is derived from it, never typed out (Copy deck, rule 5).
+ */
+const isFree = (snapshot: Snapshot) =>
+  /\bfree\b/i.test(snapshot.readme.definition);
 
 const ids = (siteUrl: string) => ({
   website: `${siteUrl}/#website`,
@@ -62,8 +67,12 @@ const softwareApplication = (snapshot: Snapshot, siteUrl: string): JsonLd => {
     name: "Oxide",
     description: markdownText(snapshot.readme.definition),
     applicationCategory: APPLICATION_CATEGORY,
-    operatingSystem: OPERATING_SYSTEM,
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    // Machine-readable layer #14, decision 6: the platforms the release
+    // actually ships (Copy deck, ⟨platforms⟩), never a typed-out list.
+    operatingSystem: snapshot.release.platforms.join(", "),
+    ...(isFree(snapshot)
+      ? { offers: { "@type": "Offer", price: "0", priceCurrency: "USD" } }
+      : {}),
     license: LICENCE_URL,
     downloadUrl: `${siteUrl}/download`,
     sameAs: [REPO_URL],

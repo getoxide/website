@@ -68,7 +68,7 @@ describe("the home @graph", () => {
       name: "Oxide",
       description: markdownText(SNAPSHOT.readme.definition),
       applicationCategory: "DeveloperApplication",
-      operatingSystem: "macOS (Apple Silicon), Windows 10/11 x64",
+      operatingSystem: SNAPSHOT.release.platforms.join(", "),
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
       license: LICENCE_URL,
       downloadUrl: `${SITE_URL}/download`,
@@ -77,6 +77,32 @@ describe("the home @graph", () => {
     expect(markdownText(SNAPSHOT.readme.definition)).not.toMatch(/[*[\]]/);
     // No stable release in the Snapshot: the version is omitted, not empty.
     expect(app).not.toHaveProperty("softwareVersion");
+  });
+
+  it("derives the platforms and the price from the Snapshot", () => {
+    const app = byType("SoftwareApplication");
+    expect(app.operatingSystem).toBe("macOS on Apple Silicon, Windows x64");
+
+    const windowsOnly = {
+      ...SNAPSHOT,
+      release: { ...SNAPSHOT.release, platforms: ["Windows x64"] },
+    };
+    const node = (
+      homeGraph(windowsOnly)["@graph"] as Record<string, unknown>[]
+    ).find((n) => n["@type"] === "SoftwareApplication")!;
+    expect(node.operatingSystem).toBe("Windows x64");
+
+    const priced = {
+      ...SNAPSHOT,
+      readme: {
+        ...SNAPSHOT.readme,
+        definition: SNAPSHOT.readme.definition.replace("free, ", ""),
+      },
+    };
+    const noOffer = (
+      homeGraph(priced)["@graph"] as Record<string, unknown>[]
+    ).find((n) => n["@type"] === "SoftwareApplication")!;
+    expect(noOffer).not.toHaveProperty("offers");
   });
 
   it("adds the version once a stable release exists", () => {
