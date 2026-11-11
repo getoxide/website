@@ -61,6 +61,38 @@ export function buildIco(pngs) {
   return Buffer.concat([header, ...entries, ...pngs]);
 }
 
+const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/**
+ * The text of a README section between `<!-- site:<key> -->` and
+ * `<!-- /site:<key> -->` (Content sourced from the Oxide repo #12). Only those
+ * exact comment forms count: a bare `site:` elsewhere (the README's top note
+ * says `site:*`) is ordinary text.
+ * @param {string} readme
+ * @param {string} key
+ */
+export function extractSection(readme, key) {
+  const k = escapeRegExp(key);
+  const open = new RegExp(`<!--\\s*site:${k}\\s*-->`, "g");
+  const close = new RegExp(`<!--\\s*/site:${k}\\s*-->`, "g");
+  const opens = [...readme.matchAll(open)];
+  const closes = [...readme.matchAll(close)];
+  if (opens.length === 0) throw new Error(`README marker site:${key} missing`);
+  if (closes.length === 0) {
+    throw new Error(`README marker /site:${key} missing`);
+  }
+  if (opens.length > 1 || closes.length > 1) {
+    throw new Error(`README marker site:${key} appears more than once`);
+  }
+  const start = opens[0].index + opens[0][0].length;
+  const end = closes[0].index;
+  if (end < start)
+    throw new Error(`README marker /site:${key} before site:${key}`);
+  const text = readme.slice(start, end).trim();
+  if (!text) throw new Error(`README section site:${key} is empty`);
+  return text;
+}
+
 /**
  * Fetches the brand files at `ref` and writes them into the site.
  * @param {{
