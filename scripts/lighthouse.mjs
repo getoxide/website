@@ -127,7 +127,17 @@ async function main() {
   const server = await serve(port);
   const chrome = await launch({
     chromePath: process.env.CHROME_PATH ?? chromium.executablePath(),
-    chromeFlags: ["--headless=new", "--no-sandbox", "--disable-gpu"],
+    // No WebGL in the measurement: with `--disable-gpu`, Linux CI falls back
+    // to SwiftShader, whose software GL makes the hero shader and even
+    // Lighthouse's own gatherer slow and TBT noisy (Budgets, Shader: GPU time
+    // is not a CI number). Disabling the software rasteriser gives every run
+    // the same no-WebGL page, where the static gradient is the real fallback.
+    chromeFlags: [
+      "--headless=new",
+      "--no-sandbox",
+      "--disable-gpu",
+      "--disable-software-rasterizer",
+    ],
   });
 
   const failures = [];
