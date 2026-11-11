@@ -26,6 +26,7 @@
     "@types/react-dom": "^19.3.0",
     "eslint": "^10.14.0",
     "eslint-config-next": "^16.4.5",
+    "parse5": "^8.1.1",
     "prettier": "^3.9.10",
     "typescript": "^6.0.3",
     "vitest": "^5.1.0"
