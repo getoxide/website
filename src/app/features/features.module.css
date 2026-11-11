@@ -1,0 +1,6 @@
+.intro {
+  max-width: var(--site-w-prose);
+  margin: 0 0 var(--site-space-9);
+  font: 400 var(--site-text-small) var(--site-font-body);
+  color: var(--ox-text-muted);
+}
