@@ -13,6 +13,9 @@ const at = (needle) => {
   return i;
 };
 
+/** The whole step that contains `cmd`, from its `- name:` line. */
+const stepOf = (cmd) => wf.slice(wf.lastIndexOf("- name:", at(cmd)), at(cmd));
+
 describe("content-sync workflow", () => {
   it("runs daily and by hand with an optional ref", () => {
     expect(wf).toMatch(/schedule:\s*\n\s*- cron: "[^"]+"/);
@@ -37,26 +40,81 @@ describe("content-sync workflow", () => {
   });
 
   it("syncs, stops when unchanged, checks, then commits and pushes last", () => {
-    const sync = at("pnpm sync:oxide");
-    const changed = at("changed=");
-    const test = at("pnpm test");
-    const build = at("pnpm build");
-    const e2e = at("pnpm e2e");
-    const commit = at("git commit");
-    const push = at("git push origin HEAD:main");
-    expect(sync).toBeLessThan(changed);
-    expect(changed).toBeLessThan(test);
-    expect(test).toBeLessThan(build);
-    expect(build).toBeLessThan(e2e);
-    expect(e2e).toBeLessThan(commit);
-    expect(commit).toBeLessThan(push);
+    const order = [
+      "pnpm sync:oxide",
+      "changed=",
+      "pnpm test",
+      "pnpm build",
+      "pnpm check:budgets",
+      "pnpm check:copy",
+      "pnpm check:concept-links",
+      "pnpm e2e",
+      "pnpm check:lighthouse",
+      "git commit",
+      "git push origin HEAD:main",
+    ].map(at);
+    expect(order).toEqual([...order].sort((a, b) => a - b));
     expect(wf.match(/git push/g)).toHaveLength(1);
   });
 
+  // ADR-0003: a changed Snapshot is pushed only when the site's checks pass.
+  // engineering.md defines those as format, lint, typecheck, test, build,
+  // budgets, copy, concept links, e2e and Lighthouse (issue #29, item 3).
+  it("runs every check engineering.md defines", () => {
+    for (const cmd of [
+      "pnpm format:check",
+      "pnpm lint",
+      "pnpm typecheck",
+      "pnpm test",
+      "pnpm build",
+      "pnpm check:budgets",
+      "pnpm check:copy",
+      "pnpm check:concept-links",
+      "pnpm e2e",
+      "pnpm check:lighthouse",
+    ]) {
+      expect(wf, cmd).toContain(cmd);
+    }
+  });
+
+  it("installs the browser before every check that needs it", () => {
+    const browser = at("pnpm exec playwright install");
+    expect(browser).toBeLessThan(at("pnpm og:card"));
+    expect(browser).toBeLessThan(at("pnpm e2e"));
+    expect(browser).toBeLessThan(at("pnpm check:lighthouse"));
+  });
+
+  it("regenerates the share card before the tests when the tokens changed", () => {
+    const og = stepOf("pnpm og:card");
+    expect(og).toContain("steps.sync.outputs.tokens == 'true'");
+    expect(at("pnpm og:card")).toBeLessThan(at("pnpm test"));
+    expect(wf).toContain("content/oxide/brand");
+    expect(wf).toContain("tokens=true");
+  });
+
+  it("commits the regenerated card with the Snapshot", () => {
+    const commit = stepOf("git commit");
+    expect(commit).toContain("public/og.png");
+    expect(commit).toContain("assets/og-card.json");
+  });
+
   it("gates every check step on a changed Snapshot", () => {
-    for (const cmd of ["pnpm test", "pnpm build", "pnpm e2e", "git commit"]) {
-      const step = wf.slice(wf.lastIndexOf("- name:", at(cmd)), at(cmd));
-      expect(step, cmd).toContain("steps.sync.outputs.changed == 'true'");
+    for (const cmd of [
+      "pnpm format:check",
+      "pnpm lint",
+      "pnpm typecheck",
+      "pnpm test",
+      "pnpm build",
+      "pnpm check:budgets",
+      "pnpm check:copy",
+      "pnpm check:concept-links",
+      "pnpm e2e",
+      "pnpm check:lighthouse",
+      "git commit",
+    ]) {
+      expect(stepOf(cmd), cmd).toContain(
+        "steps.sync.outputs.changed == 'true'",
+      );
     }
   });
 
@@ -64,8 +122,8 @@ describe("content-sync workflow", () => {
     expect(wf).toMatch(/chore\(content\): sync from oxide \$/);
   });
 
-  it("lists new glossary terms in the job summary", () => {
-    expect(wf).toContain("New glossary terms");
+  it("labels the summary with the glossary terms that are not on the site", () => {
+    expect(wf).toContain("Glossary terms not on the site");
     expect(wf).toContain("GITHUB_STEP_SUMMARY");
   });
 });

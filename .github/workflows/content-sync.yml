@@ -26,7 +26,7 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     env:
       NEXT_TELEMETRY_DISABLED: 1
     steps:
@@ -60,9 +60,9 @@ jobs:
           pnpm sync:oxide "${args[@]}" 2>&1 | tee sync.log
           {
             echo "### Content sync"
-            if grep -q "New glossary terms" sync.log; then
+            if grep -q "Glossary terms not on the site" sync.log; then
               echo
-              grep "New glossary terms" sync.log | sed 's/^/- /'
+              grep "Glossary terms not on the site" sync.log | sed 's/^/- /'
             fi
           } >> "$GITHUB_STEP_SUMMARY"
           if [ -z "$(git status --porcelain -- content src/app)" ]; then
@@ -70,21 +70,57 @@ jobs:
             echo "Snapshot unchanged, nothing to commit." >> "$GITHUB_STEP_SUMMARY"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
+            if [ -n "$(git status --porcelain -- content/oxide/brand)" ]; then
+              echo "tokens=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "tokens=false" >> "$GITHUB_OUTPUT"
+            fi
           fi
 
-      # The site's own checks, on the synced files, before anything is pushed.
+      # The share card is a function of the brand tokens and the hero lines:
+      # regenerate it before the staleness test, or a token sync would fail
+      # every run and never reach main. It needs Chromium.
+      - name: Install the browser
+        if: steps.sync.outputs.changed == 'true'
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Regenerate the share card
+        if: steps.sync.outputs.changed == 'true' && steps.sync.outputs.tokens == 'true'
+        run: pnpm og:card
+
+      # The site's own checks (docs/agents/engineering.md), on the synced
+      # files, before anything is pushed. Budgets, copy and Concept links read
+      # the export, so they run after the build.
+      - name: Format
+        if: steps.sync.outputs.changed == 'true'
+        run: pnpm format:check
+      - name: Lint
+        if: steps.sync.outputs.changed == 'true'
+        run: pnpm lint
+      - name: Typecheck
+        if: steps.sync.outputs.changed == 'true'
+        run: pnpm typecheck
       - name: Snapshot schema and unit tests
         if: steps.sync.outputs.changed == 'true'
         run: pnpm test
       - name: Build
         if: steps.sync.outputs.changed == 'true'
         run: pnpm build
-      - name: Install the browser
+      - name: Budgets
         if: steps.sync.outputs.changed == 'true'
-        run: pnpm exec playwright install --with-deps chromium
+        run: pnpm check:budgets
+      - name: Copy
+        if: steps.sync.outputs.changed == 'true'
+        run: pnpm check:copy
+      - name: Concept links
+        if: steps.sync.outputs.changed == 'true'
+        run: pnpm check:concept-links
       - name: End-to-end tests
         if: steps.sync.outputs.changed == 'true'
         run: pnpm e2e
+      - name: Lighthouse
+        if: steps.sync.outputs.changed == 'true'
+        run: pnpm check:lighthouse
 
       - name: Commit the Snapshot
         if: steps.sync.outputs.changed == 'true'
@@ -93,7 +129,7 @@ jobs:
           ref="$(node -p "JSON.parse(require('fs').readFileSync('content/oxide/source.json','utf8')).ref")"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A content src/app
+          git add -A content src/app public/og.png assets/og-card.json
           git commit -m "chore(content): sync from oxide ${ref}"
           echo "Synced from oxide ${ref}." >> "$GITHUB_STEP_SUMMARY"
       - name: Push to main
