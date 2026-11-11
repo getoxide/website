@@ -94,6 +94,61 @@ export function extractSection(readme, key) {
 }
 
 /**
+ * The Concepts allowlist: the user-facing glossary terms `/docs/concepts`
+ * renders, in page order (Content sourced from the Oxide repo #12, addendum
+ * point 4). It lives in the website repo; extend it deliberately.
+ */
+export const CONCEPTS = [
+  "Project",
+  "Thread",
+  "Turn",
+  "Provider",
+  "Surface",
+  "Checkpoint",
+  "Verification Dossier",
+  "Blind review",
+  "Restore",
+];
+
+const conceptId = (term) => term.toLowerCase().replace(/\s+/g, "-");
+
+/**
+ * The allowlisted terms of the Oxide GLOSSARY.md, definitions verbatim with
+ * the `_Avoid_` lines stripped, plus the terms left off the allowlist.
+ * An entry is a `**Term**:` line followed by its definition lines up to the
+ * next blank line.
+ * @param {string} glossary
+ * @returns {{
+ *   concepts: { term: string, id: string, definition: string }[],
+ *   unlisted: string[],
+ * }}
+ */
+export function extractConcepts(glossary) {
+  const entries = new Map();
+  const lines = glossary.replace(/\r\n/g, "\n").split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    const head = lines[i].match(/^\*\*(.+?)\*\*:\s*$/);
+    if (!head) continue;
+    const body = [];
+    for (let j = i + 1; j < lines.length && lines[j].trim() !== ""; j++) {
+      if (!/^_Avoid_:/.test(lines[j])) body.push(lines[j]);
+    }
+    entries.set(head[1], body.join("\n").trim());
+  }
+  const concepts = CONCEPTS.map((term) => {
+    if (!entries.has(term)) {
+      throw new Error(`GLOSSARY term "${term}" missing (Concepts allowlist)`);
+    }
+    const definition = entries.get(term);
+    if (!definition)
+      throw new Error(`GLOSSARY term "${term}" has no definition`);
+    return { term, id: conceptId(term), definition };
+  });
+  const unlisted = [...entries.keys()].filter((t) => !CONCEPTS.includes(t));
+  return { concepts, unlisted };
+}
+
+/**
  * Fetches the brand files at `ref` and writes them into the site.
  * @param {{
  *   ref: string,

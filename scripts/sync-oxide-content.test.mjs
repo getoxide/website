@@ -1,5 +1,112 @@
 import { describe, expect, it } from "vitest";
-import { extractSection } from "./sync-oxide.mjs";
+import { extractConcepts, extractSection } from "./sync-oxide.mjs";
+
+const GLOSSARY = `# Oxide
+
+A desktop app for agentic engineering.
+
+## Language
+
+## Projects
+
+**Project**:
+A folder holding a Git repository.
+_Avoid_: Workspace, repo
+
+**Open Project**:
+A Project the user opened.
+_Avoid_: Pinned
+
+## Threads
+
+**Thread**:
+One conversation with a single Provider. \`/clear\` starts a new Thread. See ADR-0005.
+_Avoid_: Agent, session
+
+**Turn**:
+One user prompt in a Thread
+and everything the Provider does in response.
+_Avoid_: Run
+
+**Checkpoint**:
+A snapshot of a Thread's files.
+
+## Review
+
+**Verification Dossier**:
+The account of a change's intent, evidence and risk signals.
+_Avoid_: Report
+
+**Blind review**:
+A review of a change by a Provider session that received only the diff.
+
+## Providers
+
+**Provider**:
+An agent CLI that Oxide drives: Claude Code, Codex, or Antigravity CLI (\`agy\`).
+_Avoid_: Agent
+
+## Layout
+
+**Surface**:
+One of the five tools in the right dock.
+
+**Restore**:
+Putting the selected Thread's files back.
+_Avoid_: Rewind
+`;
+
+describe("extractConcepts", () => {
+  it("takes the nine allowlisted terms in allowlist order, definitions verbatim, _Avoid_ lines stripped", () => {
+    const { concepts } = extractConcepts(GLOSSARY);
+    expect(concepts.map((c) => c.term)).toEqual([
+      "Project",
+      "Thread",
+      "Turn",
+      "Provider",
+      "Surface",
+      "Checkpoint",
+      "Verification Dossier",
+      "Blind review",
+      "Restore",
+    ]);
+    expect(concepts.map((c) => c.id)).toEqual([
+      "project",
+      "thread",
+      "turn",
+      "provider",
+      "surface",
+      "checkpoint",
+      "verification-dossier",
+      "blind-review",
+      "restore",
+    ]);
+    expect(concepts[1].definition).toBe(
+      "One conversation with a single Provider. `/clear` starts a new Thread. See ADR-0005.",
+    );
+    expect(concepts[2].definition).toBe(
+      "One user prompt in a Thread\nand everything the Provider does in response.",
+    );
+    expect(concepts.some((c) => c.definition.includes("_Avoid_"))).toBe(false);
+  });
+
+  it("lists the glossary terms that are not on the allowlist", () => {
+    expect(extractConcepts(GLOSSARY).unlisted).toEqual(["Open Project"]);
+  });
+
+  it("fails loudly when an allowlisted term is missing", () => {
+    const glossary = GLOSSARY.replace("**Turn**:", "**Round**:");
+    expect(() => extractConcepts(glossary)).toThrow(/Turn/);
+  });
+
+  it("fails when an allowlisted term has no definition", () => {
+    const glossary = GLOSSARY.replace(
+      "**Surface**:\nOne of the five tools in the right dock.\n",
+      "**Surface**:\n",
+    );
+    expect(() => extractConcepts(glossary)).toThrow(/Surface.*definition/);
+  });
+});
 
 describe("extractSection", () => {
   it("returns the text between the exact site markers, trimmed", () => {
