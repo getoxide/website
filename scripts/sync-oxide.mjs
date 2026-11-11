@@ -148,6 +148,60 @@ export function extractConcepts(glossary) {
   return { concepts, unlisted };
 }
 
+/**
+ * README anchors of sections the site hosts, and where they live on the site
+ * (Content #12, Links). Any other anchor links to the README on GitHub.
+ */
+export const SITE_ANCHORS = {
+  requirements: "/docs/quick-start#requirements",
+  "quick-start": "/docs/quick-start",
+  faq: "/faq",
+};
+
+/** Where a link target of the Oxide README points once on the site. */
+function resolveTarget(target, ref, { image }) {
+  if (/^([a-z][a-z\d+.-]*:|\/\/)/i.test(target)) return target;
+  if (target.startsWith("#")) {
+    const anchor = target.slice(1);
+    return (
+      SITE_ANCHORS[anchor] ??
+      `https://github.com/${OXIDE_REPO}/blob/${ref}/README.md${target}`
+    );
+  }
+  const path = target.replace(/^(\.\/|\/)+/, "");
+  if (image)
+    return `https://raw.githubusercontent.com/${OXIDE_REPO}/${ref}/${path}`;
+  const kind = path.split("#")[0].endsWith("/") ? "tree" : "blob";
+  return `https://github.com/${OXIDE_REPO}/${kind}/${ref}/${path}`;
+}
+
+/**
+ * Rewrites the links of README Markdown for the site: relative repo links
+ * become absolute GitHub URLs at `ref`, anchors the site hosts become site
+ * URLs. Code spans and fenced code are left untouched.
+ * @param {string} markdown
+ * @param {string} ref
+ */
+export function rewriteLinks(markdown, ref) {
+  return markdown
+    .split(/(```[\s\S]*?```|`[^`\n]*`)/)
+    .map((part, i) => {
+      if (i % 2 === 1) return part;
+      return part
+        .replace(
+          /(!?)\[([^\]]*)\]\(\s*([^)\s]+)((?:\s+"[^"]*")?)\s*\)/g,
+          (_m, bang, text, target, title) =>
+            `${bang}[${text}](${resolveTarget(target, ref, { image: !!bang })}${title})`,
+        )
+        .replace(
+          /\b(href|src)="([^"]+)"/g,
+          (_m, attr, target) =>
+            `${attr}="${resolveTarget(target, ref, { image: attr === "src" })}"`,
+        );
+    })
+    .join("");
+}
+
 /** GitHub's page listing every Oxide release. */
 export const RELEASES_URL = `https://github.com/${OXIDE_REPO}/releases`;
 

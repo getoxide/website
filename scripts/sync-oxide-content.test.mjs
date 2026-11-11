@@ -1,5 +1,61 @@
 import { describe, expect, it } from "vitest";
-import { extractConcepts, extractSection, releaseData } from "./sync-oxide.mjs";
+import {
+  extractConcepts,
+  extractSection,
+  releaseData,
+  rewriteLinks,
+} from "./sync-oxide.mjs";
+
+describe("rewriteLinks", () => {
+  const BLOB = "https://github.com/getoxide/oxide/blob/v1.2.3";
+
+  it("makes relative repo links absolute GitHub URLs at the pinned ref", () => {
+    expect(
+      rewriteLinks(
+        "Under the [MIT License](LICENSE), see [the ADR](docs/adr/0010-x.md) and [packaging](./docs/dictation.md#packaging).",
+        "v1.2.3",
+      ),
+    ).toBe(
+      `Under the [MIT License](${BLOB}/LICENSE), see [the ADR](${BLOB}/docs/adr/0010-x.md) and [packaging](${BLOB}/docs/dictation.md#packaging).`,
+    );
+  });
+
+  it("links a directory as a tree and an image to its raw file", () => {
+    expect(
+      rewriteLinks("[ADRs](docs/adr/) ![Logo](assets/logo.svg)", "v1.2.3"),
+    ).toBe(
+      "[ADRs](https://github.com/getoxide/oxide/tree/v1.2.3/docs/adr/) ![Logo](https://raw.githubusercontent.com/getoxide/oxide/v1.2.3/assets/logo.svg)",
+    );
+  });
+
+  it("maps README anchors the site hosts to site URLs, the rest to the README on GitHub", () => {
+    expect(
+      rewriteLinks(
+        "[reqs](#requirements) [start](#quick-start) [faq](#faq) [build](#build-from-source)",
+        "main",
+      ),
+    ).toBe(
+      "[reqs](/docs/quick-start#requirements) [start](/docs/quick-start) [faq](/faq) [build](https://github.com/getoxide/oxide/blob/main/README.md#build-from-source)",
+    );
+  });
+
+  it("leaves absolute URLs, mail links and inline code alone", () => {
+    const md =
+      '[Tauri](https://tauri.app) [mail](mailto:a@b.c) `[x](LICENSE)` [cli](https://cli.github.com "GitHub CLI")';
+    expect(rewriteLinks(md, "main")).toBe(md);
+  });
+
+  it("rewrites HTML href and src attributes the same way", () => {
+    expect(
+      rewriteLinks(
+        '<a href="CONTRIBUTING.md">C</a> <img src="assets/a.png">',
+        "main",
+      ),
+    ).toBe(
+      '<a href="https://github.com/getoxide/oxide/blob/main/CONTRIBUTING.md">C</a> <img src="https://raw.githubusercontent.com/getoxide/oxide/main/assets/a.png">',
+    );
+  });
+});
 
 const INSTALL = `| Platform | File | Notes |
 | --- | --- | --- |
