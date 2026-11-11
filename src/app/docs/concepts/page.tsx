@@ -1,5 +1,5 @@
+import { AnchoredHeading } from "@/components/AnchoredHeading";
 import { DocsNav } from "@/components/DocsNav";
-import { Icon } from "@/components/Icon";
 import { Markdown } from "@/components/Markdown";
 import { PageHeader } from "@/components/PageHeader";
 import { Prose } from "@/components/Prose";
@@ -9,7 +9,7 @@ import { PAGES } from "@/content/pages";
 import { pageMetadata } from "@/lib/metadata";
 import { GLOSSARY_URL } from "@/lib/oxide";
 import { SNAPSHOT } from "@/lib/snapshot";
-import styles from "../docs.module.css";
+import styles from "../../reading.module.css";
 
 export const metadata = pageMetadata(PAGES.docsConcepts);
 
@@ -31,16 +31,9 @@ export default function ConceptsPage() {
         <DocsNav path={page.path} />
         {SNAPSHOT.concepts.map(({ term, id, definition }) => (
           <section key={id} className={styles.section} aria-labelledby={id}>
-            <div className={styles.term}>
-              <h2 id={id}>{term}</h2>
-              <a
-                className={styles.anchor}
-                href={`#${id}`}
-                aria-label={copy.anchorLabel(term)}
-              >
-                <Icon name="link" />
-              </a>
-            </div>
+            <AnchoredHeading id={id} label={COPY.anchorLabel(term)}>
+              {term}
+            </AnchoredHeading>
             <Prose id={`${id}-definition`}>
               <Markdown source={definition} />
             </Prose>

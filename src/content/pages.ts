@@ -75,6 +75,29 @@ export const PAGES = {
     indexable: true,
     llmsSection: "Pages",
   },
+  faq: {
+    path: "/faq",
+    h1: "Frequently asked questions",
+    title: "FAQ · Oxide",
+    description:
+      "Answers about Oxide, the open-source desktop app for Claude Code and Codex: what it is, what it is not, where your code goes and how it differs.",
+    budgetClass: "reading",
+    structuredData: "FAQPage",
+    indexable: true,
+    llmsSection: "Pages",
+  },
+  changelog: {
+    path: "/changelog",
+    h1: "Changelog",
+    title: "Changelog · Oxide",
+    description:
+      "Every stable Oxide release, newest first: breaking changes, new features and fixes, with a link to the full release notes on GitHub for each version.",
+    budgetClass: "reading",
+    structuredData: "WebPage",
+    indexable: true,
+    // Machine-readable layer #14, decision 7: Changelog is under Optional.
+    llmsSection: "Optional",
+  },
   // Not in the Copy deck: build-written, approved by Lorenzo in review.
   privacy: {
     path: "/privacy",

@@ -8,6 +8,9 @@ export type Link = { label: string; href: string };
 export const COPY = {
   skipLink: "Skip to content",
 
+  /** Accessible name of a heading's anchor link (build-written). */
+  anchorLabel: (heading: string) => `Link to ${heading}`,
+
   /**
    * Site header. Labels and targets from Page inventory (#9), Header; the
    * logo's alt text, the GitHub link's name and "Menu" are build-written.
@@ -92,7 +95,33 @@ export const COPY = {
     concepts: {
       leadBefore: "The words Oxide uses, defined in the Oxide",
       glossary: "glossary",
-      anchorLabel: (term: string) => `Link to ${term}`,
+    },
+  },
+
+  /**
+   * `/changelog`. The group names, the per-version link and the maintenance
+   * line come from Content #12 (Changelog); the empty-state line, the
+   * older-releases line and the anchor-link name are build-written, drafts
+   * Lorenzo approves in review.
+   */
+  changelog: {
+    groups: {
+      breaking: "Breaking changes",
+      features: "Features",
+      fixes: "Fixes",
+    },
+    fullNotes: "Full release notes on GitHub",
+    maintenance: "Maintenance release: dependency and documentation updates.",
+    anchorLabel: (version: string) => `Link to version ${version}`,
+    older: {
+      before: "Older releases are on",
+      link: "GitHub Releases",
+      after: ".",
+    },
+    empty: {
+      before: "No stable release yet. New versions will be listed here and on",
+      link: "GitHub Releases",
+      after: ".",
     },
   },
 
