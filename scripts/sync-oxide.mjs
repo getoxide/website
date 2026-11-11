@@ -94,6 +94,37 @@ export function extractSection(readme, key) {
 }
 
 /**
+ * The Features groups (`### …`) and each bullet's bold lead-in, the names the
+ * `/features` contract checks (Copy #18, feature names). The narrative after
+ * each lead-in stays in the README.
+ * @param {string} features the `site:features` section
+ * @returns {{ group: string, leadIns: string[] }[]}
+ */
+export function extractFeatures(features) {
+  const groups = [];
+  for (const line of features.split("\n")) {
+    const heading = line.match(/^###\s+(.+?)\s*$/);
+    if (heading) {
+      groups.push({ group: heading[1], leadIns: [] });
+      continue;
+    }
+    if (!/^[-*]\s/.test(line)) continue;
+    const leadIn = line.match(/^[-*]\s+\*\*(.+?)\*\*/);
+    if (!leadIn)
+      throw new Error(`README feature without a bold lead-in: ${line}`);
+    if (!groups.length)
+      throw new Error(`README feature before any group: ${line}`);
+    groups.at(-1).leadIns.push(leadIn[1].replace(/[.:]\s*$/, ""));
+  }
+  for (const { group, leadIns } of groups) {
+    if (!leadIns.length)
+      throw new Error(`README feature group "${group}" is empty`);
+  }
+  if (!groups.length) throw new Error("README Features has no group");
+  return groups;
+}
+
+/**
  * The Concepts allowlist: the user-facing glossary terms `/docs/concepts`
  * renders, in page order (Content sourced from the Oxide repo #12, addendum
  * point 4). It lives in the website repo; extend it deliberately.

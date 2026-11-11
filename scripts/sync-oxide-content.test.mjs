@@ -1,10 +1,53 @@
 import { describe, expect, it } from "vitest";
 import {
   extractConcepts,
+  extractFeatures,
   extractSection,
   releaseData,
   rewriteLinks,
 } from "./sync-oxide.mjs";
+
+describe("extractFeatures", () => {
+  it("keeps only the groups and the bold lead-ins, without their final period", () => {
+    const features = [
+      "### One app, every agent CLI",
+      "",
+      "- **Multiple Providers.** Use [Claude Code](https://x) side by side.",
+      "- **Threads.** Each Thread is one conversation.",
+      "",
+      "### Review before you merge",
+      "",
+      "- **Diff by Turn, Uncommitted or Branch.** See exactly what changed.",
+      "- **Verification Dossier.** An account of the change.",
+    ].join("\n");
+    expect(extractFeatures(features)).toEqual([
+      {
+        group: "One app, every agent CLI",
+        leadIns: ["Multiple Providers", "Threads"],
+      },
+      {
+        group: "Review before you merge",
+        leadIns: [
+          "Diff by Turn, Uncommitted or Branch",
+          "Verification Dossier",
+        ],
+      },
+    ]);
+  });
+
+  it("fails on a feature bullet with no bold lead-in", () => {
+    expect(() =>
+      extractFeatures("### Group\n\n- Plain bullet with no lead-in."),
+    ).toThrow(/lead-in/);
+  });
+
+  it("fails on a group with no features, or features before any group", () => {
+    expect(() => extractFeatures("### Empty\n\n### Full\n- **A.** a")).toThrow(
+      /Empty/,
+    );
+    expect(() => extractFeatures("- **A.** a")).toThrow(/group/);
+  });
+});
 
 describe("rewriteLinks", () => {
   const BLOB = "https://github.com/getoxide/oxide/blob/v1.2.3";
