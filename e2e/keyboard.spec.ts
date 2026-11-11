@@ -125,9 +125,9 @@ test.describe("at 1280px", () => {
     }
     expect(names).toEqual([
       // Links in the canonical definition, which opens the footer.
-      ...[
-        ...SNAPSHOT.readme.definition.matchAll(/(?<!!)\[([^\]]+)\]\(/g),
-      ].map((m) => m[1]),
+      ...[...SNAPSHOT.readme.definition.matchAll(/(?<!!)\[([^\]]+)\]\(/g)].map(
+        (m) => m[1],
+      ),
       "Features",
       "Download",
       "Changelog",
