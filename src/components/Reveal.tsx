@@ -3,12 +3,13 @@
 import { useEffect, useRef, type ReactNode } from "react";
 
 /**
- * A section reveal (ADR-0001, Rules that follow): plays once per page view,
- * never reverses, and is never used above the fold. It only marks the element
- * `data-in` the first time it scrolls into view; the CSS that hides the start
- * state applies only under `html[data-motion]`, which the inline motion
- * script sets when JavaScript runs and the visitor allows motion. The server
- * HTML therefore carries no hidden state.
+ * A section reveal (ADR-0001, Rules that follow). The server HTML carries no
+ * hidden state: once JavaScript runs, motion is allowed
+ * (`prefers-reduced-motion` is not `reduce`) and the section starts below the
+ * fold, it is marked `data-pending`, which the CSS reads as the hidden start
+ * state. The first time it scrolls into view it is marked `data-in` and plays,
+ * once per page view, never reversing. A section already on screen is never
+ * hidden: no reveal above the fold.
  */
 export function Reveal({
   className,
@@ -22,15 +23,21 @@ export function Reveal({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const reveal = () => el.setAttribute("data-in", "");
-    if (typeof IntersectionObserver === "undefined") {
-      reveal();
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const belowTheFold = el.getBoundingClientRect().top >= innerHeight;
+    if (
+      reduced ||
+      !belowTheFold ||
+      typeof IntersectionObserver === "undefined"
+    ) {
       return;
     }
+    el.setAttribute("data-pending", "");
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
-        reveal();
+        el.removeAttribute("data-pending");
+        el.setAttribute("data-in", "");
         observer.disconnect();
       },
       { threshold: 0.2 },

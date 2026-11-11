@@ -81,7 +81,11 @@
 }
 
 @media (max-width: 860px) {
+  /* On a phone the first screen is the hero alone, the capture only peeking
+     in: the H1 stays the largest paint, so it is the LCP element and the
+     capture never decides it (Budgets, Home LCP). */
   .hero {
+    min-height: calc(100svh + 60px);
     padding-bottom: 160px;
   }
 

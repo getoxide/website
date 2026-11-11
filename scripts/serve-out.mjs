@@ -6,6 +6,7 @@
 // state test exports, see scripts/build-fixtures.mjs).
 import { createReadStream, statSync } from "node:fs";
 import { createServer } from "node:http";
+import { createGzip } from "node:zlib";
 import { extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -31,6 +32,16 @@ const TYPES = {
   ".xml": "application/xml; charset=utf-8",
   ".mp4": "video/mp4",
 };
+
+const COMPRESSIBLE = new Set([
+  ".html",
+  ".js",
+  ".css",
+  ".json",
+  ".txt",
+  ".svg",
+  ".xml",
+]);
 
 function isFile(path) {
   try {
@@ -64,11 +75,19 @@ for (const [i, dir] of (roots.length ? roots : ["out"]).entries()) {
     const url = new URL(req.url ?? "/", "http://localhost");
     const file = resolve(ROOT, url.pathname);
     const path = file ?? join(ROOT, "404.html");
+    const type = TYPES[extname(path)] ?? "application/octet-stream";
+    // Vercel compresses text assets (brotli; gzip stands in here), and the
+    // Lighthouse gate's simulated network counts the bytes sent.
+    const gzip =
+      COMPRESSIBLE.has(extname(path)) &&
+      /\bgzip\b/.test(req.headers["accept-encoding"] ?? "");
     res.writeHead(file ? 200 : 404, {
-      "content-type": TYPES[extname(path)] ?? "application/octet-stream",
+      "content-type": type,
+      ...(gzip ? { "content-encoding": "gzip", vary: "Accept-Encoding" } : {}),
     });
     if (req.method === "HEAD") return res.end();
-    createReadStream(path).pipe(res);
+    const body = createReadStream(path);
+    (gzip ? body.pipe(createGzip()) : body).pipe(res);
   }).listen(port + i, () => {
     console.log(`Serving ${dir}/ on http://localhost:${port + i}`);
   });

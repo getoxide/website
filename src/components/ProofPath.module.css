@@ -1,7 +1,8 @@
 /* Design system, Proof path: a hairline with a node per step. Four columns at
    --site-w-wide, vertical below 860px (a documented constant). The hidden
-   start state exists only under html[data-motion], which the inline motion
-   script sets when JavaScript runs and motion is allowed (ADR-0001). */
+   start state is `.wrap[data-pending]`, which <Reveal> sets only when
+   JavaScript runs, motion is allowed and the path is below the fold
+   (ADR-0001). The transitions apply only then, so reduced motion is instant. */
 .path {
   width: 100%;
   max-width: var(--site-w-wide);
@@ -88,32 +89,40 @@
   font: 500 var(--site-text-small) var(--site-font-body);
 }
 
-/* Lit nodes: the ring is the node's own border colour at low opacity. */
-.wrap[data-in] .node {
+/* Lit nodes (the ring is the accent at low opacity): the resting state, so
+   the path is complete without JavaScript or motion. */
+.node {
   border-color: var(--ox-text-accent);
   box-shadow: 0 0 0 3px
     color-mix(in srgb, var(--ox-text-accent) 16%, transparent);
-  transition-delay: calc(var(--n, 0) * var(--site-stagger) + 150ms);
 }
 
-:global(html[data-motion]) .line {
-  transition: transform var(--site-dur-slow) var(--site-ease-in-out);
+.wrap[data-pending] .node {
+  border-color: var(--ox-element-border);
+  box-shadow: none;
 }
 
-:global(html[data-motion]) .wrap:not([data-in]) .line {
+.wrap[data-pending] .line {
   transform: scaleX(0);
 }
 
-:global(html[data-motion]) .body {
-  transition: opacity var(--site-dur-base) var(--site-ease-fade);
-}
-
-:global(html[data-motion]) .wrap:not([data-in]) .body {
+.wrap[data-pending] .body {
   opacity: 0;
 }
 
-:global(html[data-motion]) .wrap[data-in] .body {
+/* The reveal: the line draws, then each node and its text light one stagger
+   after the other. */
+.wrap[data-in] .line {
+  transition: transform var(--site-dur-slow) var(--site-ease-in-out);
+}
+
+.wrap[data-in] .body {
+  transition: opacity var(--site-dur-base) var(--site-ease-fade);
   transition-delay: calc(var(--n, 0) * var(--site-stagger) + 200ms);
+}
+
+.wrap[data-in] .node {
+  transition-delay: calc(var(--n, 0) * var(--site-stagger) + 150ms);
 }
 
 @media (max-width: 860px) {
@@ -140,7 +149,7 @@
     transform-origin: top;
   }
 
-  :global(html[data-motion]) .wrap:not([data-in]) .line {
+  .wrap[data-pending] .line {
     transform: scaleY(0);
   }
 }

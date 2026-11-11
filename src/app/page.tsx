@@ -6,7 +6,6 @@ import { COPY } from "@/content/copy";
 import { PAGES } from "@/content/pages";
 import { seenBefore } from "@/lib/concept-links";
 import { pageMetadata } from "@/lib/metadata";
-import { MOTION_SCRIPT } from "@/lib/motion";
 import { token } from "@/lib/snapshot";
 
 export const metadata = pageMetadata(PAGES.home);
@@ -21,9 +20,6 @@ export default function HomePage() {
   ]);
   return (
     <SiteFrame page={PAGES.home}>
-      {/* Hidden start states exist only once this runs and motion is allowed
-          (ADR-0001); the server HTML never hides anything. */}
-      <script dangerouslySetInnerHTML={{ __html: MOTION_SCRIPT }} />
       <Hero />
       <DefinitionLine seen={definitionSeen} />
       <ProofPath seen={proofSeen} />

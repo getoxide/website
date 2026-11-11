@@ -1,3 +1,4 @@
+import { preload } from "react-dom";
 import { CAPTURE_SLOTS } from "@/content/captures";
 import { loadCaptureManifest } from "@/lib/capture-manifest";
 import {
@@ -62,6 +63,16 @@ export function Capture({
       </div>
     );
   }
+  if (priority) {
+    // Above the fold: found while the HTML is parsed, not after the CSS.
+    preload(captureFile(slot, middle(entry), "avif"), {
+      as: "image",
+      type: "image/avif",
+      imageSrcSet: srcSetOf(slot, entry, "avif"),
+      imageSizes: sizes,
+      fetchPriority: "high",
+    });
+  }
   return (
     <div className={styles.frame}>
       <picture>
@@ -81,8 +92,8 @@ export function Capture({
           width={entry.width}
           height={entry.height}
           alt={alt}
-          decoding="async"
           loading={priority ? undefined : "lazy"}
+          fetchPriority={priority ? "high" : undefined}
         />
       </picture>
     </div>

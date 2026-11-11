@@ -101,10 +101,13 @@ test.describe("home", () => {
       "The complete desktop app for agentic coding.",
     );
     const sections = page.locator("main > section");
-    await expect(sections).toHaveCount(2);
-    await expect(sections.first()).toHaveText(
-      "The complete desktop app for agentic coding." +
-        "Prompt, review, pull request and merge, with Claude Code, Codex and Antigravity CLI.",
+    // Hero, definition line, proof path, closing CTA.
+    await expect(sections).toHaveCount(4);
+    await expect(sections.first()).toContainText(
+      "The complete desktop app for agentic coding.",
+    );
+    await expect(sections.first()).toContainText(
+      "Prompt, review, pull request and merge, with Claude Code, Codex and Antigravity CLI.",
     );
     await expect(sections.last()).toHaveAttribute(
       "aria-labelledby",
