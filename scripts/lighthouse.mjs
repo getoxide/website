@@ -136,16 +136,19 @@ async function main() {
     for (const { path, budgetClass } of targets) {
       const runs = [];
       for (let i = 0; i < RUNS; i++) {
-        const result = await lighthouse(
-          `${server.url}${path === "/404" ? "/this-page-does-not-exist" : path}`,
-          {
-            port: chrome.port,
-            output: "json",
-            logLevel: "error",
-            onlyCategories: ["performance", "accessibility"],
-          },
+        // `/404` is served `404.html` with status 200: Lighthouse refuses a
+        // page answered with an error status.
+        const result = await lighthouse(`${server.url}${path}`, {
+          port: chrome.port,
+          output: "json",
+          logLevel: "error",
+          onlyCategories: ["performance", "accessibility"],
+        });
+        const run = metricsOf(result.lhr);
+        runs.push(run);
+        console.log(
+          `  ${path} run ${i + 1}: LCP ${Math.round(run.lcp)} ms, TBT ${Math.round(run.tbt)} ms, CLS ${run.cls.toFixed(3)}`,
         );
-        runs.push(metricsOf(result.lhr));
       }
       const verdict = assessLighthouse(path, budgetClass, runs);
       const m = verdict.median;
