@@ -77,6 +77,10 @@ const DATE = new Intl.DateTimeFormat("en-GB", {
   timeZone: "UTC",
 });
 
+/** A Snapshot date (`YYYY-MM-DD`) as the site writes it: "10 December 2026". */
+export const formatDate = (date: string) =>
+  DATE.format(new Date(`${date}T00:00:00Z`));
+
 /** Installer size in SI megabytes, one decimal, as GitHub shows it. */
 const megabytes = (bytes: number) => `${(bytes / 1_000_000).toFixed(1)} MB`;
 
@@ -108,9 +112,7 @@ export function tokensOf(snapshot: Snapshot) {
       case "version":
         return stable?.version ?? null;
       case "release-date":
-        return stable
-          ? DATE.format(new Date(`${stable.date}T00:00:00Z`))
-          : null;
+        return stable ? formatDate(stable.date) : null;
       case "asset-size:macos":
         return size("macos");
       case "asset-size:windows":

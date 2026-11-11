@@ -13,6 +13,23 @@ function withChangelog(changelog: ChangelogEntry[]): Snapshot {
   return { ...SNAPSHOT, changelog };
 }
 
+function release(
+  version: string,
+  date: string,
+  notes: Partial<Pick<ChangelogEntry, "breaking" | "features" | "fixes">> = {},
+): ChangelogEntry {
+  return {
+    version,
+    tag: `v${version}`,
+    date,
+    url: `${RELEASES}/tag/v${version}`,
+    breaking: null,
+    features: null,
+    fixes: null,
+    ...notes,
+  };
+}
+
 const html = (snapshot: Snapshot) =>
   renderToStaticMarkup(createElement(Changelog, { snapshot }));
 
@@ -35,5 +52,37 @@ describe("Changelog", () => {
       "No stable release yet. New versions will be listed here and on GitHub Releases.",
     );
     expect(markup).toContain(`<a href="${RELEASES}">GitHub Releases</a>`);
+  });
+
+  it("renders a release as an anchored version heading with its date, the three groups and its GitHub link", () => {
+    const markup = html(
+      withChangelog([
+        release("0.4.0", "2026-12-10", {
+          breaking: "- Settings moved to `~/.oxide`.",
+          features: "- **Blind review** by a second Provider.",
+          fixes: "- The Diff no longer flickers.",
+        }),
+      ]),
+    );
+    expect(markup).toMatch(
+      /<h2 id="v0-4-0"[^>]*>0\.4\.0 · <time dateTime="2026-12-10">10 December 2026<\/time><\/h2>/,
+    );
+    expect(markup).toContain(
+      'href="#v0-4-0" aria-label="Link to version 0.4.0"',
+    );
+    expect(text(markup)).toContain(
+      "Breaking changes Settings moved to ~/.oxide. Features Blind review by a second Provider. Fixes The Diff no longer flickers.",
+    );
+    expect(markup.match(/<h3[^>]*>[^<]*<\/h3>/g)).toEqual([
+      expect.stringContaining(">Breaking changes<"),
+      expect.stringContaining(">Features<"),
+      expect.stringContaining(">Fixes<"),
+    ]);
+    expect(markup).toMatch(
+      new RegExp(
+        `<a href="${RELEASES}/tag/v0\\.4\\.0"[^>]*>Full release notes on GitHub</a>`,
+      ),
+    );
+    expect(text(markup)).not.toContain("No stable release yet");
   });
 });
