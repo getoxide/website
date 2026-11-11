@@ -64,6 +64,10 @@ jobs:
               echo
               grep "Glossary terms not on the site" sync.log | sed 's/^/- /'
             fi
+            if grep -q "installer asset" sync.log; then
+              echo
+              grep "installer asset" sync.log | sed 's/^/- /'
+            fi
           } >> "$GITHUB_STEP_SUMMARY"
           if [ -z "$(git status --porcelain -- content src/app)" ]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"

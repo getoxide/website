@@ -126,4 +126,8 @@ describe("content-sync workflow", () => {
     expect(wf).toContain("Glossary terms not on the site");
     expect(wf).toContain("GITHUB_STEP_SUMMARY");
   });
+
+  it("puts unresolved installer warnings in the summary too", () => {
+    expect(wf).toContain('grep -q "installer asset" sync.log');
+  });
 });
