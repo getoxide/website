@@ -42,6 +42,28 @@ export const PAGES = {
     indexable: true,
     llmsSection: "Pages",
   },
+  docsQuickStart: {
+    path: "/docs/quick-start",
+    h1: "Quick start",
+    title: "Quick start · Oxide",
+    description:
+      "Install a Provider, open a Project, start a Thread, review the Turn in the Diff Surface, then commit, push and open the pull request. Oxide in five steps.",
+    budgetClass: "reading",
+    structuredData: "TechArticle",
+    indexable: true,
+    llmsSection: "Docs",
+  },
+  docsConcepts: {
+    path: "/docs/concepts",
+    h1: "Concepts",
+    title: "Concepts · Oxide",
+    description:
+      "The words Oxide uses and what they mean: Project, Thread, Turn, Provider, Surface, Checkpoint, Verification Dossier, Blind review and Restore.",
+    budgetClass: "reading",
+    structuredData: "TechArticle",
+    indexable: true,
+    llmsSection: "Docs",
+  },
   // Not in the Copy deck: build-written, approved by Lorenzo in review.
   privacy: {
     path: "/privacy",
