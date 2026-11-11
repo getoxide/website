@@ -24,7 +24,7 @@ Read by `/verify`, `/judge`, `/build`, `/ship`, `/ui` and `/release`.
 - run: `pnpm dev`, available at `http://localhost:3000`. For the static export: `pnpm build && pnpm serve --port 3130`, at `http://localhost:3130`
 - exercise: browser or curl against the served export, e.g. `curl -sI http://localhost:3130/nope` must answer `404`. The `X-Robots-Tag: noindex` header exists only on Vercel: `curl -sI <preview URL> | grep -i x-robots-tag`
 - measure: `pnpm measure:js [page.html ...]` prints the gzip JS of exported pages (default: the home)
-- sync: `pnpm sync:oxide [--ref <ref>]` refreshes the brand tokens and icons from `getoxide/oxide` (network; builds never touch it)
+- sync: `pnpm sync:oxide [--ref <ref>]` refreshes the brand tokens, the icons and the content Snapshot (`content/oxide/snapshot.json`, ADR-0003) from `getoxide/oxide` at the latest stable tag (`main` while none exists); network, builds never touch it. Dev only: `--local-source <git-dir>:<ref>` reads the Oxide files from a local clone for a ref not pushed yet and records its ref and commit in the Snapshot
 - test data: none needed, the site has no user data
 
 ## Review
