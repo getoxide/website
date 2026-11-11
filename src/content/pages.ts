@@ -11,10 +11,7 @@ export type BudgetClass = "showcase" | "reading";
 
 /** JSON-LD a page carries (Machine-readable layer #14, decision 5). */
 export type StructuredDataType =
-  | "HomeGraph"
-  | "WebPage"
-  | "TechArticle"
-  | "FAQPage";
+  "HomeGraph" | "WebPage" | "TechArticle" | "FAQPage";
 
 /** Section of the site's /llms.txt a page is listed under. */
 export type LlmsSection = "Docs" | "Guides" | "Pages" | "Optional";

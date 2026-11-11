@@ -1,8 +1,30 @@
+import { PageHeader } from "@/components/PageHeader";
+import { COPY } from "@/content/copy";
 import { PAGES } from "@/content/pages";
 import { pageMetadata } from "@/lib/metadata";
+import { readmeUrl } from "@/lib/oxide";
+import styles from "./privacy.module.css";
 
 export const metadata = pageMetadata(PAGES.privacy);
 
 export default function PrivacyPage() {
-  return <h1>{PAGES.privacy.h1}</h1>;
+  const { lead, app, site } = COPY.privacy;
+  return (
+    <div className={styles.page}>
+      <PageHeader title={PAGES.privacy.h1} lead={lead} />
+      <section className={styles.section} aria-labelledby="app">
+        <h2 id="app">{app.heading}</h2>
+        <p>
+          {app.sentence} {app.readmeLead}{" "}
+          <a href={readmeUrl("faq")}>{app.readmeLink}</a>.
+        </p>
+      </section>
+      <section className={styles.section} aria-labelledby="site">
+        <h2 id="site">{site.heading}</h2>
+        {site.paragraphs.map((p) => (
+          <p key={p}>{p}</p>
+        ))}
+      </section>
+    </div>
+  );
 }

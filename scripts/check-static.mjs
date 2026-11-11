@@ -108,10 +108,9 @@ function main() {
     middleware: readJsonOr(join(next, "server/middleware-manifest.json"), {
       middleware: {},
     }).middleware,
-    functions: readJsonOr(
-      join(next, "server/functions-config-manifest.json"),
-      { functions: {} },
-    ).functions,
+    functions: readJsonOr(join(next, "server/functions-config-manifest.json"), {
+      functions: {},
+    }).functions,
     serverActions: readJsonOr(
       join(next, "server/server-reference-manifest.json"),
       { node: {}, edge: {} },

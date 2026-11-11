@@ -82,9 +82,9 @@ describe("syncBrand", () => {
     const { fetched, written } = await run(source(), "v1.2.3");
 
     expect(fetched.every((f) => f.startsWith("v1.2.3:"))).toBe(true);
-    expect(written.get("content/oxide/brand/oxide-tokens.css")?.toString()).toBe(
-      TOKENS,
-    );
+    expect(
+      written.get("content/oxide/brand/oxide-tokens.css")?.toString(),
+    ).toBe(TOKENS);
     expect(written.get("src/app/icon.svg")?.toString()).toBe("<svg/>");
     expect(written.get("src/app/apple-icon.png")?.readUInt32BE(16)).toBe(180);
 

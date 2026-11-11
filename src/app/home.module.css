@@ -1,0 +1,24 @@
+.hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--site-space-5);
+  padding: var(--site-section) 0;
+  text-align: center;
+}
+
+.title {
+  max-width: 14em;
+  font: 500 var(--site-text-display) var(--site-font-heading);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.subheadline {
+  max-width: var(--site-w-text);
+  font: 400 var(--site-text-lead) var(--site-font-body);
+  color: var(--ox-text-muted);
+  text-wrap: balance;
+}

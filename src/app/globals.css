@@ -1,0 +1,74 @@
+/* Dark only (Design system, Theme): no switch, no prefers-color-scheme. */
+html {
+  color-scheme: dark;
+  background: var(--ox-background);
+  color: var(--ox-text);
+  -webkit-text-size-adjust: 100%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font: 400 var(--site-text-body) var(--site-font-body);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-family: var(--site-font-heading);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  color: var(--ox-text-bright);
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--ox-text-accent);
+  text-underline-offset: 0.2em;
+}
+
+code,
+pre {
+  font-family: var(--site-font-code);
+  font-feature-settings: "calt" 0;
+}
+
+/* Focus and states: always visible, never removed without a replacement. */
+:focus-visible {
+  outline: 2px solid var(--ox-focus-ring);
+  outline-offset: 2px;
+}
+
+/* The skip link stays out of view until it receives focus. */
+.skip-link {
+  position: absolute;
+  top: var(--site-space-3);
+  left: var(--site-space-3);
+  z-index: 10;
+  padding: var(--site-space-2) var(--site-space-4);
+  border-radius: var(--site-radius-pill);
+  background: var(--ox-element-background);
+  color: var(--ox-text-bright);
+  font: 500 var(--site-text-small) var(--site-font-body);
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: none;
+}
