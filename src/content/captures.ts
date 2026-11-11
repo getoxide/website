@@ -28,6 +28,18 @@ export const CAPTURE_SLOTS = {
     // The 1160px frame at 2× is 2320px: the 2560px variant serves it.
     ceiling: { width: 2560, bytes: 200_000 },
   },
+  // Provider landing pages: build-written draft alts, Lorenzo records the
+  // captures (getoxide/website#15). No source file, no frame.
+  "claude-code-turn": {
+    kind: "image",
+    alt: "Oxide's Diff Surface showing only the files one Turn changed, beside the Claude Code Thread that made them",
+    quality: 60,
+  },
+  "codex-dossier": {
+    kind: "image",
+    alt: "Oxide's Verification Dossier for a Codex Turn: the closing message kept apart from the checks that actually ran",
+    quality: 60,
+  },
 } as const satisfies Record<string, CaptureSlot>;
 
 export type SlotId = keyof typeof CAPTURE_SLOTS;

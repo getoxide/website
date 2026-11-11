@@ -1,0 +1,41 @@
+/* Provider landing pages (Budget class showcase): the reading column, with
+   capture frames at the frame width. */
+.page {
+  width: 100%;
+  max-width: var(--site-w-prose);
+  margin: 0 auto;
+  padding-bottom: var(--site-space-9);
+}
+
+.definition {
+  max-width: var(--site-w-prose);
+  margin-bottom: var(--site-space-8);
+  font: 400 var(--site-text-body) var(--site-font-body);
+  color: var(--ox-text-muted);
+}
+
+.section + .section {
+  margin-top: var(--site-space-8);
+}
+
+.section h2,
+.faq h2 {
+  font: 500 var(--site-text-h3) var(--site-font-heading);
+  letter-spacing: -0.03em;
+}
+
+.section section > * + * {
+  margin-top: var(--site-space-4);
+}
+
+.faq {
+  margin-top: var(--site-space-9);
+}
+
+.faq h2 {
+  margin-bottom: var(--site-space-5);
+}
+
+.faq section + section {
+  margin-top: var(--site-space-6);
+}
