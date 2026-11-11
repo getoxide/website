@@ -1,5 +1,5 @@
 // PROTOTYPE: the four card designs, each a 1200×630 DOM node. render.py screenshots them to PNG.
-import { HOST, HEADLINES, PAGES, PRODUCT_LINE } from "./data.js";
+import { HOST, HEADLINES, PAGES } from "./data.js";
 
 export const VARIANTS = {
   A: { name: "Plate", scope: "site-wide", how: "static file, committed", shader: false },
@@ -33,7 +33,7 @@ const builders = {
       <div class="k-b__in">
         ${MARK}
         <h1 class="k-b__h">${esc(o.hero)}</h1>
-        ${o.sub ? `<p class="k-b__sub">${PRODUCT_LINE}</p>` : ""}
+        ${o.sub ? `<p class="k-b__sub">${esc(o.sub)}</p>` : ""}
       </div>
     </div>`,
 

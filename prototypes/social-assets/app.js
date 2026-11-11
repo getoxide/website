@@ -17,15 +17,15 @@ const ICONS = {
 };
 
 let sizes = null;
-const state = { variant: "B", copy: "1", sub: "0", page: "/", mode: "bare", theme: "dark", icons: "I1", guides: true };
+const state = { variant: "B", copy: "7", sub: "1", page: "/", mode: "bare", theme: "dark", icons: "I1", guides: true };
 const headline = () => HEADLINES.find((h) => h.id === state.copy);
 
 function readUrl() {
   const q = new URLSearchParams(location.search);
   const v = (q.get("variant") || "B").toUpperCase();
   state.variant = ORDER.includes(v) ? v : "B";
-  state.copy = HEADLINES.some((h) => h.id === q.get("copy")) ? q.get("copy") : "1";
-  state.sub = q.get("sub") === "1" ? "1" : "0";
+  state.copy = HEADLINES.some((h) => h.id === q.get("copy")) ? q.get("copy") : HEADLINES[0].id;
+  state.sub = q.get("sub") === "0" ? "0" : "1";
   state.page = PAGES.some((p) => p.path === q.get("page")) ? q.get("page") : "/";
   state.mode = ["bare", "full", "h1"].includes(q.get("mode")) ? q.get("mode") : "bare";
   state.theme = q.get("theme") === "light" ? "light" : "dark";
@@ -51,7 +51,7 @@ function render() {
   const title = ogTitle(page, state.mode), desc = page.desc;
   const url = `${HOST}${page.path === "/" ? "" : page.path}`;
   document.body.classList.toggle("light", state.theme === "light");
-  const hl = headline(), opts = { hero: hl.text, sub: state.sub === "1" };
+  const hl = headline(), opts = { hero: hl.text, sub: state.sub === "1" ? hl.sub : "" };
   $(".switcher output").textContent = `Headline ${hl.id}/${HEADLINES.length} · ${hl.angle}`;
   $("#sub").checked = state.sub === "1";
   for (const [id, val] of [["card", state.variant], ["page", state.page], ["mode", state.mode], ["theme", state.theme], ["icons", state.icons]]) $(`#${id}`).value = val;

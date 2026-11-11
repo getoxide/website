@@ -1,7 +1,7 @@
 <!doctype html>
 <!--
   PROTOTYPE · throwaway · getoxide/website#23 "Social and share assets".
-  Round 2: card B chosen; the bottom bar now cycles headline candidates (?copy=1..6, ?sub=1 adds a product line).
+  Round 3: card B chosen; the bottom bar cycles headline + subline candidates (?copy=7..12, ?sub=0 hides the subline).
   Four card variants (A Plate, B Passivation, C Page title, D Capture) still selectable via ?variant=,
   shown full size and inside approximate unfurl mocks; icon options via ?icons=; page via ?page=.
   Run: pnpm proto:social  →  http://localhost:4312/   (re-render PNGs: pnpm proto:social:render)
@@ -19,7 +19,7 @@
 <header class="bar">
   <strong>PROTOTYPE · Social and share assets</strong>
   <label>Card <select id="card"><option value="A">A · Plate</option><option value="B">B · Passivation</option><option value="C">C · Page title</option><option value="D">D · Capture</option></select></label>
-  <label class="tick" style="margin:0;color:inherit"><input type="checkbox" id="sub"> product line under the headline</label>
+  <label class="tick" style="margin:0;color:inherit"><input type="checkbox" id="sub"> subline</label>
   <label>Page <select id="page"></select></label>
   <label>og:title <select id="mode">
     <option value="bare">&lt;title&gt; without “ · Oxide”</option>

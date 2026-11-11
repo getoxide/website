@@ -3,16 +3,28 @@ export const HOST = "oxide.cavallinilorenzo.com";
 export const SITE_NAME = "Oxide";
 export const HERO = "Agentic coding, from prompt to merge."; // rejected by Lorenzo, kept for /-page data only
 
-// Round 2: headline candidates for the B card (and the hero). Proposals, not locked copy.
+// Round 2 (rejected by Lorenzo: too narrow, review-only or generic):
+// 1 See what your coding agents actually did. · 2 Know what was checked before you merge.
+// 3 Your agents write the code. You decide what merges. · 4 Claude Code and Codex, in one desktop app.
+// 5 One window for every coding agent you use. · 6 Review every agent change before it lands.
+
+// Round 3: Lorenzo's brief: the main, most complete app for agentic coding; professional, not vibe coding;
+// see what is really happening, open pull requests, a 360° view from prompt to merge, agents talking to GitHub.
+// Headline + subline pairs. Proposals, not locked copy.
 export const HEADLINES = [
-  { id: "1", angle: "What the agent did", text: "See what your coding agents actually did." },
-  { id: "2", angle: "What was checked", text: "Know what was checked before you merge." },
-  { id: "3", angle: "Who decides", text: "Your agents write the code. You decide what merges." },
-  { id: "4", angle: "Name the agents", text: "Claude Code and Codex, in one desktop app." },
-  { id: "5", angle: "One window", text: "One window for every coding agent you use." },
-  { id: "6", angle: "Review before it lands", text: "Review every agent change before it lands." },
+  { id: "7", angle: "Complete", text: "The complete desktop app for agentic coding.",
+    sub: "Prompt, review, pull request and merge, with Claude Code, Codex and Antigravity CLI." },
+  { id: "8", angle: "Everything in one app", text: "Everything agentic coding needs, in one app.",
+    sub: "Claude Code, Codex and Antigravity CLI with the editor, terminal, Git and GitHub around them." },
+  { id: "9", angle: "Professional", text: "Agentic coding, done professionally.",
+    sub: "See every change, every check and every pull request, from the first prompt to the merge." },
+  { id: "10", angle: "Beyond the prompt", text: "Agentic coding beyond the prompt.",
+    sub: "See what the agent changed and what actually ran, then take it to a reviewed pull request." },
+  { id: "11", angle: "Agents meet GitHub", text: "Where your agents and GitHub work together.",
+    sub: "Drive Claude Code, Codex and Antigravity CLI, review each change, open the pull request and merge." },
+  { id: "12", angle: "The whole loop", text: "From the first prompt to the merged pull request.",
+    sub: "One desktop app for Claude Code, Codex and Antigravity CLI, with every change in view." },
 ];
-export const PRODUCT_LINE = "Desktop app for Claude Code, Codex and Antigravity CLI";
 
 export const PAGES = [
   { path: "/", h1: HERO, title: "Oxide: the desktop app for Claude Code and Codex",
