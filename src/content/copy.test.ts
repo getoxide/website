@@ -24,6 +24,30 @@ describe("Copy deck parity", () => {
     expect(deck).toContain(`**Secondary button**: ${github} →`);
   });
 
+  it("the hero is verbatim", () => {
+    const deck = section("Home").split("### Proof points")[0];
+    const { subheadline, download, getOxide, github, platformSuffix } =
+      COPY.hero;
+    expect(deck).toContain(`**Subheadline**: ${subheadline}`);
+    expect(deck).toContain(`**Primary button** *(locked)*: ${download} → `);
+    expect(deck).toContain(`**Secondary button** *(locked)*: ${github} → `);
+    expect(deck).toContain(`\`⟨platforms⟩\` · ${platformSuffix}`);
+    expect(getOxide).toBe(COPY.closingCta.getOxide);
+  });
+
+  it("the proof path is verbatim", () => {
+    const deck = section("Home").split("### Proof points")[1];
+    expect(deck).toContain(`Section heading: **${COPY.proofPath.heading}**`);
+    expect(COPY.proofPath.steps).toHaveLength(4);
+    COPY.proofPath.steps.forEach(({ heading, sentence, href }, i) => {
+      expect(deck).toContain(
+        `| ${i + 1} | ${heading} | ${sentence} | \`${href}\` |`,
+      );
+    });
+    expect(deck).toContain(`**${COPY.proofPath.learnMore}**`);
+    expect(deck).toContain(COPY.proofPath.leadIn);
+  });
+
   it("the /download reassurance lines are verbatim", () => {
     const deck = section("`/download`");
     const { byoa, buttons, lines, signing, unsupported } = COPY.download;

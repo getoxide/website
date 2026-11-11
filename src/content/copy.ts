@@ -129,6 +129,57 @@ export const COPY = {
   hero: {
     subheadline:
       "Prompt, review, pull request and merge, with Claude Code, Codex and Antigravity CLI.",
+    /** Locked buttons; the primary reads "Get Oxide" while the state is `none`. */
+    download: "Download Oxide",
+    getOxide: "Get Oxide",
+    github: "View on GitHub",
+    /** The platform line is `⟨platforms⟩ · Pre-release` (locked). */
+    platformSuffix: "Pre-release",
+  },
+
+  /**
+   * Copy deck, Home → Proof points (locked). The heading and the four steps
+   * are the deck's; "Learn more about ⟨heading⟩" is the link's accessible
+   * name (build-written, as the deck specifies it).
+   */
+  proofPath: {
+    heading: "From prompt to merge",
+    learnMore: "Learn more",
+    /**
+     * Steps 3 and 4 claim the in-app merge and Fix: they render only when the
+     * Snapshot's Features carry this README lead-in (oxide#416).
+     */
+    leadIn: "Pull requests, from review to merge.",
+    steps: [
+      {
+        heading: "Prompt",
+        sentence:
+          "Claude Code, Codex and Antigravity CLI side by side, each Thread a real session of the agent you already use, with the editor and terminal around it.",
+        href: "/features#multiple-providers",
+        icon: "terminal",
+      },
+      {
+        heading: "Review",
+        sentence:
+          "See what each Turn changed and which checks actually ran in the Verification Dossier, have a second Provider run a Blind review, and Restore what you don't want.",
+        href: "/features#diff-by-turn",
+        icon: "code-review",
+      },
+      {
+        heading: "Pull request",
+        sentence:
+          "Open the pull request without a browser, send Line comments to GitHub as a review, and hand failing checks and review threads back to the agent.",
+        href: "/features#pull-requests",
+        icon: "git-pull-request",
+      },
+      {
+        heading: "Merge",
+        sentence:
+          "Merge when GitHub says it's ready, or turn on auto-merge once the checks pass, with the Verification Dossier published in the pull request body.",
+        href: "/features#verification-dossier",
+        icon: "git-merge",
+      },
+    ],
   },
 
   /**

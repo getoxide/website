@@ -1,0 +1,16 @@
+/* Design system, Animated mark: 120px, centred above the hero H1. The eyes are
+   static until the hero's motion lands; they never move under reduced motion. */
+.mark {
+  display: block;
+  width: 120px;
+  height: 120px;
+  margin-bottom: 28px;
+  overflow: visible;
+  color: var(--ox-text);
+}
+
+.eyes,
+.eye {
+  transform-box: fill-box;
+  transform-origin: center;
+}
