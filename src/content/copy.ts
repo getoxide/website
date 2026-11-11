@@ -8,6 +8,9 @@ export type Link = { label: string; href: string };
 export const COPY = {
   skipLink: "Skip to content",
 
+  /** Accessible name of a heading's anchor link (build-written). */
+  anchorLabel: (heading: string) => `Link to ${heading}`,
+
   /**
    * Site header. Labels and targets from Page inventory (#9), Header; the
    * logo's alt text, the GitHub link's name and "Menu" are build-written.
@@ -92,7 +95,6 @@ export const COPY = {
     concepts: {
       leadBefore: "The words Oxide uses, defined in the Oxide",
       glossary: "glossary",
-      anchorLabel: (term: string) => `Link to ${term}`,
     },
   },
 

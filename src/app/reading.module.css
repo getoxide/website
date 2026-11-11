@@ -1,0 +1,17 @@
+/* Reading pages (Budget class reading): docs, FAQ, changelog. */
+.page {
+  width: 100%;
+  max-width: var(--site-w-prose);
+  margin: 0 auto;
+  padding-bottom: var(--site-space-9);
+}
+
+.section + .section {
+  margin-top: var(--site-space-8);
+}
+
+.section h2 {
+  margin-bottom: var(--site-space-4);
+  font: 500 var(--site-text-h3) var(--site-font-heading);
+  letter-spacing: -0.03em;
+}

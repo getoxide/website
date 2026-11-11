@@ -7,7 +7,7 @@ import { COPY } from "@/content/copy";
 import { PAGES } from "@/content/pages";
 import { pageMetadata } from "@/lib/metadata";
 import { SNAPSHOT, token } from "@/lib/snapshot";
-import styles from "../docs.module.css";
+import styles from "../../reading.module.css";
 
 export const metadata = pageMetadata(PAGES.docsQuickStart);
 
