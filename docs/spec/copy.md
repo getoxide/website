@@ -1,6 +1,6 @@
 # Copy deck
 
-The site-owned words the build works from. Decided in [Copy deck: locked strings and page outlines](https://github.com/getoxide/website/issues/20), at the fidelity fixed by [Copy: what the spec locks and what the build writes](https://github.com/getoxide/website/issues/18).
+The site-owned words the build works from. Decided in [Copy deck: locked strings and page outlines](https://github.com/getoxide/website/issues/20), at the fidelity fixed by [Copy: what the spec locks and what the build writes](https://github.com/getoxide/website/issues/18). The hero, the home proof points and the H1, `<title>` and description of `/`, `/features`, `/claude-code-gui` and `/codex-gui` were rewritten in [Copy rewrite: hero, page titles and descriptions](https://github.com/getoxide/website/issues/27).
 
 Build issues **cite** this file; they never copy it. A change to a locked string is a PR to this file, approved by Lorenzo.
 
@@ -29,7 +29,7 @@ A `⟨…⟩` token is never typed out: the build renders it from the committed 
 ### Rules every string here follows
 
 1. The canonical definition is never reworded; where it appears, it is `⟨definition⟩`.
-2. None of the banned phrases from Copy (`copy-lint` rule 2) appears.
+2. None of the banned phrases from Copy (`copy-lint` rule 2) appears. [Copy rewrite: hero, page titles and descriptions](https://github.com/getoxide/website/issues/27) adds three superlatives to that list: "the most complete", "the best" and "the main app" (not bare "the main", which would match "the main branch"). "Complete" itself is allowed, in its absolute form only and only next to the loop that backs it: prompt, review, pull request and merge.
 3. "GUI" appears only on `/claude-code-gui`, `/codex-gui` and in the derived `/faq#what-is-oxide`.
 4. Glossary terms are capitalised (Project, Thread, Turn, Provider, Surface, Checkpoint, Verification Dossier, Blind review, Restore, Revert, Line comment, Verification command, Risk signal, Approval, Permission mode). The **first** capitalised mention of one of the nine Concepts terms on a page links to `/docs/concepts#<term>`; that link is the build's job and is not marked below.
 5. Product facts (platforms, requirements, licence, telemetry, API key, version) are tokens or links, never typed out. Two hand-written exceptions: the footer trust line and the unsupported-platform line on `/download`. "Free" and "open-source" come from the canonical definition, so they count as identity and may appear in titles and descriptions; "MIT" is the licence fact and may not.
@@ -41,10 +41,10 @@ Rendered `<title>` follows the template `%s · Oxide` from [Machine-readable lay
 
 | Path | H1 | `<title>` | Meta description |
 | --- | --- | --- | --- |
-| `/` | Agentic coding, from prompt to merge. *(frozen)* | Oxide: the desktop app for Claude Code and Codex *(frozen)* | Oxide drives Claude Code, Codex and Antigravity CLI from one desktop app and shows what each change touched and what was actually checked before you merge. |
-| `/features` | Everything between the prompt and the merge | Features: review, diff and restore agent changes · Oxide | See what each agent Turn changed, which checks actually ran and what stayed unverified, then comment, revert or restore before you merge. Every Oxide feature. |
-| `/claude-code-gui` | A Claude Code GUI for reviewing what the agent changed | Claude Code GUI: an open-source desktop app · Oxide | Oxide is an open-source desktop GUI for Claude Code: keep your claude login and sessions, and see each Turn's diff and what was actually checked. |
-| `/codex-gui` | A Codex GUI that shows what actually ran | Codex GUI: a desktop app for the Codex CLI · Oxide | Is there a GUI for Codex? Oxide is an open-source desktop app that drives the codex CLI you already use and shows which checks ran before you merge. |
+| `/` | The complete desktop app for agentic coding. *(frozen)* | Oxide: the complete desktop app for Claude Code and Codex *(frozen)* | Oxide drives Claude Code, Codex and Antigravity CLI through the whole loop in one desktop app: prompt, review each Turn, open the pull request and merge. |
+| `/features` | Everything between the prompt and the merge | Features: from the prompt to the merge · Oxide | Every Oxide feature, from the prompt to the merge: drive three agent CLIs, review each Turn and what actually ran, then open the pull request and merge it. |
+| `/claude-code-gui` | A Claude Code GUI from the first prompt to the merge | Claude Code GUI: an open-source desktop app · Oxide | Oxide is an open-source desktop GUI for Claude Code: keep your claude login and sessions, review each Turn, then open the pull request and merge in one window. |
+| `/codex-gui` | A Codex GUI that takes each change all the way to the merge | Codex GUI: a desktop app for the Codex CLI · Oxide | Is there a GUI for Codex? Oxide is an open-source desktop app that drives the codex CLI you already use, from the prompt to the pull request and the merge. |
 | `/guides` | Guides | Guides · Oxide | Practical guides to reviewing what coding agents write: a method for AI-generated code, and using Claude Code and Codex together as writer and reviewer. |
 | `/guides/review-ai-generated-code` | How to review AI-generated code before you merge | How to review AI-generated code · Oxide | A four-step method to review AI-generated code: read one Turn at a time, check what actually ran, send feedback where it belongs, undo what you don't want. |
 | `/guides/claude-code-and-codex-together` | Claude Code and Codex together: one writes, the other reviews | Claude Code and Codex together, with Blind review · Oxide | Use Claude Code and Codex together: let one agent write the change and have the other review only the diff and the issue, never the original conversation. |
@@ -55,14 +55,16 @@ Rendered `<title>` follows the template `%s · Oxide` from [Machine-readable lay
 | `/download` | Download Oxide | Download · Oxide | Download the Oxide desktop app from GitHub Releases, verify the file, and connect the Claude Code, Codex or Antigravity CLI you already have installed. |
 | 404 | Page not found | Page not found · Oxide | *(none: not indexable, not in the sitemap)* |
 
-The home description deliberately does not repeat the canonical definition: the definition is already in the body below the hero and in the `SoftwareApplication` description.
+The home description deliberately does not repeat the canonical definition: the definition is already in the body below the hero and in the `SoftwareApplication` description. The home `<title>` is also the home `og:title`.
 
 ## Home
 
 ### Hero *(frozen)*
 
-- **H1**: Agentic coding, from prompt to merge.
-- **Subheadline**: Drive Claude Code, Codex and Antigravity CLI from one desktop app, with the editor, terminal, Git and GitHub around them, and see what was actually checked before you merge.
+- **H1**: The complete desktop app for agentic coding.
+- **Subheadline**: Prompt, review, pull request and merge, with Claude Code, Codex and Antigravity CLI.
+
+The H1 and the subheadline are the share card's two lines, word for word ([Social and share assets](https://github.com/getoxide/website/issues/23)). They always travel together: the subheadline is the loop that backs "complete". The word "drives" is left to `⟨definition⟩` right below. If the hero changes, the card follows it.
 - **Primary button** *(locked)*: Download Oxide → `/download`
 - **Secondary button** *(locked)*: View on GitHub → `https://github.com/getoxide/oxide` (event `github-cta`)
 - **Platform line** *(locked)*: `⟨platforms⟩` · Pre-release
@@ -73,14 +75,16 @@ Below the hero, centred: `⟨definition⟩`, then the trust line (fixed by [Page
 
 Section heading: **From prompt to merge**
 
-In the order of the actual flow, from the prompt to the merge, because the visual direction draws them as a four-step path. On the home page this order replaces the positioning order from [Positioning and core message](https://github.com/getoxide/website/issues/8). The positioning *priority* (review is the edge) still holds everywhere else, e.g. the `/features` groups. Each step ends with a link labelled **Learn more** to its `/features` anchor. Its accessible name includes the heading ("Learn more about Verification Dossier").
+The four steps are the four words of the hero subheadline, in the order of the actual flow, because the visual direction draws them as a four-step path. The `/features` groups follow the same loop. Each step ends with a link labelled **Learn more** to its `/features` anchor. Its accessible name includes the heading ("Learn more about Review").
 
 | # | Heading | Sentence | Link |
 | --- | --- | --- | --- |
-| 1 | One window | Claude Code, Codex and Antigravity CLI side by side, with the editor, terminal, Git, GitHub pull requests and Issues around them. | `/features#multiple-providers` |
-| 2 | Every Turn, reviewable and undoable | See what one Turn changed, send Line comments back to the agent or to GitHub, and Restore the files to how they were before any Turn. | `/features#diff-by-turn` |
-| 3 | Verification Dossier | See which Verification commands actually ran, which are stale and what stayed unverified, computed without an LLM as separate signals, never a single score. | `/features#verification-dossier` |
-| 4 | Blind review | A second Provider reviews the change seeing only the diff and the issue, never the original conversation, and its findings come back as Line comments. | `/features#blind-review` |
+| 1 | Prompt | Claude Code, Codex and Antigravity CLI side by side, each Thread a real session of the agent you already use, with the editor and terminal around it. | `/features#multiple-providers` |
+| 2 | Review | See what each Turn changed and which checks actually ran in the Verification Dossier, have a second Provider run a Blind review, and Restore what you don't want. | `/features#diff-by-turn` |
+| 3 | Pull request | Open the pull request without a browser, send Line comments to GitHub as a review, and hand failing checks and review threads back to the agent. | `/features#pull-requests` |
+| 4 | Merge | Merge when GitHub says it's ready, or turn on auto-merge once the checks pass, with the Verification Dossier published in the pull request body. | `/features#verification-dossier` |
+
+Steps 3 and 4 claim the in-app merge, auto-merge and Fix. They rest on the README lead-in **Pull requests, from review to merge.**, which [Align product positioning with the website's canonical definition](https://github.com/getoxide/oxide/issues/416) adds. The site does not ship these lines before the README has them.
 
 ## Closing CTA block *(locked)*
 
@@ -156,22 +160,9 @@ Oxide updates itself from Settings → Updates and offers only stable releases; 
 
 ### The feature-name contract
 
-One section per README Features lead-in, no more, no fewer. The **lead-in** column is the contract key the test compares with the `site:features` snapshot; the **heading** is what the page shows; the **anchor** is published and stable. Groups and their order follow [Page inventory and site structure](https://github.com/getoxide/website/issues/9): review first.
+One section per README Features lead-in, no more, no fewer. The **lead-in** column is the contract key the test compares with the `site:features` snapshot; the **heading** is what the page shows; the **anchor** is published and stable. The groups come from [Page inventory and site structure](https://github.com/getoxide/website/issues/9). Their order follows the loop, as decided in [Copy rewrite: hero, page titles and descriptions](https://github.com/getoxide/website/issues/27): the agents first, then review through to the merge, then the workspace.
 
-#### Group 1: Review before you merge
-
-Group key sentence: The part most agent tools leave to you: seeing what changed, what was checked and what stayed unverified.
-
-| README lead-in | Heading | Anchor | Key sentences |
-| --- | --- | --- | --- |
-| Verification Dossier. | Verification Dossier | `#verification-dossier` | Which Verification commands ran and whether they're still fresh, which languages no check covers, source changed without a test change, sensitive paths. Computed without an LLM, shown as separate signals, never a score; the agent's closing message stays apart as a claim. Links to the [review guide](/guides/review-ai-generated-code). |
-| Blind review. | Blind review | `#blind-review` | A second Provider reviews the change seeing only the diff and the issue, never the original Thread. Its findings become Line comments you keep or dismiss. Links to the [Claude Code and Codex guide](/guides/claude-code-and-codex-together). |
-| Diff by Turn, Uncommitted or Branch. | Diff by Turn | `#diff-by-turn` | See exactly what one Turn changed, thanks to Checkpoints taken when it starts and ends. Switch to everything uncommitted or the whole branch. |
-| Line comments. | Line comments | `#line-comments` | Comment on any line of the Diff and send the comments back to the Thread as one prompt, or submit them to GitHub as a pull request review. |
-| Revert and Restore. | Revert and Restore | `#restore` | Revert takes out one file or hunk; Restore puts a Thread's files back to how they were before any Turn. Both can be undone. |
-| Rule suggestions. | Rule suggestions | `#rule-suggestions` | Feedback you keep giving becomes a proposed rule for the Project's `AGENTS.md`. |
-
-#### Group 2: One app, every agent CLI
+#### Group 1: One app, every agent CLI
 
 Group key sentence: The agents keep doing the work; Oxide gives them one window.
 
@@ -183,13 +174,27 @@ Group key sentence: The agents keep doing the work; Oxide gives them one window.
 | Slash commands, attachments and usage limits. | Slash commands, attachments and usage limits | `#slash-commands` | Each Provider's Slash commands and skills in the composer, files and images in the prompt, and the usage limits your Provider reports. |
 | Worktrees. | Worktrees | `#worktrees` | A Thread can work in its own Git worktree, with an optional setup command per Project, so parallel work never collides. Never the lead of the page. |
 
+#### Group 2: Review before you merge
+
+Group key sentence: The part most agent tools leave to you: seeing what changed, what was checked and what stayed unverified.
+
+| README lead-in | Heading | Anchor | Key sentences |
+| --- | --- | --- | --- |
+| Verification Dossier. | Verification Dossier | `#verification-dossier` | Which Verification commands ran and whether they're still fresh, which languages no check covers, source changed without a test change, sensitive paths. Computed without an LLM, shown as separate signals, never a score; the agent's closing message stays apart as a claim. Links to the [review guide](/guides/review-ai-generated-code). |
+| Blind review. | Blind review | `#blind-review` | A second Provider reviews the change seeing only the diff and the issue, never the original Thread. Its findings become Line comments you keep or dismiss. Links to the [Claude Code and Codex guide](/guides/claude-code-and-codex-together). |
+| Diff by Turn, Uncommitted or Branch. | Diff by Turn | `#diff-by-turn` | See exactly what one Turn changed, thanks to Checkpoints taken when it starts and ends. Switch to everything uncommitted or the whole branch. |
+| Line comments. | Line comments | `#line-comments` | Comment on any line of the Diff and send the comments back to the Thread as one prompt, or submit them to GitHub as a pull request review. |
+| Revert and Restore. | Revert and Restore | `#restore` | Revert takes out one file or hunk; Restore puts a Thread's files back to how they were before any Turn. Both can be undone. |
+| Rule suggestions. | Rule suggestions | `#rule-suggestions` | Feedback you keep giving becomes a proposed rule for the Project's `AGENTS.md`. |
+| Pull requests, from review to merge. | Pull requests | `#pull-requests` | Open the pull request from the Pull request Surface and submit Line comments to GitHub as a review. Fix sends failing checks, conflicts and the review threads you pick back to the agent, in the branch's Thread or a new one. Merge, squash or rebase when GitHub says it's ready, or turn on auto-merge while checks run. |
+
 #### Group 3: A full workspace around the conversation
 
 Group key sentence: Everything the review needs, without a second app open.
 
 | README lead-in | Heading | Anchor | Key sentences |
 | --- | --- | --- | --- |
-| Git and GitHub. | Git and GitHub | `#git-and-github` | Branches, commit and push, pull requests with checks and review threads, and Issues, through `git` and the GitHub CLI. |
+| Git and GitHub. | Git and GitHub | `#git-and-github` | Branches, commit and push, and Issues, through `git` and the GitHub CLI. Pull requests have their own section, [Pull requests](#pull-requests). |
 | Code editor. | Code editor | `#code-editor` | A Monaco editor with language servers, installed on first use and only when you press Install. |
 | Terminal. | Terminal | `#terminal` | Terminal tabs per Project with Command blocks, kept alive while you switch Threads. |
 | Local dictation. | Local dictation | `#dictation` | Speak into the composer or the terminal; on-device Whisper models, and the audio never leaves your machine. |
