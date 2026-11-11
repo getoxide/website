@@ -112,8 +112,12 @@ describe.each(GUIDES.map((guide) => [guide.page.path, guide] as const))(
         (s) => s.id === "why-the-reviewer-works-blind",
       );
       if (!section) return;
-      expect(section.body.match(/Blind review/g), section.heading).toHaveLength(
-        1,
+      expect(
+        section.body.match(/That is a \[Blind review\]/g),
+        section.heading,
+      ).toHaveLength(1);
+      expect(section.body, section.heading).not.toMatch(
+        /that is a Blind review/,
       );
     });
 

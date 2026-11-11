@@ -121,7 +121,9 @@ In practice:
         heading: "Why a second agent",
         body: `A reviewer that didn't write the change, from a different model, catches what the author's context hides.
 
-Every agent has habits: the files it reaches for, the tests it trusts, the edge cases it assumes away. A different model has different habits, so its read of the change covers ground the writer never looked at. The value is not a second opinion on style but a check on the assumptions the first agent never wrote down.`,
+Every agent has habits: the files it reaches for, the tests it trusts, the edge cases it assumes away. A different model has different habits, so its read of the change covers ground the writer never looked at. The value is not a second opinion on style but a check on the assumptions the first agent never wrote down.
+
+That second reader is most useful as a [Blind review](/docs/concepts#blind-review): it sees the change, not the conversation.`,
       },
       {
         id: "why-the-reviewer-works-blind",
