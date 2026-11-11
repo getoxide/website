@@ -121,3 +121,31 @@ export function tokensOf(snapshot: Snapshot) {
 
 /** Renders a token from the committed Snapshot. */
 export const token = tokensOf(SNAPSHOT);
+
+/** One row of `⟨requirements⟩`: a Provider and its install cell (Markdown). */
+export type ProviderInstall = { provider: string; install: string };
+
+/**
+ * The Provider install links beside "Bring your own agent" (Copy deck,
+ * `/download`), read from the Requirements table: the first column and the
+ * `Install` column of every body row, as the README writes them.
+ */
+export function providerInstalls(requirements: string): ProviderInstall[] {
+  const rows = requirements
+    .split("\n")
+    .filter((line) => line.trim().startsWith("|"))
+    .map((line) =>
+      line
+        .trim()
+        .replace(/^\||\|$/g, "")
+        .split("|")
+        .map((cell) => cell.trim()),
+    );
+  const [header, , ...body] = rows;
+  if (!header) return [];
+  const install = header.indexOf("Install");
+  return body.map((cells) => ({
+    provider: cells[0],
+    install: cells[install],
+  }));
+}

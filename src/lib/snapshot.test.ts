@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { SNAPSHOT, tokensOf, type Snapshot } from "./snapshot";
+import {
+  providerInstalls,
+  SNAPSHOT,
+  tokensOf,
+  type Snapshot,
+} from "./snapshot";
 
 const asset = (name: string, size: number) => ({
   name,
@@ -100,5 +105,32 @@ describe("tokens (Copy deck, Tokens)", () => {
 describe("the committed Snapshot", () => {
   it("renders the definition token today", () => {
     expect(tokensOf(SNAPSHOT)("definition")).toMatch(/^Oxide is /);
+  });
+});
+
+describe("providerInstalls (Copy deck, `/download` → Bring your own agent)", () => {
+  const requirements = [
+    "| Provider | Command | Install |",
+    "| --- | --- | --- |",
+    "| Claude Code | `claude` | [docs.claude.com](https://docs.claude.com/en/docs/claude-code) |",
+    "| Codex | `codex` | [github.com/openai/codex](https://github.com/openai/codex) |",
+    "| Antigravity CLI | `agy` | Google Antigravity |",
+    "",
+    "`git` is required.",
+  ].join("\n");
+
+  it("reads each Provider's install cell from the Requirements table", () => {
+    expect(providerInstalls(requirements)).toEqual([
+      {
+        provider: "Claude Code",
+        install:
+          "[docs.claude.com](https://docs.claude.com/en/docs/claude-code)",
+      },
+      {
+        provider: "Codex",
+        install: "[github.com/openai/codex](https://github.com/openai/codex)",
+      },
+      { provider: "Antigravity CLI", install: "Google Antigravity" },
+    ]);
   });
 });
