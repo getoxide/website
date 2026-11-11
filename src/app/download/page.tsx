@@ -1,7 +1,9 @@
+import { AnchoredHeading } from "@/components/AnchoredHeading";
 import { DeckText } from "@/components/DeckText";
 import { DownloadBlock } from "@/components/DownloadBlock";
 import { InlineMarkdown } from "@/components/InlineMarkdown";
 import { PageHeader } from "@/components/PageHeader";
+import { Prose } from "@/components/Prose";
 import { SiteFrame } from "@/components/SiteFrame";
 import { COPY } from "@/content/copy";
 import { PAGES } from "@/content/pages";
@@ -14,7 +16,8 @@ export const metadata = pageMetadata(PAGES.download);
 /**
  * `/download` (Copy deck, `/download`), in the order fixed by Download
  * experience (#13): Provider requirement, buttons, signing note and verify
- * link, unsupported-platform line, then the page FAQ. No closing CTA.
+ * link, unsupported-platform line, then the page FAQ: anchored questions
+ * with visible answers (Design system, FAQ). No closing CTA.
  */
 export default function DownloadPage() {
   const page = PAGES.download;
@@ -55,12 +58,20 @@ export default function DownloadPage() {
         <section className={styles.faq} aria-labelledby="questions">
           <h2 id="questions">{copy.faqHeading}</h2>
           {copy.faq.map(({ id, question, answer }) => (
-            <div key={id} className={styles.question}>
-              <h3 id={id}>{question}</h3>
-              <p>
-                <DeckText source={answer} />
-              </p>
-            </div>
+            <section key={id} aria-labelledby={id}>
+              <AnchoredHeading
+                id={id}
+                level={3}
+                label={COPY.anchorLabel(question)}
+              >
+                {question}
+              </AnchoredHeading>
+              <Prose>
+                <p>
+                  <DeckText source={answer} />
+                </p>
+              </Prose>
+            </section>
           ))}
         </section>
       </div>

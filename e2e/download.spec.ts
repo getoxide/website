@@ -95,7 +95,7 @@ test("the signing notes, verify link and unsupported line link the README at the
   ).toHaveAttribute("href", `${README}#build-from-source`);
 });
 
-test("the page FAQ has four anchored H3 questions with visible answers", async ({
+test("the page FAQ has four anchored H3 questions, each linking to itself, with visible answers", async ({
   browser,
 }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
@@ -106,6 +106,11 @@ test("the page FAQ has four anchored H3 questions with visible answers", async (
   expect(await questions.evaluateAll((hs) => hs.map((h) => h.id))).toEqual(
     FAQ.map(([id]) => id),
   );
+  for (const [id, question] of FAQ) {
+    await expect(
+      page.getByRole("link", { name: `Link to ${question}` }),
+    ).toHaveAttribute("href", `#${id}`);
+  }
   await expect(page.locator("h3#verify-download")).toBeInViewport();
   await expect(page.locator("main details")).toHaveCount(0);
   await expect(page.locator("main")).toContainText(
