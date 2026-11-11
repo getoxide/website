@@ -101,22 +101,6 @@ function mentioned(source: string, concepts: Term[]): Set<string> {
 }
 
 /**
- * Every term mentioned in these Markdown sources (plus `initial`): what a
- * block rendered after them, like the closing CTA, has already seen.
- */
-export function mentionedIn(
-  sources: string[],
-  initial: Iterable<string> = [],
-  concepts: Term[] = SNAPSHOT.concepts,
-): ReadonlySet<string> {
-  const seen = new Set(initial);
-  for (const source of sources) {
-    for (const term of mentioned(source, concepts)) seen.add(term);
-  }
-  return seen;
-}
-
-/**
  * For Markdown sources rendered in this order on one page, the terms already
  * mentioned before each one (plus `initial`, e.g. headings shown earlier).
  */

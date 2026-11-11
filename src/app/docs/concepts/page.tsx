@@ -25,10 +25,8 @@ export default function ConceptsPage() {
     (before, i) =>
       new Set([...before, ...concepts.slice(0, i + 1).map((c) => c.term)]),
   );
-  // Every term has its heading on this page before the closing CTA.
-  const all = new Set(concepts.map((c) => c.term));
   return (
-    <SiteFrame page={page} conceptsSeen={all}>
+    <SiteFrame page={page}>
       <div className={styles.page}>
         <PageHeader
           title={page.h1}

@@ -5,7 +5,7 @@ import { Prose } from "@/components/Prose";
 import { SiteFrame } from "@/components/SiteFrame";
 import { COPY } from "@/content/copy";
 import { PAGES } from "@/content/pages";
-import { mentionedIn, seenBefore } from "@/lib/concept-links";
+import { seenBefore } from "@/lib/concept-links";
 import { faqOf } from "@/lib/faq";
 import { pageMetadata } from "@/lib/metadata";
 import { SNAPSHOT } from "@/lib/snapshot";
@@ -21,10 +21,9 @@ export const metadata = pageMetadata(PAGES.faq);
 export default function FaqPage() {
   const page = PAGES.faq;
   const faq = faqOf(SNAPSHOT);
-  const answers = faq.map((entry) => entry.answer);
-  const seen = seenBefore(answers);
+  const seen = seenBefore(faq.map((entry) => entry.answer));
   return (
-    <SiteFrame page={page} conceptsSeen={mentionedIn(answers)}>
+    <SiteFrame page={page}>
       <div className={styles.page}>
         <PageHeader title={page.h1} />
         {faq.map(({ question, id, answer }, i) => (

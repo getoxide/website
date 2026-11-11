@@ -5,17 +5,13 @@ import releases from "../../e2e/fixtures/releases.json";
 import { SNAPSHOT, type Snapshot } from "@/lib/snapshot";
 import { ClosingCta } from "./ClosingCta";
 
-const render = (
-  key: keyof typeof releases,
-  conceptsSeen?: ReadonlySet<string>,
-) =>
+const render = (key: keyof typeof releases) =>
   renderToStaticMarkup(
     createElement(ClosingCta, {
       snapshot: {
         ...SNAPSHOT,
         release: releases[key] as Snapshot["release"],
       },
-      conceptsSeen,
     }),
   );
 
@@ -67,20 +63,13 @@ describe("ClosingCta", () => {
     ]);
   });
 
-  // Content #12 addendum, point 4: the CTA closes every page, so it links
-  // the terms the page has not mentioned before it.
-  it("links the first mention of Turn, Project and Thread", () => {
+  // Content #12 addendum, point 4: on a page that mentions none of them
+  // before, the CTA holds the first mentions of Turn, Project and Thread.
+  it("links its first mention of Turn, Project and Thread", () => {
     expect(conceptLinks(render("stable"))).toEqual([
       { href: "/docs/concepts#turn", text: "Turn" },
       { href: "/docs/concepts#project", text: "Project" },
       { href: "/docs/concepts#thread", text: "Thread" },
-    ]);
-  });
-
-  it("leaves unlinked the terms the page mentioned before it", () => {
-    const html = render("stable", new Set(["Turn", "Thread"]));
-    expect(conceptLinks(html)).toEqual([
-      { href: "/docs/concepts#project", text: "Project" },
     ]);
   });
 

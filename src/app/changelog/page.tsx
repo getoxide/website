@@ -1,4 +1,4 @@
-import { Changelog, changelogConcepts } from "@/components/Changelog";
+import { Changelog } from "@/components/Changelog";
 import { PageHeader } from "@/components/PageHeader";
 import { SiteFrame } from "@/components/SiteFrame";
 import { PAGES } from "@/content/pages";
@@ -12,7 +12,7 @@ export const metadata = pageMetadata(PAGES.changelog);
 export default function ChangelogPage() {
   const page = PAGES.changelog;
   return (
-    <SiteFrame page={page} conceptsSeen={changelogConcepts(SNAPSHOT)}>
+    <SiteFrame page={page}>
       <div className={styles.page}>
         <PageHeader title={page.h1} />
         <Changelog snapshot={SNAPSHOT} />

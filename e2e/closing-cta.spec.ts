@@ -10,6 +10,9 @@ const PRIMARY =
 
 const WITH_CTA = REGISTERED.filter((p) => p.path !== "/download");
 
+/** The block's two buttons; its copy also links its Concepts terms. */
+const BUTTONS = 'a:not([href^="/docs/concepts#"])';
+
 test("the closing CTA block is identical on every page that carries it", async ({
   page,
 }) => {
@@ -39,12 +42,10 @@ for (const entry of WITH_CTA) {
       "aria-labelledby",
       "closing-cta",
     );
-    await expect(cta.getByRole("link")).toHaveText([PRIMARY, "View on GitHub"]);
-    await expect(cta.getByRole("link").first()).toHaveAttribute(
-      "href",
-      "/download",
-    );
-    await expect(cta.getByRole("link").last()).toHaveAttribute(
+    const buttons = cta.locator(BUTTONS);
+    await expect(buttons).toHaveText([PRIMARY, "View on GitHub"]);
+    await expect(buttons.first()).toHaveAttribute("href", "/download");
+    await expect(buttons.last()).toHaveAttribute(
       "href",
       "https://github.com/getoxide/oxide",
     );

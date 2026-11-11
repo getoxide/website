@@ -276,7 +276,10 @@ test.describe("closing CTA primary", () => {
       const cta = page.getByRole("region", {
         name: "Take your next Turn all the way to the merge.",
       });
-      await expect(cta.getByRole("link").first()).toHaveText(label);
+      // The first button; the block's copy also links its Concepts terms.
+      await expect(
+        cta.locator('a:not([href^="/docs/concepts#"])').first(),
+      ).toHaveText(label);
     });
   }
 });

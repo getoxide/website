@@ -10,20 +10,16 @@ import styles from "./ClosingCta.module.css";
  * page except `/download` (Page inventory #9, internal linking rule 1). With
  * no release at all the primary reads "Get Oxide", so no button promises a
  * download that does not exist.
- * @param conceptsSeen the Concepts terms the page mentioned before the block;
- *   the block links the first mention of the others (Content #12 addendum,
- *   point 4)
+ *
+ * The block links its own first mention of each Concepts term (Content #12
+ * addendum, point 4). On a page that links a term earlier, that is a second
+ * link to the same Concept, which the rule allows, and the block stays
+ * identical on every page.
  */
-export function ClosingCta({
-  snapshot = SNAPSHOT,
-  conceptsSeen = new Set<string>(),
-}: {
-  snapshot?: Snapshot;
-  conceptsSeen?: ReadonlySet<string>;
-}) {
+export function ClosingCta({ snapshot = SNAPSHOT }: { snapshot?: Snapshot }) {
   const copy = COPY.closingCta;
   const none = snapshot.release.state === "none";
-  const seen = seenBefore([copy.heading, copy.sentence], conceptsSeen);
+  const seen = seenBefore([copy.heading, copy.sentence]);
   return (
     <section className={styles.cta} aria-labelledby="closing-cta">
       <h2 id="closing-cta" className={styles.heading}>
