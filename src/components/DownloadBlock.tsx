@@ -1,9 +1,14 @@
 import { COPY, GITHUB_REPO_URL } from "@/content/copy";
 import { readmeUrl } from "@/lib/oxide";
-import { SNAPSHOT, type Snapshot } from "@/lib/snapshot";
+import { SNAPSHOT, tokensOf, type Snapshot } from "@/lib/snapshot";
 import { Button } from "./Button";
 import { DeckText } from "./DeckText";
 import styles from "./DownloadBlock.module.css";
+
+type Platform = "macos" | "windows";
+
+/** macOS is primary without JavaScript (Download experience #13). */
+const PLATFORMS: Platform[] = ["macos", "windows"];
 
 /**
  * The download buttons and the quiet line under them (Design system, Download
@@ -17,7 +22,8 @@ export function DownloadBlock({
 }) {
   const copy = COPY.download;
   const { release } = snapshot;
-  if (release.state === "none" || !release.latest) {
+  const latest = release.latest;
+  if (release.state === "none" || !latest) {
     return (
       <div className={styles.block}>
         <div className={styles.buttons}>
@@ -34,5 +40,46 @@ export function DownloadBlock({
       </div>
     );
   }
-  return null;
+
+  const token = tokensOf(snapshot);
+  return (
+    <div className={styles.block}>
+      <div className={styles.buttons}>
+        {PLATFORMS.map((platform, i) => {
+          const size = token(`asset-size:${platform}`);
+          const sublabel = [copy.buttons.sublabel[platform], size]
+            .filter(Boolean)
+            .join(" · ");
+          const id = `download-${platform}-details`;
+          return (
+            <div
+              key={platform}
+              className={`${styles.option} ${styles[platform]}`}
+            >
+              <Button
+                href={latest.assets[platform].url}
+                variant={i === 0 ? "primary" : "ghost"}
+                platform={platform}
+                icon="download"
+                describedBy={id}
+              >
+                {copy.buttons[platform]}
+              </Button>
+              <p id={id} className={styles.sublabel}>
+                {sublabel}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+      <p className={styles.line}>
+        <DeckText
+          source={copy.lines.stable(
+            token("version")!,
+            token("release-date")!,
+          )}
+        />
+      </p>
+    </div>
+  );
 }

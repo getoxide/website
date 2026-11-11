@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { Os } from "@/lib/os";
 import { Icon } from "./Icon";
 import styles from "./Button.module.css";
 
@@ -14,6 +15,8 @@ export function Button({
   variant,
   icon,
   current = false,
+  platform,
+  describedBy,
   children,
 }: {
   href: string;
@@ -22,13 +25,27 @@ export function Button({
   icon?: string;
   /** The link points at the page being viewed. */
   current?: boolean;
+  /**
+   * One of the Download block's platform pair. Its look follows the platform
+   * the inline script detects (`html[data-os]`); `variant` is the look
+   * without JavaScript.
+   */
+  platform?: Exclude<Os, "other">;
+  /** Id of the element that describes the link (a sublabel). */
+  describedBy?: string;
   children: ReactNode;
 }) {
+  const classes = [
+    styles.button,
+    styles[variant],
+    platform ? styles[platform] : null,
+  ];
   return (
     <a
       href={href}
-      className={`${styles.button} ${styles[variant]}`}
+      className={classes.filter(Boolean).join(" ")}
       aria-current={current ? "page" : undefined}
+      aria-describedby={describedBy}
     >
       {icon ? <Icon name={icon} /> : null}
       {children}

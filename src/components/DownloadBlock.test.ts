@@ -46,3 +46,43 @@ describe("DownloadBlock, no release (`none`)", () => {
     expect(textOf(html)).not.toMatch(/Download/);
   });
 });
+
+describe("DownloadBlock, stable release", () => {
+  it("links both installers directly, macOS first, with their sublabels", () => {
+    const html = render("stable");
+    expect(links(html).slice(0, 2)).toEqual([
+      {
+        href: "https://github.com/getoxide/oxide/releases/download/v1.1.0/Oxide_1.1.0_aarch64.dmg",
+        text: "Download for macOS",
+      },
+      {
+        href: "https://github.com/getoxide/oxide/releases/download/v1.1.0/Oxide_1.1.0_x64-setup.exe",
+        text: "Download for Windows",
+      },
+    ]);
+    const text = textOf(html);
+    expect(text).toContain("Apple Silicon · .dmg · 101.2 MB");
+    expect(text).toContain("x64 · installer · 88.8 MB");
+  });
+
+  it("states the version and date and links the changelog", () => {
+    const html = render("stable");
+    expect(textOf(html)).toContain(
+      "Version 1.1.0 · 10 December 2026 · Release notes",
+    );
+    expect(links(html)).toContainEqual({
+      href: "/changelog",
+      text: "Release notes",
+    });
+    expect(links(html)).toHaveLength(3);
+  });
+
+  it("ties each sublabel to its button", () => {
+    const html = render("stable");
+    const ids = [...html.matchAll(/aria-describedby="([^"]+)"/g)].map(
+      ([, id]) => id,
+    );
+    expect(new Set(ids).size).toBe(2);
+    for (const id of ids) expect(html).toContain(`id="${id}"`);
+  });
+});
