@@ -11,3 +11,7 @@
 .entry time {
   color: var(--ox-text-muted);
 }
+
+.older {
+  margin-top: var(--site-space-8);
+}

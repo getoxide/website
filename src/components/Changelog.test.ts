@@ -108,4 +108,26 @@ describe("Changelog", () => {
     expect(maintenance).toContain(`href="${RELEASES}/tag/v0.9.1"`);
     expect(markup.match(/Maintenance release/g)).toHaveLength(1);
   });
+
+  // Budgets, HTML: the page keeps only the latest releases rather than move
+  // the ceiling; GitHub Releases has the rest.
+  it("keeps only the latest 30 stable releases and points to GitHub Releases for older ones", () => {
+    const versions = (n: number) =>
+      Array.from({ length: n }, (_, i) =>
+        release(`0.${i + 1}.0`, "2027-01-01", { fixes: "- A fix." }),
+      );
+    const ids = (markup: string) =>
+      [...markup.matchAll(/<h2 id="([^"]+)"/g)].map((m) => m[1]);
+
+    const full = html(withChangelog(versions(30)));
+    expect(ids(full)).toHaveLength(30);
+    expect(text(full)).not.toContain("Older releases");
+
+    const over = html(withChangelog(versions(31)));
+    expect(ids(over)).toHaveLength(30);
+    expect(ids(over)[0]).toBe("v0-31-0");
+    expect(ids(over).at(-1)).toBe("v0-2-0");
+    expect(text(over)).toMatch(/Older releases are on GitHub Releases\.$/);
+    expect(over).toContain(`<a href="${RELEASES}">GitHub Releases</a>`);
+  });
 });

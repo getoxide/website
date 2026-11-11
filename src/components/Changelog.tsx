@@ -17,6 +17,13 @@ const byVersionDesc = (a: string, b: string) => {
   return y[0] - x[0] || y[1] - x[1] || y[2] - x[2];
 };
 
+/**
+ * Releases the page shows, newest first (Budgets, HTML: past the ceiling the
+ * page keeps the latest N releases; the ceiling does not move). Lower it if
+ * `/changelog` ever exceeds its HTML ceiling.
+ */
+const LATEST = 30;
+
 /** Anchor of a version's heading: `0.4.0` → `v0-4-0`. */
 const anchorOf = (version: string) => `v${version.replace(/\./g, "-")}`;
 
@@ -26,9 +33,10 @@ const anchorOf = (version: string) => `v${version.replace(/\./g, "-")}`;
  */
 export function Changelog({ snapshot }: { snapshot: Snapshot }) {
   const copy = COPY.changelog;
-  const entries = snapshot.changelog
+  const stable = snapshot.changelog
     .filter((entry) => STABLE.test(entry.version))
     .sort((a, b) => byVersionDesc(a.version, b.version));
+  const entries = stable.slice(0, LATEST);
   if (!entries.length) {
     return (
       <Prose>
@@ -72,6 +80,17 @@ export function Changelog({ snapshot }: { snapshot: Snapshot }) {
           </section>
         );
       })}
+      {stable.length > entries.length ? (
+        <div className={styles.older}>
+          <Prose>
+            <p>
+              {copy.older.before}{" "}
+              <a href={snapshot.release.releasesUrl}>{copy.older.link}</a>
+              {copy.older.after}
+            </p>
+          </Prose>
+        </div>
+      ) : null}
     </>
   );
 }
