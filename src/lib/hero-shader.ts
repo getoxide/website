@@ -11,8 +11,6 @@ export const MAX_PIXELS = 360_000;
 export const FRAME_MS = 1000 / 30;
 /** The time of the one still frame under reduced motion. */
 export const STILL_T = 6.0;
-/** `localStorage` key of the "Pause animation" choice (value "1"). */
-export const PAUSED_KEY = "oxide-hero-paused";
 
 export function bufferSize(cssWidth: number, cssHeight: number) {
   let k = RENDER_SCALE;
@@ -26,26 +24,6 @@ export function bufferSize(cssWidth: number, cssHeight: number) {
     else height -= 1;
   }
   return { width, height };
-}
-
-type Store = Pick<Storage, "getItem" | "setItem" | "removeItem">;
-
-export function heroPaused(store?: Store): boolean {
-  try {
-    return (store ?? localStorage).getItem(PAUSED_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
-
-export function setHeroPaused(paused: boolean, store?: Store) {
-  try {
-    const s = store ?? localStorage;
-    if (paused) s.setItem(PAUSED_KEY, "1");
-    else s.removeItem(PAUSED_KEY);
-  } catch {
-    // Storage blocked: the choice lasts for this page view only.
-  }
 }
 
 export const SHADER_VERTEX = `attribute vec2 a; void main(){ gl_Position = vec4(a, 0.0, 1.0); }`;
@@ -111,8 +89,6 @@ void main(){
 }`;
 
 export type ShaderHandle = {
-  /** Freeze on the current frame (true) or run again (false). */
-  setPaused(paused: boolean): void;
   destroy(): void;
 };
 
@@ -120,12 +96,12 @@ export type ShaderHandle = {
  * Mounts the shader on `canvas`; `host` is observed for visibility. Calls
  * `onReady` after the first drawn frame (the canvas then fades in). Returns
  * null without WebGL: the static gradient stays. With `still` (reduced
- * motion) or while paused it draws one frame and nothing more.
+ * motion) it draws one frame and nothing more.
  */
 export function mountShader(
   canvas: HTMLCanvasElement,
   host: Element,
-  opts: { still: boolean; paused: boolean; onReady: () => void },
+  opts: { still: boolean; onReady: () => void },
 ): ShaderHandle | null {
   let gl: WebGLRenderingContext | null = null;
   try {
@@ -172,7 +148,6 @@ export function mountShader(
   let visible = true;
   let destroyed = false;
   let shown = false;
-  let paused = opts.paused;
   let last = -Infinity;
   // The shader clock only advances while it runs, so a resume continues from
   // the frozen frame instead of jumping.
@@ -199,7 +174,7 @@ export function mountShader(
   }
   function frame(now: number) {
     raf = 0;
-    if (destroyed || paused || !visible || document.hidden) return;
+    if (destroyed || !visible || document.hidden) return;
     if (now - last >= FRAME_MS - 1) {
       clock += (now - lastNow) / 1000;
       lastNow = now;
@@ -214,7 +189,7 @@ export function mountShader(
   }
   function update() {
     if (destroyed) return;
-    if (opts.still || paused) {
+    if (opts.still) {
       stop();
       draw(clock);
       return;
@@ -233,17 +208,13 @@ export function mountShader(
   });
   io.observe(host);
   const ro = new ResizeObserver(() => {
-    if (opts.still || paused) draw(clock);
+    if (opts.still) draw(clock);
   });
   ro.observe(canvas);
   document.addEventListener("visibilitychange", update);
   update();
 
   return {
-    setPaused(next) {
-      paused = next;
-      update();
-    },
     destroy() {
       destroyed = true;
       stop();

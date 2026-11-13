@@ -2,8 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 // Ticket #39 (Budgets, Shader and Accessibility; ADR-0001). GPU frame time is
 // manual (SwiftShader in CI makes it noise); here: the drawing buffer cap, the
-// 30 fps cap, the pause toggle and its persistence, reduced motion and the
-// no-WebGL fallback.
+// 30 fps cap, reduced motion and the no-WebGL fallback.
 
 // Counts the shader's draw calls without touching production code.
 const countDraws = (page: Page) =>
@@ -22,8 +21,6 @@ const draws = (page: Page) =>
   page.evaluate(() => (window as unknown as { __draws: number }).__draws);
 
 const canvas = (page: Page) => page.locator("section[data-hero] canvas");
-const toggle = (page: Page) =>
-  page.getByRole("button", { name: /(Pause|Play) animation/ });
 
 test("the shader draws behind the hero within the buffer and frame caps", async ({
   page,
@@ -90,75 +87,7 @@ test("without WebGL the static gradient stays and the hero is complete", async (
   ).toBeVisible();
 });
 
-test("the toggle freezes the shader and the eyes, labelled and keyboard-operable", async ({
-  page,
-}) => {
-  await countDraws(page);
-  await page.goto("/");
-  await expect(canvas(page)).toHaveCSS("opacity", "1", { timeout: 10_000 });
-  const btn = toggle(page);
-  await expect(btn).toHaveText("Pause animation");
-  await expect(btn).toHaveAttribute("aria-pressed", "false");
-  const eyeAnimation = () =>
-    page
-      .locator("section[data-hero] svg path[d='M448 472V552']")
-      .evaluate((el) => getComputedStyle(el).animationName);
-  expect(await eyeAnimation()).not.toBe("none");
-
-  await btn.focus();
-  await page.keyboard.press("Enter");
-  await expect(btn).toHaveText("Play animation");
-  await expect(btn).toHaveAttribute("aria-pressed", "true");
-  expect(await eyeAnimation()).toBe("none");
-  await page.waitForTimeout(200);
-  const frozen = await draws(page);
-  await page.waitForTimeout(1000);
-  expect(await draws(page)).toBe(frozen);
-
-  await page.keyboard.press("Space");
-  await expect(btn).toHaveText("Pause animation");
-  await page.waitForTimeout(500);
-  expect(await draws(page)).toBeGreaterThan(frozen);
-});
-
-test("a paused choice persists and is applied before first paint", async ({
-  page,
-}) => {
-  await page.goto("/");
-  await toggle(page).click();
-  expect(
-    await page.evaluate(() => localStorage.getItem("oxide-hero-paused")),
-  ).toBe("1");
-
-  await countDraws(page);
-  // Record the attribute at the earliest point the page can observe it.
-  await page.addInitScript(() => {
-    document.addEventListener("DOMContentLoaded", () => {
-      (window as unknown as { __early: boolean }).__early =
-        !!document.querySelector("section[data-hero][data-paused]");
-    });
-  });
-  await page.reload();
-  expect(
-    await page.evaluate(
-      () => (window as unknown as { __early: boolean }).__early,
-    ),
-  ).toBe(true);
-  await expect(toggle(page)).toHaveText("Play animation");
-  await page.waitForTimeout(500);
-  // only still frames (first draw, resize observer), and no more over time
-  const still = await draws(page);
-  expect(still).toBeLessThanOrEqual(4);
-  await page.waitForTimeout(1500);
-  expect(await draws(page)).toBe(still);
-  expect(
-    await page
-      .locator("section[data-hero] svg path[d='M448 472V552']")
-      .evaluate((el) => getComputedStyle(el).animationName),
-  ).toBe("none");
-});
-
-test("under reduced motion the mark is static, one still frame, no toggle", async ({
+test("under reduced motion the mark is static, one still frame", async ({
   browser,
 }) => {
   const context = await browser.newContext({ reducedMotion: "reduce" });
@@ -173,7 +102,6 @@ test("under reduced motion the mark is static, one still frame, no toggle", asyn
       .locator("section[data-hero] svg path[d='M448 472V552']")
       .evaluate((el) => getComputedStyle(el).animationName),
   ).toBe("none");
-  await expect(toggle(page)).toHaveCount(0);
   // only opacity fades of up to 200 ms remain
   await expect(canvas(page)).toHaveCSS("transition-duration", "0.2s");
   const word = page.locator("section[data-hero] h1 span").first();

@@ -1,7 +1,7 @@
 /* Design system, Animated mark: 120px, centred above the hero H1. The eyes
    blink and glance on two independent loops (11 s glance, 7 s blink; local to
    the mark, not tokens), only when `animated`. They stay still under reduced
-   motion and while the hero is paused (`data-paused` on the hero section). */
+   motion. */
 .mark {
   display: block;
   width: 120px;
@@ -25,11 +25,6 @@
 
 .animated .eye {
   animation: blink 7s linear 2.2s infinite;
-}
-
-:global([data-paused]) .animated .eyes,
-:global([data-paused]) .animated .eye {
-  animation: none;
 }
 
 @keyframes glance {
