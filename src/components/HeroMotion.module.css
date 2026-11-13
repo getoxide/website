@@ -16,29 +16,6 @@
   opacity: 1;
 }
 
-/* The "Pause animation" toggle (Budgets, Accessibility, 2.2.2): small, top
-   right under the header, at least 24 x 24 px. Opaque enough to read over the
-   brightest shader frame. */
-.toggle {
-  position: absolute;
-  top: 84px;
-  right: var(--site-gutter);
-  z-index: 3;
-  min-height: 32px;
-  padding: 0 14px;
-  font: 400 var(--site-text-caption) var(--site-font-body);
-  color: var(--ox-text);
-  cursor: pointer;
-  background: color-mix(in srgb, var(--ox-background) 80%, transparent);
-  border: 1px solid var(--ox-element-border);
-  border-radius: var(--site-radius-pill);
-  transition: background-color var(--site-dur-fast) var(--site-ease-fade);
-}
-
-.toggle:hover {
-  background: var(--ox-element-background);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .canvas {
     transition-duration: var(--site-dur-reduced);

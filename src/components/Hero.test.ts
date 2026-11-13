@@ -4,7 +4,6 @@ import { describe, expect, it } from "vitest";
 import releases from "../../e2e/fixtures/releases.json";
 import type { CaptureManifest } from "@/lib/captures";
 import { SNAPSHOT, type Snapshot } from "@/lib/snapshot";
-import { PAUSED_KEY } from "@/lib/hero-shader";
 import { Hero } from "./Hero";
 
 const manifest: CaptureManifest = {
@@ -104,11 +103,10 @@ describe("Hero", () => {
     expect(html).toMatch(/<canvas[^>]*aria-hidden="true"/);
   });
 
-  it("applies the saved pause before first paint, from an inline script", () => {
+  it("marks a full load before first paint, from an inline script", () => {
     const html = render();
     const script = html.match(/<script>(.*?)<\/script>/)![1];
-    expect(script).toContain(PAUSED_KEY);
-    expect(script).toContain("data-paused");
+    expect(script).toContain("data-reveal");
     // before the headline, the mark and the canvas
     expect(html.indexOf("<script")).toBeLessThan(html.indexOf("<svg"));
     expect(html.indexOf("<script")).toBeLessThan(html.indexOf("<canvas"));

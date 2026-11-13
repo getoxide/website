@@ -5,8 +5,7 @@ import styles from "./OxideMark.module.css";
  * The Oxide Braces mark, inline, 120px (Design system, Animated mark). The
  * geometry is shared with the generated share card (`@/lib/mark`). It is
  * static unless `animated`, which only the home hero sets: the eyes (`.eyes`,
- * `.eye`) then blink and glance in CSS, frozen by the hero's pause toggle and
- * under reduced motion. Decorative: the H1 below it names the page.
+ * `.eye`) then blink and glance in CSS, still under reduced motion. Decorative: the H1 below it names the page.
  */
 export function OxideMark({ animated = false }: { animated?: boolean }) {
   return (

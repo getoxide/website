@@ -1,12 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  FRAME_MS,
-  MAX_PIXELS,
-  RENDER_SCALE,
-  bufferSize,
-  heroPaused,
-  setHeroPaused,
-} from "./hero-shader";
+import { FRAME_MS, MAX_PIXELS, RENDER_SCALE, bufferSize } from "./hero-shader";
 
 // Budgets, Shader rules 1 and 2: buffer at 0.5 x CSS pixels, hard cap of
 // 360,000 pixels, never from devicePixelRatio; 30 fps.
@@ -38,34 +31,5 @@ describe("bufferSize", () => {
 
   it("caps at 30 fps", () => {
     expect(FRAME_MS).toBeCloseTo(1000 / 30);
-  });
-});
-
-describe("the paused choice", () => {
-  const store = () => {
-    const m = new Map<string, string>();
-    return {
-      getItem: (k: string) => m.get(k) ?? null,
-      setItem: (k: string, v: string) => void m.set(k, v),
-      removeItem: (k: string) => void m.delete(k),
-    };
-  };
-
-  it("persists in localStorage", () => {
-    const s = store();
-    expect(heroPaused(s)).toBe(false);
-    setHeroPaused(true, s);
-    expect(heroPaused(s)).toBe(true);
-    setHeroPaused(false, s);
-    expect(heroPaused(s)).toBe(false);
-  });
-
-  it("survives a storage that throws", () => {
-    const fail = () => {
-      throw new Error("blocked");
-    };
-    const broken = { getItem: fail, setItem: fail, removeItem: fail };
-    expect(heroPaused(broken)).toBe(false);
-    expect(() => setHeroPaused(true, broken)).not.toThrow();
   });
 });

@@ -12,7 +12,7 @@
     "src/fonts/inter-latin-wght-normal.woff2",
     "scripts/og-card.mjs"
   ],
-  "hash": "276d44cf1c3cdba9ebedb0250efa545c664df9f2e90864a4efd8caf6661fa126",
+  "hash": "828a74486e0ef869ecfa2fd599e8ca0adfae3a035bfc09f92a672cbd2a76e7df",
   "cardSha256": "a454889f925262f246486291195ddda266417b0d7f3bde0e263973b5c43c65cc",
   "generatedBy": "pnpm og:card (scripts/og-card.mjs)"
 }
