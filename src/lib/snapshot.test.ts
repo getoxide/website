@@ -129,7 +129,7 @@ describe("providerInstalls (Copy deck, `/download` → Bring your own agent)", (
     "| --- | --- | --- |",
     "| Claude Code | `claude` | [docs.claude.com](https://docs.claude.com/en/docs/claude-code) |",
     "| Codex | `codex` | [github.com/openai/codex](https://github.com/openai/codex) |",
-    "| Antigravity CLI | `agy` | Google Antigravity |",
+    "| Antigravity CLI | `agy` | [antigravity.google](https://antigravity.google/download) |",
     "",
     "`git` is required.",
   ].join("\n");
@@ -145,7 +145,10 @@ describe("providerInstalls (Copy deck, `/download` → Bring your own agent)", (
         provider: "Codex",
         install: "[github.com/openai/codex](https://github.com/openai/codex)",
       },
-      { provider: "Antigravity CLI", install: "Google Antigravity" },
+      {
+        provider: "Antigravity CLI",
+        install: "[antigravity.google](https://antigravity.google/download)",
+      },
     ]);
   });
 });
