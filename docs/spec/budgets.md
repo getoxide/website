@@ -2,7 +2,7 @@
 
 The numbers the site commits to and the checks that hold it to them. Decided in [Performance and accessibility budgets](https://github.com/getoxide/website/issues/22), for direction C ([Visual direction](https://github.com/getoxide/website/issues/11)) and the tiered motion toolset ([ADR-0001](../adr/0001-tiered-motion-toolset.md)).
 
-Build issues **cite** this file; they never copy it. Changing a number is a PR to this file, approved by Lorenzo. Reduced-motion behaviour is fixed by [Motion approach](https://github.com/getoxide/website/issues/10) and is not restated here. Visual styling (colours, focus-ring token, components) lives in the design system.
+Build issues **cite** this file; they never copy it. Changing a number is a PR to this file, approved by Lorenzo or Matteo. Reduced-motion behaviour is fixed by [Motion approach](https://github.com/getoxide/website/issues/10) and is not restated here. Visual styling (colours, focus-ring token, components) lives in the design system.
 
 ## Budget classes
 

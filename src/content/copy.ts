@@ -82,7 +82,7 @@ export const COPY = {
   /**
    * `/docs/*`. Sub-nav labels from the Design system (Prose); the leads, the
    * section headings and the anchor-link names are build-written drafts
-   * Lorenzo approves in review. Everything else on these pages is derived.
+   * Lorenzo or Matteo approves in review. Everything else on these pages is derived.
    */
   docs: {
     nav: {
@@ -107,7 +107,7 @@ export const COPY = {
    * `/changelog`. The group names, the per-version link and the maintenance
    * line come from Content #12 (Changelog); the empty-state line, the
    * older-releases line and the anchor-link name are build-written, drafts
-   * Lorenzo approves in review.
+   * Lorenzo or Matteo approves in review.
    */
   changelog: {
     groups: {
@@ -226,7 +226,7 @@ export const COPY = {
     /** Hand-written exception to the Copy deck's rule 5. */
     unsupported:
       "Linux, Intel Macs and Windows on ARM aren't packaged yet. [Build from source](README#build-from-source).",
-    /** Build-written: the H2 over the page FAQ, a draft for Lorenzo. */
+    /** Build-written: the H2 over the page FAQ, a draft for Lorenzo or Matteo. */
     faqHeading: "Questions",
     faq: [
       {
@@ -282,7 +282,7 @@ export const COPY = {
 
   /**
    * `/privacy`, build-written (not in the Copy deck): a draft Lorenzo
-   * approves in review. Wording constraints from the Measurement plan (#16):
+   * or Matteo approves in review. Wording constraints from the Measurement plan (#16):
    * the app has no telemetry, the site counts page views without cookies
    * through GoatCounter, aggregate only, and never "collects nothing".
    */

@@ -2,7 +2,7 @@
 
 How direction C · Passivation becomes the site's tokens and components. Decided in [Design system](https://github.com/getoxide/website/issues/21), on top of [Visual direction](https://github.com/getoxide/website/issues/11), [Motion approach](https://github.com/getoxide/website/issues/10) and [ADR-0001](../adr/0001-tiered-motion-toolset.md).
 
-Build issues **cite** this file by section anchor; they never copy it. A change here is a PR to this file, approved by Lorenzo.
+Build issues **cite** this file by section anchor; they never copy it. A change here is a PR to this file, approved by Lorenzo or Matteo.
 
 The reference implementation is the prototype at [`prototype/visual-direction@90559ae`](https://github.com/getoxide/website/tree/90559ae/prototypes/visual-direction) (`?variant=C`). Where this file and the prototype disagree, this file wins; where this file is silent, match the prototype. Performance and accessibility numbers live in [Performance and accessibility budgets](https://github.com/getoxide/website/issues/22), not here.
 

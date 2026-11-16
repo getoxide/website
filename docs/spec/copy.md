@@ -2,14 +2,14 @@
 
 The site-owned words the build works from. Decided in [Copy deck: locked strings and page outlines](https://github.com/getoxide/website/issues/20), at the fidelity fixed by [Copy: what the spec locks and what the build writes](https://github.com/getoxide/website/issues/18). The hero, the home proof points and the H1, `<title>` and description of `/`, `/features`, `/claude-code-gui` and `/codex-gui` were rewritten in [Copy rewrite: hero, page titles and descriptions](https://github.com/getoxide/website/issues/27).
 
-Build issues **cite** this file; they never copy it. A change to a locked string is a PR to this file, approved by Lorenzo.
+Build issues **cite** this file; they never copy it. A change to a locked string is a PR to this file, approved by Lorenzo or Matteo.
 
 ## How to read this deck
 
 | Level | Meaning | Who may change it |
 | --- | --- | --- |
 | **Locked** | Rendered verbatim, punctuation included. | A PR to this file. The hero needs a new ticket. |
-| **Outline** | The section headings are fixed. The key sentences are fixed in meaning; the build may adjust their grammar to fit the running text around them. | The build writes the running text; Lorenzo approves it in PR review. |
+| **Outline** | The section headings are fixed. The key sentences are fixed in meaning; the build may adjust their grammar to fit the running text around them. | The build writes the running text; Lorenzo or Matteo approves it in PR review. |
 | **Derived** | Rendered from the Oxide snapshot, never written here. | The Oxide repo. |
 
 ### Tokens

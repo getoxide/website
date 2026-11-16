@@ -2,7 +2,7 @@
 // Provider page sections). The
 // intro key sentences and the page FAQs are locked and verbatim; the section
 // headings are the outline's and the running text is build-written, a draft
-// Lorenzo approves in review. Strings keep the deck's notation
+// Lorenzo or Matteo approves in review. Strings keep the deck's notation
 // (`[label](target)`, `` `code` ``): `<DeckText>` renders them. The
 // `⟨platforms⟩` token is substituted at render time from the Snapshot.
 //

@@ -1,7 +1,7 @@
 // The two guides (ticket #42; Copy deck, the guides' outlines). The headings,
 // the intro key sentences and the meaning of each section's key sentences are
 // the deck's; the running text around them is build-written and Lorenzo
-// approves it in review. The second guide is honest about the cost of a
+// or Matteo approves it in review. The second guide is honest about the cost of a
 // second agent and about doing it without Oxide.
 //
 // Notation as in the Copy deck: `[label](target)` links, `code`, `**bold**`.

@@ -175,7 +175,7 @@ export const PAGES = {
     // Machine-readable layer #14, decision 7: Changelog is under Optional.
     llmsSection: "Optional",
   },
-  // Not in the Copy deck: build-written, approved by Lorenzo in review.
+  // Not in the Copy deck: build-written, approved by Lorenzo or Matteo in review.
   privacy: {
     path: "/privacy",
     h1: "Privacy",
