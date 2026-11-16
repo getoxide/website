@@ -2,12 +2,20 @@ import { describe, expect, it } from "vitest";
 import { assessLighthouse, metricsOf, verdictOfRounds } from "./lighthouse.mjs";
 
 /** One Lighthouse run, as `metricsOf` reads it. */
-const run = (lcp, tbt, cls, accessibility = 1, performance = 0.99) => ({
+const run = (
+  lcp,
+  tbt,
+  cls,
+  accessibility = 1,
+  performance = 0.99,
+  benchmark = 0,
+) => ({
   lcp,
   tbt,
   cls,
   accessibility,
   performance,
+  benchmark,
 });
 
 describe("assessLighthouse", () => {
@@ -118,6 +126,7 @@ describe("verdictOfRounds", () => {
 
 describe("metricsOf", () => {
   const lhr = {
+    environment: { benchmarkIndex: 1700 },
     audits: {
       "largest-contentful-paint": { numericValue: 1234.5 },
       "total-blocking-time": { numericValue: 12 },
@@ -127,7 +136,7 @@ describe("metricsOf", () => {
   };
 
   it("reads the metrics a run is judged on from a Lighthouse result", () => {
-    expect(metricsOf(lhr)).toEqual(run(1234.5, 12, 0.001, 1, 0.97));
+    expect(metricsOf(lhr)).toEqual(run(1234.5, 12, 0.001, 1, 0.97, 1700));
   });
 
   it("fails loudly on a run Lighthouse could not complete", () => {

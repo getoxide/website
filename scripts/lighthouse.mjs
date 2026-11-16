@@ -53,6 +53,8 @@ export function metricsOf(lhr) {
     cls: lhr.audits["cumulative-layout-shift"].numericValue,
     accessibility: lhr.categories.accessibility.score,
     performance: lhr.categories.performance.score,
+    // The host CPU speed Lighthouse measured: a slow runner shows here.
+    benchmark: lhr.environment?.benchmarkIndex ?? 0,
   };
 }
 
@@ -152,7 +154,7 @@ async function measurePage(lighthouse, chrome, url, path) {
     const run = metricsOf(result.lhr);
     runs.push(run);
     console.log(
-      `  ${path} run ${i + 1}: LCP ${Math.round(run.lcp)} ms, TBT ${Math.round(run.tbt)} ms, CLS ${run.cls.toFixed(3)}`,
+      `  ${path} run ${i + 1}: LCP ${Math.round(run.lcp)} ms, TBT ${Math.round(run.tbt)} ms, CLS ${run.cls.toFixed(3)}, CPU benchmark ${Math.round(run.benchmark)}`,
     );
   }
   return runs;
