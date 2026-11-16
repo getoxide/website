@@ -21,7 +21,16 @@ test("the closing CTA block is identical on every page that carries it", async (
     await page.goto(urlOf(entry));
     const cta = page.getByRole("region", { name: HEADING });
     await expect(cta, entry.path).toHaveCount(1);
-    blocks.add(await cta.evaluate((el) => el.outerHTML));
+    // The same copy and links everywhere; off the home it sits in a lit
+    // panel (Design system, Closing CTA), so only its frame differs.
+    blocks.add(
+      await cta.evaluate((el) =>
+        JSON.stringify({
+          text: (el as HTMLElement).innerText,
+          links: [...el.querySelectorAll("a")].map((a) => a.href),
+        }),
+      ),
+    );
   }
   expect(blocks.size).toBe(1);
 });

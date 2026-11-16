@@ -22,7 +22,7 @@ export const metadata = pageMetadata(PAGES.download);
  * experience (#13): Provider requirement, buttons, signing note and verify
  * link, unsupported-platform line, then the page FAQ: anchored questions
  * with visible answers (Design system, FAQ). No closing CTA. The two steps
- * (the agent, then the app) are panels, the notes sit beside them.
+ * (the agent, then the app) are panels side by side, the notes under them.
  */
 export default function DownloadPage() {
   const page = PAGES.download;
@@ -80,7 +80,7 @@ export default function DownloadPage() {
               <DownloadBlock />
             </div>
           </div>
-          <aside className={`${ui.panel} ${styles.notes}`}>
+          <div className={`${ui.panel} ${styles.notes}`}>
             <span className={ui.badge}>
               <Icon name="shield-check" />
             </span>
@@ -96,7 +96,7 @@ export default function DownloadPage() {
             <p className={styles.unsupported}>
               <DeckText source={copy.unsupported} conceptLinks={seen[3]} />
             </p>
-          </aside>
+          </div>
         </div>
         <section className={styles.faq} aria-labelledby="questions">
           <h2 id="questions" className={styles.faqHeading}>

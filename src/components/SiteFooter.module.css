@@ -135,7 +135,6 @@
 }
 
 .credits .link {
-  display: inline;
   color: var(--ox-text-muted);
 }
 

@@ -1,16 +1,15 @@
 /* `/download` (Design system, Download block; Panel): the two steps, the
-   Provider and then the app, as panels; the signing and verify notes in a
-   panel beside them; the page FAQ in rows. One column below the breakpoint,
+   Provider and then the app, as panels side by side; the signing and verify
+   notes in a panel under them; the page FAQ in rows. One column below the breakpoint,
    in the same order. */
 .layout {
   display: grid;
-  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-  align-items: start;
   gap: var(--site-space-5);
 }
 
 .main {
   display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
   gap: var(--site-space-5);
 }
 
@@ -108,10 +107,14 @@
   height: 40px;
 }
 
-/* Signing note, verify link and the unsupported-platform line: quiet. */
+/* Signing note, verify link and the unsupported-platform line: quiet, at
+   the reading measure beside their icon. Full width, so the lines with code
+   never rewrap when the mono font swaps in (no layout shift). */
 .notes {
   display: grid;
-  gap: var(--site-space-4);
+  grid-template-columns: auto minmax(0, var(--site-w-prose));
+  column-gap: var(--site-space-5);
+  row-gap: var(--site-space-4);
   font: var(--site-text-small) var(--site-font-body);
   color: var(--ox-text-muted);
 }
@@ -119,6 +122,14 @@
 .notes strong {
   color: var(--ox-text);
   font-weight: 500;
+}
+
+.notes > :first-child {
+  grid-row: span 4;
+}
+
+.notes > p {
+  grid-column: 2;
 }
 
 .unsupported {
@@ -142,8 +153,17 @@
 }
 
 @media (max-width: 860px) {
-  .layout {
+  .main,
+  .notes {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .notes > :first-child {
+    grid-row: auto;
+  }
+
+  .notes > p {
+    grid-column: 1;
   }
 
   .faq {
