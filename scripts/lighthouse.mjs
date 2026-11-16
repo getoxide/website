@@ -4,7 +4,8 @@
 // CI). LCP, TBT and CLS over the page's budget class and an accessibility
 // score under 100 fail; the overall performance score only warns. Runs `/`
 // and `/changelog` (the heaviest reading page) unless paths are given; each
-// page's class comes from the PAGES registry.
+// page's class comes from the PAGES registry. A round over budget is measured
+// once more (`ROUNDS`) so a busy CI runner cannot fail a page on its own.
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { registry } from "./exported-pages.mjs";
@@ -19,6 +20,19 @@ export const VITALS = {
 export const LIGHTHOUSE_PATHS = ["/", "/changelog"];
 
 export const RUNS = 3;
+
+/**
+ * Rounds of `RUNS` runs per page. A round whose median breaks a ceiling is
+ * measured again before the gate fails: CI runners share their CPU, and the
+ * same commit has measured 73 ms and 168 ms of TBT against the 150 ms
+ * showcase ceiling, with the three runs of a busy round all slow together.
+ * A real regression breaks every round, so the retry costs the failing case
+ * one extra round and never the passing one.
+ */
+export const ROUNDS = 2;
+
+/** The pause between two rounds, so a transient CPU burst can clear. */
+const RETRY_PAUSE = 15_000;
 
 /** Below this overall performance score, a warning (never a failure). */
 const PERFORMANCE_WARNING = 0.9;
@@ -89,6 +103,20 @@ export function assessLighthouse(path, budgetClass, runs) {
   return { median: m, failures, warnings };
 }
 
+/**
+ * The verdict a page is judged on, over the rounds measured for it in order.
+ * A page passes on the first round within budget; only when every round is
+ * over budget does it fail, reported on the last one.
+ * @param {{ median: ReturnType<typeof metricsOf>, failures: string[], warnings: string[] }[]} rounds
+ */
+export function verdictOfRounds(rounds) {
+  if (rounds.length === 0) {
+    throw new Error("no Lighthouse round to judge");
+  }
+  const passed = rounds.find((round) => round.failures.length === 0);
+  return passed ?? rounds[rounds.length - 1];
+}
+
 /** Serves `out/` like CI does and resolves once it answers. */
 async function serve(port) {
   const server = spawn(
@@ -107,6 +135,27 @@ async function serve(port) {
   }
   server.kill();
   throw new Error(`serve-out did not answer on ${url}`);
+}
+
+/** Measures `RUNS` runs of one page, printing each, and returns the runs. */
+async function measurePage(lighthouse, chrome, url, path) {
+  const runs = [];
+  for (let i = 0; i < RUNS; i++) {
+    // `/404` is served `404.html` with status 200: Lighthouse refuses a
+    // page answered with an error status.
+    const result = await lighthouse(`${url}${path}`, {
+      port: chrome.port,
+      output: "json",
+      logLevel: "error",
+      onlyCategories: ["performance", "accessibility"],
+    });
+    const run = metricsOf(result.lhr);
+    runs.push(run);
+    console.log(
+      `  ${path} run ${i + 1}: LCP ${Math.round(run.lcp)} ms, TBT ${Math.round(run.tbt)} ms, CLS ${run.cls.toFixed(3)}`,
+    );
+  }
+  return runs;
 }
 
 async function main() {
@@ -144,28 +193,30 @@ async function main() {
   const warnings = [];
   try {
     for (const { path, budgetClass } of targets) {
-      const runs = [];
-      for (let i = 0; i < RUNS; i++) {
-        // `/404` is served `404.html` with status 200: Lighthouse refuses a
-        // page answered with an error status.
-        const result = await lighthouse(`${server.url}${path}`, {
-          port: chrome.port,
-          output: "json",
-          logLevel: "error",
-          onlyCategories: ["performance", "accessibility"],
-        });
-        const run = metricsOf(result.lhr);
-        runs.push(run);
-        console.log(
-          `  ${path} run ${i + 1}: LCP ${Math.round(run.lcp)} ms, TBT ${Math.round(run.tbt)} ms, CLS ${run.cls.toFixed(3)}`,
-        );
+      const rounds = [];
+      for (let round = 1; round <= ROUNDS; round++) {
+        if (round > 1) {
+          console.log(
+            `  ${path}: over budget, re-measuring once after ${RETRY_PAUSE / 1000} s (the ceiling is unchanged)`,
+          );
+          await new Promise((resolve) => setTimeout(resolve, RETRY_PAUSE));
+        }
+        const runs = await measurePage(lighthouse, chrome, server.url, path);
+        const verdict = assessLighthouse(path, budgetClass, runs);
+        rounds.push(verdict);
+        if (verdict.failures.length === 0) break;
       }
-      const verdict = assessLighthouse(path, budgetClass, runs);
+      const verdict = verdictOfRounds(rounds);
       const m = verdict.median;
       const c = VITALS[budgetClass];
       console.log(
         `${path} (${budgetClass}), median of ${RUNS}: LCP ${Math.round(m.lcp)} ms (≤ ${c.lcp}), TBT ${Math.round(m.tbt)} ms (≤ ${c.tbt}), CLS ${m.cls.toFixed(3)} (≤ ${c.cls}), accessibility ${Math.round(m.accessibility * 100)}, performance ${Math.round(m.performance * 100)}`,
       );
+      if (rounds.length > 1 && verdict.failures.length === 0) {
+        warnings.push(
+          `${path}: first round over budget (${rounds[0].failures.join("; ")}), passed on the re-measure`,
+        );
+      }
       failures.push(...verdict.failures);
       warnings.push(...verdict.warnings);
     }
