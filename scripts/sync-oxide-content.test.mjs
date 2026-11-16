@@ -103,7 +103,10 @@ describe("rewriteLinks", () => {
 const INSTALL = `| Platform | File | Notes |
 | --- | --- | --- |
 | macOS (Apple Silicon) | \`Oxide_<version>_aarch64.dmg\` | Drag \`Oxide.app\` into \`/Applications\`. |
-| Windows 10/11 (x64) | \`Oxide_<version>_x64-setup.exe\` | Includes CPU and GPU dictation. |`;
+| Windows 10/11 (x64) | \`Oxide_<version>_x64-setup.exe\` | Includes CPU and GPU dictation. |
+| Windows 11 (arm64) | \`Oxide_<version>_windows_arm64.exe\` | NSIS installer. |
+| Linux (x64) | \`Oxide_<version>_linux_x64.AppImage\` | Updates itself. |
+| Linux (arm64) | \`Oxide_<version>_linux_arm64.AppImage\` | Updates itself. |`;
 
 const DL = "https://github.com/getoxide/oxide/releases/download";
 const PAGE = "https://github.com/getoxide/oxide/releases/tag";
@@ -315,7 +318,8 @@ describe("releaseData", () => {
     });
     expect(data.release.platforms).toEqual([
       "macOS on Apple Silicon",
-      "Windows x64",
+      "Windows (x64, arm64)",
+      "Linux (x64, arm64)",
     ]);
     expect(data.release.platformsFrom).toBe("readme");
   });

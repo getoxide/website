@@ -49,6 +49,10 @@ export const COPY = {
         links: [
           { label: "Claude Code", href: "/claude-code-gui" },
           { label: "Codex", href: "/codex-gui" },
+          {
+            label: "Antigravity",
+            href: "https://antigravity.google/download",
+          },
         ],
       },
       {

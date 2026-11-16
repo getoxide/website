@@ -306,15 +306,33 @@ function installer(release, version, { suffix }) {
     : { name: null, url: release.html_url, size: null };
 }
 
-/** Platforms named by the README Install table (`site:install`). */
+/**
+ * Platforms named by the README Install table (`site:install`): one entry per
+ * operating system, in table order, with its architectures, e.g.
+ * "macOS on Apple Silicon", "Windows (x64, arm64)", "Linux (x64, arm64)".
+ */
 function readmePlatforms(install) {
-  const platforms = INSTALLERS.filter((i) =>
-    install.split("\n").some((row) => row.includes(i.suffix)),
-  ).map((i) => i.platform);
-  if (platforms.length === 0) {
+  const order = [];
+  const archs = new Map();
+  for (const row of install.split("\n")) {
+    const cell = row.split("|")[1]?.trim() ?? "";
+    const os = cell.match(/^(macOS|Windows|Linux)\b/)?.[1];
+    if (!os) continue;
+    if (!archs.has(os)) {
+      order.push(os);
+      archs.set(os, []);
+    }
+    const arch = cell.match(/\(([^)]*)\)/)?.[1];
+    if (arch) archs.get(os).push(arch);
+  }
+  if (order.length === 0) {
     throw new Error("README Install table names no known platform installer");
   }
-  return platforms;
+  return order.map((os) => {
+    const list = archs.get(os);
+    if (os === "macOS") return list.length ? `macOS on ${list.join(", ")}` : os;
+    return list.length ? `${os} (${list.join(", ")})` : os;
+  });
 }
 
 /**
