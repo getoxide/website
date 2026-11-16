@@ -169,7 +169,11 @@ describe("releaseData", () => {
       state: "none",
       releasesUrl: "https://github.com/getoxide/oxide/releases",
       latest: null,
-      platforms: ["macOS on Apple Silicon", "Windows x64"],
+      platforms: [
+        "macOS on Apple Silicon",
+        "Windows (x64, arm64)",
+        "Linux (x64, arm64)",
+      ],
       platformsFrom: "readme",
     });
     expect(data.changelog).toEqual([]);
