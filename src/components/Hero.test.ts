@@ -1,11 +1,6 @@
-// The lazy boundary suspends under a synchronous render; the server build
-// resolves it, so the tests render the preview it wraps.
-vi.mock("./AppPreviewLazy", async () => ({
-  AppPreviewLazy: (await import("./AppPreviewApp")).AppPreviewApp,
-}));
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import releases from "../../e2e/fixtures/releases.json";
 import { SNAPSHOT, type Snapshot } from "@/lib/snapshot";
 import { Hero } from "./Hero";
