@@ -191,7 +191,11 @@ export function AppPreviewApp({
 
   const timers = useRef<number[]>([]);
   const messages = useRef<HTMLDivElement>(null);
+  const root = useRef<HTMLElement>(null);
   useEffect(() => {
+    // Hydrated: the controls answer from now on (the runtime boots after the
+    // LCP paint, so a moment after the page shows).
+    root.current?.setAttribute("data-ready", "");
     const pending = timers.current;
     return () => pending.forEach(clearTimeout);
   }, []);
@@ -280,6 +284,7 @@ export function AppPreviewApp({
 
   return (
     <figure
+      ref={root}
       className={cx(styles.preview, className)}
       role="group"
       aria-label={p.label(provider)}

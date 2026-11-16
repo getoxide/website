@@ -27,6 +27,7 @@ test("the app preview never moves by itself", async ({ page }) => {
   await page.goto("/");
   await page.waitForLoadState("load");
   const preview = page.getByRole("group", { name: /^Interactive preview/ });
+  await expect(preview).toHaveAttribute("data-ready", "");
   const before = await preview.innerHTML();
   await page.waitForTimeout(2500);
   expect(await preview.innerHTML()).toBe(before);
@@ -39,6 +40,8 @@ test("the app preview can be explored: push, merge, switch Threads, send", async
   await page.waitForLoadState("load");
   const preview = page.getByRole("group", { name: /^Interactive preview/ });
   await preview.scrollIntoViewIfNeeded();
+  // The runtime boots after the LCP paint; the preview says when it answers.
+  await expect(preview).toHaveAttribute("data-ready", "");
 
   // Open a file's hunk from the Diff.
   const file = preview.getByRole("button", { name: /dispatcher\.ts/ });

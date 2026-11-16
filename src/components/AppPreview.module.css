@@ -68,6 +68,11 @@
     color var(--site-dur-fast) var(--site-ease-fade);
 }
 
+/* Until the runtime has booted the controls do nothing: no hand cursor. */
+.preview:not([data-ready]) button {
+  cursor: default;
+}
+
 .window button:disabled {
   cursor: default;
   opacity: 0.6;
