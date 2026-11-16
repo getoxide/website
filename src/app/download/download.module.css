@@ -118,7 +118,8 @@
    never rewrap when the mono font swaps in (no layout shift). */
 .notes {
   display: grid;
-  grid-template-columns: auto minmax(0, var(--site-w-prose));
+  grid-template-columns: 36px minmax(0, var(--site-w-prose));
+  justify-content: start;
   column-gap: var(--site-space-5);
   row-gap: var(--site-space-4);
   font: var(--site-text-small) var(--site-font-body);

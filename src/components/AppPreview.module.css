@@ -904,7 +904,8 @@
 
   .branch,
   .workedTime,
-  .risks {
+  .risks,
+  .fileDir {
     display: none;
   }
 
