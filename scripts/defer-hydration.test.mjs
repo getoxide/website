@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   deferClientScripts,
   loader,
+  MAX_WAIT,
   parsesClientRuntime,
 } from "./defer-hydration.mjs";
 
@@ -27,7 +28,7 @@ describe("deferClientScripts", () => {
     expect(html).not.toContain('src="/_next/static/chunks/page.js"');
   });
 
-  it("re-inserts them on load, in order, without async reordering", () => {
+  it("re-inserts them after load, in order, without async reordering", () => {
     const html = deferClientScripts(PAGE);
     expect(html).toContain(
       loader([
@@ -38,7 +39,7 @@ describe("deferClientScripts", () => {
     // In insertion order: framework before page.
     expect(html.indexOf("framework.js")).toBeLessThan(html.indexOf("page.js"));
     expect(html).toContain("e.async=false");
-    expect(html).toContain('addEventListener("load",go,{once:true})');
+    expect(html).toContain('addEventListener("load",after,{once:true})');
     // After the content: it never delays the first paint.
     expect(html.indexOf("<h1>")).toBeLessThan(html.indexOf("addEventListener"));
   });
@@ -76,9 +77,52 @@ describe("deferClientScripts", () => {
 });
 
 describe("loader", () => {
-  it("retries immediately when the document is already complete", () => {
-    expect(loader(["/_next/a.js"])).toContain(
-      'if(document.readyState==="complete")go();',
+  const script = loader(["/_next/a.js"]);
+
+  it("starts waiting at once when the document is already complete", () => {
+    expect(script).toContain('if(document.readyState==="complete")after();');
+  });
+
+  it("waits for the finite animations (the headline reveal), not the endless ones", () => {
+    expect(script).toContain("document.getAnimations");
+    expect(script).toContain("t.iterations!==Infinity");
+    expect(script).toContain("x.finished");
+  });
+
+  it("then waits for the next frame, and never longer than MAX_WAIT", () => {
+    expect(script).toContain(
+      "requestAnimationFrame(function(){setTimeout(go,0)})",
     );
+    expect(script).toContain(`setTimeout(paint,${MAX_WAIT})`);
+    expect(MAX_WAIT).toBeLessThanOrEqual(3000);
+  });
+
+  it("boots the runtime exactly once", () => {
+    expect(script).toContain("if(d)return;d=true;");
+  });
+
+  it("runs the sources it is given, in order, when executed", () => {
+    const added = [];
+    const listeners = {};
+    const env = {
+      document: {
+        readyState: "loading",
+        getAnimations: () => [],
+        createElement: () => ({}),
+        body: { appendChild: (e) => added.push(e.src) },
+      },
+      addEventListener: (type, fn) => (listeners[type] = fn),
+      requestAnimationFrame: (fn) => fn(),
+      setTimeout: (fn) => (fn(), 0),
+    };
+    const code = loader(["/_next/a.js", "/_next/b.js"]).replace(
+      /^<script>|<\/script>$/g,
+      "",
+    );
+    new Function(...Object.keys(env), code)(...Object.values(env));
+    listeners.load();
+    return Promise.resolve().then(() => {
+      expect(added).toEqual(["/_next/a.js", "/_next/b.js"]);
+    });
   });
 });
