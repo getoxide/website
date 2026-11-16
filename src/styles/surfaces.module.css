@@ -41,17 +41,6 @@
   }
 }
 
-/* The accent glow behind a panel that carries the page's main action. */
-.glow {
-  background:
-    radial-gradient(
-      60% 120% at 0% 0%,
-      color-mix(in srgb, var(--ox-accent) 18%, transparent),
-      transparent 70%
-    ),
-    var(--ox-surface-background);
-}
-
 /* A panel's icon: a small rounded square, as the app's surface icons. */
 .badge {
   display: inline-grid;
@@ -92,7 +81,7 @@
   margin-bottom: var(--site-space-3);
   content: counter(row, decimal-leading-zero);
   font: 400 var(--site-text-mono-xs) var(--site-font-code);
-  color: var(--ox-text-accent);
+  color: var(--ox-text-disabled);
 }
 
 .row h2,

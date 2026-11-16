@@ -69,15 +69,15 @@ describe("Hero", () => {
     );
   });
 
-  it("rises the live app preview over the hero, in place of the capture", () => {
+  it("rises the interactive app preview over the hero, in place of the capture", () => {
     const html = render();
     expect(html).not.toContain("<picture");
     expect(html).toMatch(
-      /<div[^>]*role="img"[^>]*aria-label="Oxide running a Claude Code Thread/,
+      /<figure[^>]*role="group"[^>]*aria-label="Interactive preview of Oxide with Claude Code"/,
     );
     expect(html).toContain("data-capture");
-    // The server HTML is the finished scene: the merged pull request.
-    expect(text(html)).toContain("#143 · Merged");
+    // It starts on the finished Turn, ready to review and push.
+    expect(html).toContain("Commit &amp; Push");
   });
 
   // Ticket #39 (Design system, Hero shader and Animated mark; Budgets, Shader).

@@ -2,11 +2,9 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import {
-  BEAT_MS,
-  BEATS,
-  FINAL_BEAT,
   PREVIEW,
   PREVIEW_PROVIDERS,
+  PREVIEW_THREADS,
 } from "@/content/app-preview";
 import { AppPreview } from "./AppPreview";
 
@@ -17,44 +15,50 @@ const text = (html: string) =>
   html
     .replace(/<[^>]+>/g, " ")
     .replace(/&#x27;/g, "'")
+    .replace(/&amp;/g, "&")
     .replace(/\s+/g, " ")
     .trim();
 
-// Design system, App preview.
+// Design system, App preview; ADR-0004.
 describe("AppPreview", () => {
-  it("is one image to assistive tech, named like a Capture's alt", () => {
+  it("is a named group of real controls", () => {
     const html = render();
     expect(html).toMatch(
-      /role="img" aria-label="Oxide running a Claude Code Thread[^"]*"/,
+      /<figure[^>]*role="group"[^>]*aria-label="Interactive preview of Oxide with Claude Code"/,
     );
-    expect(html).toContain('aria-hidden="true"');
+    expect(html.match(/<button/g)!.length).toBeGreaterThan(10);
+    expect(html).toContain("<input");
   });
 
   it("is marked as product UI, so the copy gates skip it", () => {
     expect(render()).toContain('data-capture=""');
   });
 
-  it("renders the finished scene in the HTML, nothing hidden inline", () => {
+  it("starts on the hero Capture's Thread, finished and ready to push", () => {
+    const t = text(render());
+    const [first] = PREVIEW_THREADS;
+    expect(t).toContain(first.prompt);
+    expect(t).toContain(first.answer!.text);
+    expect(t).toContain(PREVIEW.commit);
+    expect(t).not.toContain(PREVIEW.merged);
+  });
+
+  it("lists every Thread as a button", () => {
     const html = render();
-    expect(text(html)).toContain(PREVIEW.prompt);
-    expect(text(html)).toContain(PREVIEW.answer);
-    expect(text(html)).toContain(`${PREVIEW.pr.number} · ${PREVIEW.pr.merged}`);
+    for (const thread of PREVIEW_THREADS) {
+      expect(html).toMatch(
+        new RegExp(`<button[^>]*>.*?${thread.title}.*?</button>`),
+      );
+    }
+  });
+
+  it("says under the frame that it can be explored", () => {
+    expect(render()).toMatch(/<figcaption[^>]*>Interactive preview:/);
+  });
+
+  it("runs the Provider it is given, and hides nothing inline", () => {
+    const html = render("codex");
+    expect(text(html)).toContain(PREVIEW_PROVIDERS.codex.model);
     expect(html).not.toMatch(/opacity:\s*0/);
-  });
-
-  it("renders no pause button on the server: it comes with motion", () => {
-    expect(render()).not.toContain("<button");
-  });
-
-  it("runs the Provider it is given", () => {
-    expect(text(render("codex"))).toContain(PREVIEW_PROVIDERS.codex.model);
-    expect(render("antigravity")).toContain(
-      'aria-label="Oxide running a Antigravity CLI Thread',
-    );
-  });
-
-  it("holds one duration per beat, the last beat being the finished scene", () => {
-    expect(BEAT_MS).toHaveLength(Object.keys(BEATS).length);
-    expect(FINAL_BEAT).toBe(Math.max(...Object.values(BEATS)));
   });
 });

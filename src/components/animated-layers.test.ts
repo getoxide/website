@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 // Budgets, Shader rule 3: no `mix-blend-mode` or `backdrop-filter` on or over
 // an animated layer. The animated layers of the home hero are the shader
 // canvas, the mark and the headline words; over them sit the hero, the
-// transparent header and the live app preview. ESLint enforces the same on the TSX
+// transparent header and the app preview. ESLint enforces the same on the TSX
 // (`no-restricted-syntax` in eslint.config.mjs); CSS is checked here.
 const ANIMATED = [
   "src/components/HeroMotion.module.css",
@@ -14,7 +14,7 @@ const ANIMATED = [
   "src/components/AppPreview.module.css",
   "src/components/HeroMotion.tsx",
   "src/components/AppPreview.tsx",
-  "src/components/AppPreviewPlayer.tsx",
+  "src/components/AppPreviewApp.tsx",
   "src/components/Hero.tsx",
   "src/components/OxideMark.tsx",
   "src/lib/hero-shader.ts",

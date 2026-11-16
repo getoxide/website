@@ -3,8 +3,8 @@ import styles from "./PageHeader.module.css";
 
 /**
  * H1 plus an optional lead, at the top of every page except the home (Design
- * system, Page header). It sits on a full-bleed band: the hero's static
- * gradient, quieter, with a hairline grid fading out from the top. Above the
+ * system, Page header). It sits on a full-bleed band: a neutral lift of the
+ * surface with a hairline grid fading out from the top. Above the
  * H1, the page's path in mono, as a terminal prompt would show it; it is
  * decorative, the H1 names the page.
  */

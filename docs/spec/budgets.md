@@ -29,7 +29,7 @@ The site has too little traffic for field data to exist for months, and the [Mea
 **Home LCP.**
 - The LCP element is the hero H1. It is text in the static HTML, so it does not wait for the capture.
 - The shader mounts after first paint (on idle or after `load`) and is never on the critical path.
-- The App preview rising over the shader has a fixed height at every width, and playing it changes only opacity, so it causes no layout shift.
+- The App preview rising over the shader has a fixed height at every width and its panes scroll inside it, so exploring it causes no layout shift.
 
 ## Per-page ceilings
 
