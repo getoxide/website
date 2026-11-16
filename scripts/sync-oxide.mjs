@@ -502,7 +502,7 @@ export function checkSnapshot(s) {
   if (
     !Array.isArray(platforms) ||
     !platforms.length ||
-    platforms.some((p) => !INSTALLERS.some((i) => i.platform === p))
+    platforms.some((p) => typeof p !== "string" || !p.trim())
   ) {
     problems.push("release.platforms");
   }

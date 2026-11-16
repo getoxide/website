@@ -81,7 +81,9 @@ describe("the home @graph", () => {
 
   it("derives the platforms and the price from the Snapshot", () => {
     const app = byType("SoftwareApplication");
-    expect(app.operatingSystem).toBe("macOS on Apple Silicon, Windows x64");
+    expect(app.operatingSystem).toBe(
+      "macOS on Apple Silicon, Windows (x64, arm64), Linux (x64, arm64)",
+    );
 
     const windowsOnly = {
       ...SNAPSHOT,
