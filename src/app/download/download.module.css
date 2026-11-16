@@ -27,10 +27,12 @@
   gap: var(--site-space-3);
 }
 
+/* One card per Provider: name above, install link below, so a long link
+   never wraps a row unevenly. */
 .providers {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--site-space-2) var(--site-space-5);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: var(--site-space-3);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -38,8 +40,19 @@
   color: var(--ox-text-muted);
 }
 
+.providers li {
+  display: grid;
+  gap: var(--site-space-1);
+  padding: var(--site-space-4);
+  border: 1px solid var(--ox-border);
+  border-radius: var(--site-radius);
+  background: var(--ox-surface-background);
+  overflow-wrap: anywhere;
+}
+
 .provider {
   color: var(--ox-text);
+  font-weight: 500;
 }
 
 /* Signing note, verify link and the unsupported-platform line: quiet. */

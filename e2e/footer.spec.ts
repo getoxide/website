@@ -18,7 +18,7 @@ const COLUMNS: [string, [string, string][]][] = [
     [
       ["Claude Code", "/claude-code-gui"],
       ["Codex", "/codex-gui"],
-      ["Antigravity", "https://antigravity.google/download"],
+      ["Antigravity", "/antigravity-gui"],
     ],
   ],
   [

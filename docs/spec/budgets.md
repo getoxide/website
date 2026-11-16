@@ -10,7 +10,7 @@ Every page belongs to one class. The class is the `budgetClass` field of its ent
 
 | Class | Pages | Why |
 | --- | --- | --- |
-| `showcase` | `/`, `/features`, `/claude-code-gui`, `/codex-gui` | Captures, section reveals and, on the home only, the shader |
+| `showcase` | `/`, `/features`, `/claude-code-gui`, `/codex-gui`, `/antigravity-gui` | Captures, section reveals and, on the home only, the shader |
 | `reading` | `/faq`, `/changelog`, `/docs`, both guides, `/download`, the 404 | Only page transitions and micro-interactions. `/download` adds just its OS detection |
 
 A new page picks a class when it enters `PAGES`.

@@ -101,7 +101,7 @@ describe("lintCopy: banned phrases", () => {
 describe("lintCopy: GUI", () => {
   const gui = `<p>A desktop GUI for agents.</p>`;
   const ruleBroken = (path) =>
-    `${path}: "GUI" outside /claude-code-gui, /codex-gui and /faq#what-is-oxide in "A desktop GUI for agents."`;
+    `${path}: "GUI" outside /claude-code-gui, /codex-gui, /antigravity-gui and /faq#what-is-oxide in "A desktop GUI for agents."`;
 
   it("fails GUI on any other page", () => {
     expect(lint("/changelog", html({ main: gui }))).toEqual([
@@ -109,9 +109,10 @@ describe("lintCopy: GUI", () => {
     ]);
   });
 
-  it("allows GUI on /claude-code-gui and /codex-gui", () => {
+  it("allows GUI on the three Provider pages", () => {
     expect(lint("/claude-code-gui", html({ main: gui }))).toEqual([]);
     expect(lint("/codex-gui", html({ main: gui }))).toEqual([]);
+    expect(lint("/antigravity-gui", html({ main: gui }))).toEqual([]);
   });
 
   it("allows GUI in the /faq answer to What is Oxide?, and only there", () => {

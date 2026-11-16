@@ -19,6 +19,7 @@ const section = (heading: string) =>
 const DECK_SECTIONS = {
   claudeCode: section("`/claude-code-gui`"),
   codex: section("`/codex-gui`"),
+  antigravity: section("`/antigravity-gui`"),
 } as const;
 
 describe.each(Object.entries(DECK_SECTIONS))("%s page", (key, deck) => {
@@ -80,8 +81,9 @@ describe("landing page copy", () => {
     }
   });
 
-  it("both pages are showcase pages in the registry (Budgets, classes)", () => {
+  it("all three pages are showcase pages in the registry (Budgets, classes)", () => {
     expect(PAGES.claudeCodeGui.budgetClass).toBe("showcase");
     expect(PAGES.codexGui.budgetClass).toBe("showcase");
+    expect(PAGES.antigravityGui.budgetClass).toBe("showcase");
   });
 });
