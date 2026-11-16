@@ -1,6 +1,5 @@
 import type { PreviewProvider } from "@/content/app-preview";
-import type { PreviewIcons } from "./AppPreviewApp";
-import { AppPreviewLazy } from "./AppPreviewLazy";
+import { AppPreviewApp, type PreviewIcons } from "./AppPreviewApp";
 import { Icon } from "./Icon";
 
 const NAMES = [
@@ -48,6 +47,6 @@ export function AppPreview({
     NAMES.map((name) => [name, <Icon key={name} name={name} />]),
   ) as PreviewIcons;
   return (
-    <AppPreviewLazy provider={provider} icons={icons} className={className} />
+    <AppPreviewApp provider={provider} icons={icons} className={className} />
   );
 }
