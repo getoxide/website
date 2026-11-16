@@ -1,17 +1,62 @@
-/* Design system, Footer. */
+/* Design system, Footer: a band of its own. A lit hairline on top (the proof
+   path's accent fading out), a slightly raised fill, then two tiers: the
+   logo, definition and trust line beside the link columns; under a hairline,
+   the repo and credits on one line and the disclaimers. */
 .footer {
-  padding: var(--site-space-7) var(--site-gutter) var(--site-space-8);
+  position: relative;
+  margin-top: var(--site-space-8);
+  padding: var(--site-space-9) var(--site-gutter) var(--site-space-7);
   border-top: 1px solid var(--ox-border);
+  background: linear-gradient(
+    180deg,
+    var(--ox-surface-background),
+    var(--ox-background) 70%
+  );
   font: 400 var(--site-text-caption) var(--site-font-body);
   color: var(--ox-text-disabled);
+}
+
+.footer::before {
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  width: min(640px, 80%);
+  height: 1px;
+  content: "";
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--ox-text-accent),
+    transparent
+  );
+  transform: translateX(-50%);
 }
 
 .inner {
   display: flex;
   flex-direction: column;
-  gap: var(--site-space-6);
+  gap: var(--site-space-8);
   max-width: var(--site-w-wide);
   margin: 0 auto;
+}
+
+.top {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: var(--site-space-7) var(--site-space-8);
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--site-space-4);
+}
+
+.logo {
+  display: block;
+  width: auto;
+  height: 23px;
 }
 
 .columns {
@@ -21,18 +66,20 @@
 }
 
 .heading {
-  margin-bottom: var(--site-space-2);
+  margin-bottom: var(--site-space-3);
   font: 500 var(--site-text-caption) var(--site-font-heading);
   letter-spacing: 0;
-  color: var(--ox-text-muted);
+  color: var(--ox-text-bright);
 }
 
 .list {
   display: flex;
   flex-direction: column;
+  gap: var(--site-space-1);
   margin: 0;
   padding: 0;
   list-style: none;
+  font-size: 14px;
 }
 
 .link {
@@ -45,25 +92,39 @@
   transition: color var(--site-dur-fast) var(--site-ease-fade);
 }
 
+.list .link {
+  color: var(--ox-text-muted);
+}
+
 .link:hover,
-.link[aria-current="page"] {
-  color: var(--ox-text);
+.link[aria-current="page"],
+.list .link:hover,
+.list .link[aria-current="page"] {
+  color: var(--ox-text-bright);
 }
 
 .link:hover {
   text-decoration: underline;
 }
 
-.lines {
-  display: flex;
-  flex-direction: column;
-  gap: var(--site-space-1);
-}
-
 .trust {
-  margin-bottom: var(--site-space-2);
+  padding: var(--site-space-1) var(--site-space-3);
+  border: 1px solid var(--ox-border);
+  border-radius: var(--site-radius-pill);
   font: 400 var(--site-text-mono-xs) var(--site-font-code);
   font-feature-settings: "calt" 0;
+}
+
+.bottom {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--site-space-3) var(--site-space-6);
+  padding-top: var(--site-space-6);
+  border-top: 1px solid var(--ox-border);
+}
+
+.credits {
+  margin: 0;
 }
 
 .meta {
@@ -73,10 +134,20 @@
   column-gap: var(--site-space-2);
 }
 
+.credits .link {
+  color: var(--ox-text-muted);
+}
+
+.disclaimers {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: var(--site-space-1);
+}
+
 /* The canonical definition (Copy #18): derived text, so its inline links are
    underlined to stand out from the sentence without relying on colour. */
 .definition {
-  max-width: var(--site-w-text);
+  max-width: 36em;
   font: 400 var(--site-text-small) var(--site-font-body);
   color: var(--ox-text-muted);
 }
@@ -94,4 +165,19 @@
 .definition strong {
   font-weight: 500;
   color: var(--ox-text);
+}
+
+@media (max-width: 860px) {
+  .footer {
+    padding-top: var(--site-space-8);
+  }
+
+  .top,
+  .bottom {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }

@@ -1,11 +1,70 @@
+/* Design system, Page header: the H1 and lead on a full-bleed band. The band
+   is the hero's static gradient, quieter, plus a hairline grid masked out
+   from the top left; it is static on every page (no shader off the home). */
 .header {
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   gap: var(--site-space-4);
-  padding: var(--site-space-9) 0 var(--site-space-7);
+  margin-bottom: var(--site-space-8);
+  padding: var(--site-space-9) 0 var(--site-space-8);
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0 calc(50% - 50vw);
+  z-index: -1;
+  border-bottom: 1px solid var(--ox-border);
+  background:
+    radial-gradient(
+      40% 90% at 18% 0%,
+      color-mix(in srgb, var(--ox-accent) 16%, transparent) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      35% 80% at 82% 10%,
+      var(--ox-elevated-surface-background) 0%,
+      transparent 75%
+    ),
+    var(--ox-background);
+}
+
+.backdrop::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background-image:
+    linear-gradient(var(--ox-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--ox-border) 1px, transparent 1px);
+  background-position: center top;
+  background-size: var(--site-space-8) var(--site-space-8);
+  mask-image: radial-gradient(70% 100% at 30% 0%, black, transparent 75%);
+  opacity: 0.55;
+}
+
+.crumb {
+  display: flex;
+  flex-wrap: wrap;
+  font: 400 var(--site-text-mono-xs) var(--site-font-code);
+  font-feature-settings: "calt" 0;
+  color: var(--ox-text-disabled);
+}
+
+.root {
+  color: var(--ox-text-accent);
+}
+
+.slash {
+  padding: 0 var(--site-space-2);
+}
+
+.here {
+  color: var(--ox-text-muted);
 }
 
 .title {
+  max-width: 18em;
   font: 500 var(--site-text-h1) var(--site-font-heading);
   letter-spacing: -0.03em;
   text-wrap: balance;
@@ -15,4 +74,12 @@
   max-width: var(--site-w-prose);
   font: 400 var(--site-text-lead) var(--site-font-body);
   color: var(--ox-text-muted);
+  text-wrap: pretty;
+}
+
+@media (max-width: 860px) {
+  .header {
+    margin-bottom: var(--site-space-7);
+    padding: var(--site-space-8) 0 var(--site-space-7);
+  }
 }

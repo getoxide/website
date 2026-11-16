@@ -1,8 +1,9 @@
 /* Design system, Feature section: an anchored section per feature at
-   --site-w-wide, its text, then its capture frame. The hidden start state is
-   `.feature[data-pending]`, which <Reveal> sets only when JavaScript runs,
-   motion is allowed and the section is below the fold (ADR-0001); reduced
-   motion never sets it. */
+   --site-w-wide. Each group opens with its number, heading and sentence; its
+   features are panels in two columns, a section with a capture frame spanning
+   both. The hidden start state is `.feature[data-pending]`, which <Reveal>
+   sets only when JavaScript runs, motion is allowed and the section is below
+   the fold (ADR-0001); reduced motion never sets it. */
 .group {
   width: 100%;
   max-width: var(--site-w-wide);
@@ -11,12 +12,19 @@
 }
 
 .groupHeader {
-  display: flex;
-  flex-direction: column;
-  gap: var(--site-space-3);
-  margin-bottom: var(--site-space-8);
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  align-items: end;
+  gap: var(--site-space-3) var(--site-space-8);
+  margin-bottom: var(--site-space-7);
   padding-top: var(--site-space-6);
   border-top: 1px solid var(--ox-element-border);
+}
+
+.groupIndex {
+  grid-column: 1 / -1;
+  font: 400 var(--site-text-mono-xs) var(--site-font-code);
+  color: var(--ox-text-accent);
 }
 
 .groupHeading {
@@ -31,12 +39,58 @@
   color: var(--ox-text-muted);
 }
 
-.feature + .feature {
-  margin-top: var(--site-space-9);
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--site-space-5);
+}
+
+.feature {
+  position: relative;
+  padding: var(--site-space-6);
+  border: 1px solid var(--ox-border);
+  border-top-color: color-mix(in srgb, var(--ox-text) 18%, transparent);
+  border-radius: var(--site-radius-frame);
+  background: linear-gradient(
+    180deg,
+    var(--ox-surface-background),
+    color-mix(in srgb, var(--ox-surface-background) 40%, var(--ox-background))
+  );
+  transition: border-color var(--site-dur-fast) var(--site-ease-fade);
+}
+
+.feature:hover {
+  border-color: var(--ox-element-border);
+}
+
+/* A captured section, and the last of an odd group, span both columns. */
+.captured,
+.grid > :last-child:nth-child(odd) {
+  grid-column: 1 / -1;
 }
 
 .text {
   max-width: var(--site-w-prose);
+}
+
+.icon {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin-bottom: var(--site-space-5);
+  border: 1px solid var(--ox-element-border);
+  border-radius: var(--site-radius-sm);
+  background: var(--ox-elevated-surface-background);
+  color: var(--ox-text-bright);
+  transition:
+    color var(--site-dur-fast) var(--site-ease-fade),
+    border-color var(--site-dur-fast) var(--site-ease-fade);
+}
+
+.feature:hover .icon {
+  border-color: var(--ox-text-accent);
+  color: var(--ox-text-accent);
 }
 
 .text h3 {
@@ -74,5 +128,20 @@
 .feature[data-in] {
   transition:
     opacity var(--site-dur-slow) var(--site-ease-out),
-    transform var(--site-dur-slow) var(--site-ease-out);
+    transform var(--site-dur-slow) var(--site-ease-out),
+    border-color var(--site-dur-fast) var(--site-ease-fade);
+  transition-delay:
+    calc(var(--n, 0) * var(--site-stagger)),
+    calc(var(--n, 0) * var(--site-stagger)), 0s;
+}
+
+@media (max-width: 860px) {
+  .groupHeader,
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .feature {
+    padding: var(--site-space-5);
+  }
 }

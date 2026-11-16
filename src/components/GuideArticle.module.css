@@ -1,5 +1,7 @@
 /* One guide: linear prose at the reading width (Design system, Prose:
-   Guides). The closing cross-link gets the same gap as a section. */
+   Guides), its sections on the proof path's rail: a hairline down the left
+   and a node at each heading, lit like the home's path. The closing
+   cross-link sits in a panel after the last section. */
 .page {
   width: 100%;
   max-width: var(--site-w-prose);
@@ -7,8 +9,39 @@
   padding-bottom: var(--site-space-9);
 }
 
-.section + .section,
-.closing {
+.rail {
+  position: relative;
+}
+
+.rail::before {
+  position: absolute;
+  top: var(--site-space-3);
+  bottom: 0;
+  left: -48px;
+  width: 1px;
+  content: "";
+  background: linear-gradient(var(--ox-element-border) 90%, transparent);
+}
+
+.section {
+  position: relative;
+}
+
+.section::before {
+  position: absolute;
+  top: 6px;
+  left: -55px;
+  width: 15px;
+  height: 15px;
+  content: "";
+  border: 1px solid var(--ox-text-accent);
+  border-radius: 50%;
+  background: var(--ox-background);
+  box-shadow: 0 0 0 3px
+    color-mix(in srgb, var(--ox-text-accent) 16%, transparent);
+}
+
+.section + .section {
   margin-top: var(--site-space-8);
 }
 
@@ -16,4 +49,20 @@
   margin-bottom: var(--site-space-4);
   font: 500 var(--site-text-h3) var(--site-font-heading);
   letter-spacing: -0.03em;
+}
+
+.closing {
+  margin-top: var(--site-space-8);
+  padding: var(--site-space-5) var(--site-space-6);
+  border: 1px solid var(--ox-border);
+  border-radius: var(--site-radius-frame);
+  background: var(--ox-surface-background);
+}
+
+/* Below the breakpoint there is no room beside the column: no rail. */
+@media (max-width: 860px) {
+  .rail::before,
+  .section::before {
+    display: none;
+  }
 }

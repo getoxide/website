@@ -29,3 +29,54 @@
   gap: var(--site-space-4);
   margin-top: var(--site-space-3);
 }
+
+/* Off the home the block closes the page in a lit panel: the page header's
+   materials (accent glow, hairline grid) at the frame radius. */
+.framed {
+  position: relative;
+  isolation: isolate;
+  max-width: var(--site-w-wide);
+  margin: 0 auto var(--site-space-9);
+  padding: var(--site-space-9) var(--site-gutter);
+  overflow: hidden;
+  border: 1px solid var(--ox-border);
+  border-top-color: color-mix(in srgb, var(--ox-text) 18%, transparent);
+  border-radius: var(--site-radius-frame);
+}
+
+.framed .sentence {
+  max-width: 40em;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(
+      50% 70% at 50% 0%,
+      color-mix(in srgb, var(--ox-accent) 22%, transparent),
+      transparent 75%
+    ),
+    var(--ox-surface-background);
+}
+
+.backdrop::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background-image:
+    linear-gradient(var(--ox-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--ox-border) 1px, transparent 1px);
+  background-position: center top;
+  background-size: var(--site-space-8) var(--site-space-8);
+  mask-image: radial-gradient(60% 80% at 50% 0%, black, transparent 80%);
+  opacity: 0.5;
+}
+
+@media (max-width: 860px) {
+  .framed {
+    margin: var(--site-space-7) auto var(--site-space-8);
+    padding: var(--site-space-8) var(--site-space-5);
+  }
+}

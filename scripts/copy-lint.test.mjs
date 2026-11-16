@@ -96,6 +96,11 @@ describe("lintCopy: banned phrases", () => {
     const main = `<a href="/the-best-magic">Docs</a><div hidden>the best</div>`;
     expect(lint("/", html({ main }))).toEqual([]);
   });
+
+  it("ignores the live app preview: product UI, read like a Capture", () => {
+    const main = `<div role="img" aria-label="Oxide" data-capture=""><p>the best GUI</p></div>`;
+    expect(lint("/changelog", html({ main }))).toEqual([]);
+  });
 });
 
 describe("lintCopy: GUI", () => {

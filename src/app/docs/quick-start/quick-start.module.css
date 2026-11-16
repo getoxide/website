@@ -1,0 +1,77 @@
+/* `/docs/quick-start`: the Requirements in a panel beside the Steps, which
+   run down the proof path's rail, one node per step. One column below the
+   breakpoint. */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  align-items: start;
+  gap: var(--site-space-8);
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  gap: var(--site-space-3);
+  margin-bottom: var(--site-space-5);
+  font: 500 var(--site-text-h3) var(--site-font-heading);
+  letter-spacing: -0.03em;
+}
+
+.requirements table {
+  font-size: 14px;
+}
+
+/* The derived ordered list becomes the rail: a hairline, and a numbered
+   node per step in place of the list marker. */
+.steps ol {
+  position: relative;
+  padding: 0;
+  counter-reset: step;
+  list-style: none;
+}
+
+.steps ol::before {
+  position: absolute;
+  top: var(--site-space-4);
+  bottom: var(--site-space-4);
+  left: 15px;
+  width: 1px;
+  content: "";
+  background: var(--ox-element-border);
+}
+
+.steps li {
+  position: relative;
+  min-height: 32px;
+  padding: 4px 0 0 var(--site-space-8);
+  counter-increment: step;
+}
+
+.steps li + li {
+  margin-top: var(--site-space-6);
+}
+
+.steps li::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: 31px;
+  height: 31px;
+  content: counter(step);
+  border: 1px solid var(--ox-text-accent);
+  border-radius: 50%;
+  background: var(--ox-background);
+  box-shadow: 0 0 0 4px
+    color-mix(in srgb, var(--ox-text-accent) 14%, transparent);
+  color: var(--ox-text-bright);
+  font: 500 13px / 1 var(--site-font-code);
+}
+
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--site-space-7);
+  }
+}

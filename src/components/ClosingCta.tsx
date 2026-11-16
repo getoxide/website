@@ -16,12 +16,23 @@ import styles from "./ClosingCta.module.css";
  * link to the same Concept, which the rule allows, and the block stays
  * identical on every page.
  */
-export function ClosingCta({ snapshot = SNAPSHOT }: { snapshot?: Snapshot }) {
+export function ClosingCta({
+  snapshot = SNAPSHOT,
+  framed = false,
+}: {
+  snapshot?: Snapshot;
+  /** Off the home: the block sits in a lit panel, closing the page. */
+  framed?: boolean;
+}) {
   const copy = COPY.closingCta;
   const none = snapshot.release.state === "none";
   const seen = seenBefore([copy.heading, copy.sentence]);
   return (
-    <section className={styles.cta} aria-labelledby="closing-cta">
+    <section
+      className={`${styles.cta} ${framed ? styles.framed : ""}`}
+      aria-labelledby="closing-cta"
+    >
+      {framed ? <div className={styles.backdrop} aria-hidden="true" /> : null}
       <h2 id="closing-cta" className={styles.heading}>
         <DeckText source={copy.heading} conceptLinks={seen[0]} />
       </h2>

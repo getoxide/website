@@ -10,7 +10,7 @@ import { pageMetadata } from "@/lib/metadata";
 import { GLOSSARY_URL } from "@/lib/oxide";
 import { seenBefore } from "@/lib/concept-links";
 import { SNAPSHOT } from "@/lib/snapshot";
-import styles from "../../reading.module.css";
+import ui from "@/styles/surfaces.module.css";
 
 export const metadata = pageMetadata(PAGES.docsConcepts);
 
@@ -27,26 +27,33 @@ export default function ConceptsPage() {
   );
   return (
     <SiteFrame page={page}>
-      <div className={styles.page}>
+      <div className={ui.wide}>
         <PageHeader
           title={page.h1}
+          path={page.path}
+          width="wide"
           lead={
             <>
               {copy.leadBefore} <a href={GLOSSARY_URL}>{copy.glossary}</a>.
             </>
           }
-        />
-        <DocsNav path={page.path} />
-        {concepts.map(({ term, id, definition }, i) => (
-          <section key={id} className={styles.section} aria-labelledby={id}>
-            <AnchoredHeading id={id} label={COPY.anchorLabel(term)}>
-              {term}
-            </AnchoredHeading>
-            <Prose id={`${id}-definition`}>
-              <Markdown source={definition} conceptLinks={seen[i]} />
-            </Prose>
-          </section>
-        ))}
+        >
+          <DocsNav path={page.path} />
+        </PageHeader>
+        <div className={ui.rows}>
+          {concepts.map(({ term, id, definition }, i) => (
+            <section key={id} className={ui.row} aria-labelledby={id}>
+              <div>
+                <AnchoredHeading id={id} label={COPY.anchorLabel(term)}>
+                  {term}
+                </AnchoredHeading>
+              </div>
+              <Prose id={`${id}-definition`}>
+                <Markdown source={definition} conceptLinks={seen[i]} />
+              </Prose>
+            </section>
+          ))}
+        </div>
       </div>
     </SiteFrame>
   );

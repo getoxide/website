@@ -3,6 +3,7 @@ import { COPY } from "@/content/copy";
 import { seenBefore } from "@/lib/concept-links";
 import { formatDate, type Snapshot } from "@/lib/snapshot";
 import { AnchoredHeading } from "./AnchoredHeading";
+import { Icon } from "./Icon";
 import { Markdown } from "./Markdown";
 import { Prose } from "./Prose";
 import styles from "./Changelog.module.css";
@@ -54,25 +55,33 @@ export function Changelog({ snapshot }: { snapshot: Snapshot }) {
   );
   if (!entries.length) {
     return (
-      <Prose>
-        <p>
-          {copy.empty.before}{" "}
-          <a href={snapshot.release.releasesUrl}>{copy.empty.link}</a>
-          {copy.empty.after}
-        </p>
-      </Prose>
+      <div className={styles.empty}>
+        <span className={styles.emptyIcon}>
+          <Icon name="tag" />
+        </span>
+        <Prose>
+          <p>
+            {copy.empty.before}{" "}
+            <a href={snapshot.release.releasesUrl}>{copy.empty.link}</a>
+            {copy.empty.after}
+          </p>
+        </Prose>
+      </div>
     );
   }
   return (
-    <>
+    <div className={styles.timeline}>
       {entries.map((entry) => {
         const id = anchorOf(entry.version);
         return (
           <section key={id} className={styles.entry} aria-labelledby={id}>
-            <AnchoredHeading id={id} label={copy.anchorLabel(entry.version)}>
-              {entry.version} ·{" "}
-              <time dateTime={entry.date}>{formatDate(entry.date)}</time>
-            </AnchoredHeading>
+            <div className={styles.when}>
+              <AnchoredHeading id={id} label={copy.anchorLabel(entry.version)}>
+                <span className={styles.version}>{entry.version}</span>
+                <span className={styles.sep}> · </span>
+                <time dateTime={entry.date}>{formatDate(entry.date)}</time>
+              </AnchoredHeading>
+            </div>
             <Prose>
               {GROUPS.every((group) => !entry[group]) ? (
                 <p>{copy.maintenance}</p>
@@ -81,7 +90,9 @@ export function Changelog({ snapshot }: { snapshot: Snapshot }) {
                 const notes = entry[group];
                 return notes ? (
                   <Fragment key={group}>
-                    <h3>{copy.groups[group]}</h3>
+                    <h3 className={`${styles.group} ${styles[group]}`}>
+                      {copy.groups[group]}
+                    </h3>
                     <Markdown
                       source={notes}
                       conceptLinks={seen.get(`${entry.version}/${group}`)}
@@ -109,6 +120,6 @@ export function Changelog({ snapshot }: { snapshot: Snapshot }) {
           </Prose>
         </div>
       ) : null}
-    </>
+    </div>
   );
 }

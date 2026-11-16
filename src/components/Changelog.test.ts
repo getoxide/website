@@ -65,7 +65,7 @@ describe("Changelog", () => {
       ]),
     );
     expect(markup).toMatch(
-      /<h2 id="v0-4-0"[^>]*>0\.4\.0 · <time dateTime="2026-12-10">10 December 2026<\/time><\/h2>/,
+      /<h2 id="v0-4-0"[^>]*><span[^>]*>0\.4\.0<\/span><span[^>]*> · <\/span><time dateTime="2026-12-10">10 December 2026<\/time><\/h2>/,
     );
     expect(markup).toContain(
       'href="#v0-4-0" aria-label="Link to version 0.4.0"',

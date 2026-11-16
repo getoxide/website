@@ -1,6 +1,6 @@
-/* Provider landing pages (Budget class showcase): the page is as wide as a
-   capture frame, the text keeps the reading measure and the capture spans the
-   frame (Design system, Capture frame; Feature section). */
+/* Provider landing pages (Budget class showcase): the header and rows at
+   --site-w-wide, the live app preview in the Capture frame's place, the FAQ
+   as panels in two columns (Design system, Capture frame; App preview; FAQ). */
 .page {
   width: 100%;
   max-width: var(--site-w-wide);
@@ -10,42 +10,50 @@
 
 .definition {
   max-width: var(--site-w-prose);
-  margin-bottom: var(--site-space-8);
-  font: 400 var(--site-text-body) var(--site-font-body);
+  font: 400 var(--site-text-small) var(--site-font-body);
   color: var(--ox-text-muted);
 }
 
-.section + .section {
-  margin-top: var(--site-space-8);
+.preview {
+  margin-bottom: var(--site-space-9);
 }
 
-.text {
-  max-width: var(--site-w-prose);
+.section[data-pending] {
+  opacity: 0;
+  transform: translateY(24px);
 }
 
-.section h2,
-.faq h2 {
-  font: 500 var(--site-text-h3) var(--site-font-heading);
-  letter-spacing: -0.03em;
-}
-
-.text > * + * {
-  margin-top: var(--site-space-4);
-}
-
-.capture {
-  margin-top: var(--site-space-6);
+.section[data-in] {
+  transition:
+    opacity var(--site-dur-slow) var(--site-ease-out),
+    transform var(--site-dur-slow) var(--site-ease-out);
 }
 
 .faq {
-  max-width: var(--site-w-prose);
   margin-top: var(--site-space-9);
 }
 
-.faq h2 {
-  margin-bottom: var(--site-space-5);
+.faqHeading {
+  margin-bottom: var(--site-space-6);
+  font: 500 var(--site-text-h2) var(--site-font-heading);
+  letter-spacing: -0.03em;
 }
 
-.faq section + section {
-  margin-top: var(--site-space-6);
+.faqGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+  gap: var(--site-space-5);
+}
+
+.question h3 {
+  font: 500 var(--site-text-h3) var(--site-font-heading);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+  scroll-margin-top: var(--site-space-6);
+}
+
+@media (max-width: 860px) {
+  .preview {
+    margin-bottom: var(--site-space-8);
+  }
 }

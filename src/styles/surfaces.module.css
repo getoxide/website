@@ -1,0 +1,161 @@
+/* Shared surfaces of the inner pages (Design system, Panel, Rows and Rail).
+   They borrow the home's materials: the Capture frame's fill and lighter top
+   edge for panels, the proof path's hairline and nodes for rails. */
+
+/* Panel: a framed group of content. */
+.panel {
+  position: relative;
+  padding: var(--site-space-6);
+  border: 1px solid var(--ox-border);
+  border-top-color: color-mix(in srgb, var(--ox-text) 18%, transparent);
+  border-radius: var(--site-radius-frame);
+  background: linear-gradient(
+    180deg,
+    var(--ox-surface-background),
+    color-mix(in srgb, var(--ox-surface-background) 40%, var(--ox-background))
+  );
+}
+
+/* A panel that is one link: it lifts and its border lights on hover and on
+   keyboard focus within. */
+.interactive {
+  transition:
+    border-color var(--site-dur-fast) var(--site-ease-fade),
+    transform var(--site-dur-base) var(--site-ease-out),
+    box-shadow var(--site-dur-base) var(--site-ease-out);
+}
+
+.interactive:hover,
+.interactive:focus-within {
+  border-color: var(--ox-element-border);
+  box-shadow: 0 30px 80px -40px color-mix(in srgb, black 80%, transparent);
+  transform: translateY(-2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .interactive,
+  .interactive:hover,
+  .interactive:focus-within {
+    transform: none;
+    transition-duration: var(--site-dur-reduced);
+  }
+}
+
+/* The accent glow behind a panel that carries the page's main action. */
+.glow {
+  background:
+    radial-gradient(
+      60% 120% at 0% 0%,
+      color-mix(in srgb, var(--ox-accent) 18%, transparent),
+      transparent 70%
+    ),
+    var(--ox-surface-background);
+}
+
+/* A panel's icon: a small rounded square, as the app's surface icons. */
+.badge {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--ox-element-border);
+  border-radius: var(--site-radius-sm);
+  background: var(--ox-elevated-surface-background);
+  color: var(--ox-text-bright);
+}
+
+/* Index: a two-digit mono counter, decorative (CSS content). */
+.index {
+  font: 400 var(--site-text-mono-xs) var(--site-font-code);
+  font-feature-settings: "calt" 0;
+  color: var(--ox-text-disabled);
+}
+
+/* Rows: a heading column and a prose column, hairlines between, the index
+   counted in CSS. One column below the breakpoint. */
+.rows {
+  counter-reset: row;
+  border-top: 1px solid var(--ox-border);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: var(--site-space-4) var(--site-space-8);
+  padding: var(--site-space-7) 0;
+  border-bottom: 1px solid var(--ox-border);
+  counter-increment: row;
+}
+
+.row > :first-child::before {
+  display: block;
+  margin-bottom: var(--site-space-3);
+  content: counter(row, decimal-leading-zero);
+  font: 400 var(--site-text-mono-xs) var(--site-font-code);
+  color: var(--ox-text-accent);
+}
+
+.row h2,
+.row h3 {
+  font: 500 var(--site-text-h3) var(--site-font-heading);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+  scroll-margin-top: var(--site-space-6);
+}
+
+@media (max-width: 860px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr);
+    padding: var(--site-space-6) 0;
+  }
+}
+
+/* Rail: the proof path, vertical. Each item has a node on one hairline. */
+.rail {
+  position: relative;
+  counter-reset: node;
+}
+
+.rail::before {
+  position: absolute;
+  top: var(--site-space-2);
+  bottom: var(--site-space-2);
+  left: 7px;
+  width: 1px;
+  content: "";
+  background: linear-gradient(var(--ox-element-border) 80%, transparent);
+}
+
+.node {
+  position: relative;
+  padding-left: var(--site-space-7);
+}
+
+.node::before {
+  position: absolute;
+  top: 6px;
+  left: 0;
+  width: 15px;
+  height: 15px;
+  content: "";
+  border: 1px solid var(--ox-text-accent);
+  border-radius: 50%;
+  background: var(--ox-background);
+  box-shadow: 0 0 0 3px
+    color-mix(in srgb, var(--ox-text-accent) 16%, transparent);
+}
+
+/* The page's shell: the header and content at one of two widths. */
+.wide {
+  width: 100%;
+  max-width: var(--site-w-wide);
+  margin: 0 auto;
+  padding-bottom: var(--site-space-9);
+}
+
+.prose {
+  width: 100%;
+  max-width: var(--site-w-prose);
+  margin: 0 auto;
+  padding-bottom: var(--site-space-9);
+}

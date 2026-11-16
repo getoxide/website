@@ -2,7 +2,7 @@
 
 The numbers the site commits to and the checks that hold it to them. Decided in [Performance and accessibility budgets](https://github.com/getoxide/website/issues/22), for direction C ([Visual direction](https://github.com/getoxide/website/issues/11)) and the tiered motion toolset ([ADR-0001](../adr/0001-tiered-motion-toolset.md)).
 
-Build issues **cite** this file; they never copy it. Changing a number is a PR to this file, approved by Lorenzo. Reduced-motion behaviour is fixed by [Motion approach](https://github.com/getoxide/website/issues/10) and is not restated here. Visual styling (colours, focus-ring token, components) lives in the design system.
+Build issues **cite** this file; they never copy it. Changing a number is a PR to this file, approved by Lorenzo or Matteo. Reduced-motion behaviour is fixed by [Motion approach](https://github.com/getoxide/website/issues/10) and is not restated here. Visual styling (colours, focus-ring token, components) lives in the design system.
 
 ## Budget classes
 
@@ -29,7 +29,7 @@ The site has too little traffic for field data to exist for months, and the [Mea
 **Home LCP.**
 - The LCP element is the hero H1. It is text in the static HTML, so it does not wait for the capture.
 - The shader mounts after first paint (on idle or after `load`) and is never on the critical path.
-- The capture rising over the shader has its box reserved (`width`/`height` or `aspect-ratio`), so it causes no layout shift.
+- The App preview rising over the shader has a fixed height at every width, and playing it changes only opacity, so it causes no layout shift.
 
 ## Per-page ceilings
 

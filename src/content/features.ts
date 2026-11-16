@@ -2,7 +2,7 @@
 // feature-name contract). One entry per README Features lead-in, no more, no
 // fewer. `leadIn`, `heading`, `anchor` and `keySentences` are the deck's;
 // `detail` and `caption` are build-written running text and captions, drafts
-// Lorenzo approves in review. Product facts stay in the Snapshot: nothing
+// Lorenzo or Matteo approves in review. Product facts stay in the Snapshot: nothing
 // here restates a version, a platform or a definition.
 //
 // Notation as in the Copy deck: `[label](target)` links, `code`.
