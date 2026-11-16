@@ -1,4 +1,5 @@
-// `/claude-code-gui` and `/codex-gui` (Copy deck, the two page sections). The
+// `/claude-code-gui`, `/codex-gui` and `/antigravity-gui` (Copy deck, the
+// Provider page sections). The
 // intro key sentences and the page FAQs are locked and verbatim; the section
 // headings are the outline's and the running text is build-written, a draft
 // Lorenzo approves in review. Strings keep the deck's notation
@@ -182,6 +183,78 @@ export const PROVIDER_PAGES = {
         question: "Can Claude Code review what Codex wrote?",
         answer:
           "Yes. Start a Blind review and pick Claude Code as the reviewer: it sees only the diff and the issue, never the Codex conversation, and its findings become Line comments you keep or dismiss. [The full workflow](/guides/claude-code-and-codex-together).",
+      },
+    ],
+  },
+
+  antigravity: {
+    intro:
+      "Yes, there is a GUI for Antigravity CLI: Oxide drives the `agy` CLI you already use and shows what each Turn changed and which checks actually ran.",
+    captureSlot: "antigravity-turn",
+    sections: [
+      {
+        id: "what-oxide-adds-to-antigravity-cli",
+        heading: "What Oxide adds to Antigravity CLI",
+        paragraphs: [
+          "Every Turn gets its own diff, so you read what one prompt changed instead of scrolling a transcript. Oxide takes a Checkpoint when the Turn starts and another when it ends, which is what makes that diff exact.",
+          "The Verification Dossier shows which checks actually ran, which are stale and what no check covers: [see what the Dossier shows](/features#verification-dossier).",
+        ],
+      },
+      {
+        id: "antigravity-cli-next-to-the-others",
+        heading: "Antigravity CLI next to the others",
+        paragraphs: [
+          "Run Antigravity CLI, Claude Code and Codex in the same Project, one Thread each, each with its own Model. Let one write and another run a Blind review: the reviewer sees only the diff and the issue, never the writer's conversation.",
+          `[How a Blind review works](/features#blind-review), and the full setup in [Claude Code and Codex together](${TOGETHER_GUIDE}).`,
+        ],
+      },
+      {
+        id: "what-stays-the-same",
+        heading: "What stays the same",
+        paragraphs: [
+          "Antigravity CLI still does the work, with your login and your plan. Each Thread is a real `agy` session, and the usage limits it reports are shown next to the Thread.",
+          "Oxide drives the CLI rather than replacing it: [install Antigravity](https://antigravity.google/download) once, and it shows up as a Provider.",
+        ],
+      },
+      {
+        id: "from-the-diff-to-the-pull-request",
+        heading: "From the diff to the pull request",
+        paragraphs: [
+          "Review the change, leave Line comments, commit, push and open the pull request without switching to a browser.",
+          `[How to review AI-generated code](${REVIEW_GUIDE}) is the method behind it, with or without Oxide.`,
+        ],
+      },
+    ],
+    faq: [
+      {
+        id: "install-antigravity-first",
+        question: "Do I need Antigravity CLI installed first?",
+        answer:
+          "Yes. Oxide drives the `agy` CLI rather than replacing it. [Install Antigravity](https://antigravity.google/download), log in once in a terminal, then launch Oxide and Antigravity CLI appears as a Provider. [Requirements](/docs/quick-start#requirements).",
+      },
+      {
+        id: "model",
+        question: "Can I choose the Antigravity model?",
+        answer:
+          "Yes. Every Thread has its own Model, picked when you start it and changeable between Turns.",
+      },
+      {
+        id: "usage-limits",
+        question: "Does Oxide show my Antigravity usage limits?",
+        answer:
+          "Yes, when Antigravity CLI reports them: they appear in the app, so you see how much is left before you start a long Turn.",
+      },
+      {
+        id: "windows",
+        question: "Does Oxide work with Antigravity CLI on Windows?",
+        answer:
+          "Yes. Oxide runs on `⟨platforms⟩`, and on Windows it drives the `agy` CLI installed there.",
+      },
+      {
+        id: "antigravity-reviews-claude-code",
+        question: "Can Antigravity CLI review what Claude Code wrote?",
+        answer:
+          "Yes. Start a Blind review and pick Antigravity CLI as the reviewer: it sees only the diff and the issue, never the original conversation, and its findings become Line comments you keep or dismiss. [The full workflow](/guides/claude-code-and-codex-together).",
       },
     ],
   },

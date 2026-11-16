@@ -44,7 +44,7 @@ export default function DownloadPage() {
             {providerInstalls(token("requirements")!).map(
               ({ provider, install }) => (
                 <li key={provider}>
-                  <span className={styles.provider}>{provider}</span>{" "}
+                  <span className={styles.provider}>{provider}</span>
                   <InlineMarkdown source={install} />
                 </li>
               ),

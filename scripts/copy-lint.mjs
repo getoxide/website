@@ -44,7 +44,11 @@ export const BANNED = [
 ];
 
 /** Pages where "GUI" may appear anywhere (Copy deck rule 3). */
-const GUI_PAGES = new Set(["/claude-code-gui", "/codex-gui"]);
+const GUI_PAGES = new Set([
+  "/claude-code-gui",
+  "/codex-gui",
+  "/antigravity-gui",
+]);
 /** The derived answer on /faq where "GUI" may appear (Copy deck rule 3). */
 const GUI_FAQ = { path: "/faq", section: "what-is-oxide" };
 const GUI = /\bGUIs?\b/i;
@@ -97,7 +101,7 @@ export function lintCopy({ path, html, definition }) {
     for (const block of blocksOf(document, skip)) {
       if (GUI.test(block)) {
         violations.push(
-          `${path}: "GUI" outside /claude-code-gui, /codex-gui and /faq#what-is-oxide in "${block}"`,
+          `${path}: "GUI" outside /claude-code-gui, /codex-gui, /antigravity-gui and /faq#what-is-oxide in "${block}"`,
         );
       }
     }

@@ -30,7 +30,7 @@ A `⟨…⟩` token is never typed out: the build renders it from the committed 
 
 1. The canonical definition is never reworded; where it appears, it is `⟨definition⟩`.
 2. None of the banned phrases from Copy (`copy-lint` rule 2) appears. [Copy rewrite: hero, page titles and descriptions](https://github.com/getoxide/website/issues/27) adds three superlatives to that list: "the most complete", "the best" and "the main app" (not bare "the main", which would match "the main branch"). "Complete" itself is allowed, in its absolute form only and only next to the loop that backs it: prompt, review, pull request and merge.
-3. "GUI" appears only on `/claude-code-gui`, `/codex-gui` and in the derived `/faq#what-is-oxide`.
+3. "GUI" appears only on `/claude-code-gui`, `/codex-gui`, `/antigravity-gui` and in the derived `/faq#what-is-oxide`.
 4. Glossary terms are capitalised (Project, Thread, Turn, Provider, Surface, Checkpoint, Verification Dossier, Blind review, Restore, Revert, Line comment, Verification command, Risk signal, Approval, Permission mode). The **first** capitalised mention of one of the nine Concepts terms on a page links to `/docs/concepts#<term>`; that link is the build's job and is not marked below.
 5. Product facts (platforms, requirements, licence, telemetry, API key, version) are tokens or links, never typed out. Two hand-written exceptions: the footer trust line and the unsupported-platform line on `/download`. "Free" and "open-source" come from the canonical definition, so they count as identity and may appear in titles and descriptions; "MIT" is the licence fact and may not.
 6. Oxide drives the agents; the agent writes the code. Never "write code with Oxide".
@@ -45,6 +45,7 @@ Rendered `<title>` follows the template `%s · Oxide` from [Machine-readable lay
 | `/features` | Everything between the prompt and the merge | Features: from the prompt to the merge · Oxide | Every Oxide feature, from the prompt to the merge: drive three agent CLIs, review each Turn and what actually ran, then open the pull request and merge it. |
 | `/claude-code-gui` | A Claude Code GUI from the first prompt to the merge | Claude Code GUI: an open-source desktop app · Oxide | Oxide is an open-source desktop GUI for Claude Code: keep your claude login and sessions, review each Turn, then open the pull request and merge in one window. |
 | `/codex-gui` | A Codex GUI that takes each change all the way to the merge | Codex GUI: a desktop app for the Codex CLI · Oxide | Is there a GUI for Codex? Oxide is an open-source desktop app that drives the codex CLI you already use, from the prompt to the pull request and the merge. |
+| `/antigravity-gui` | An Antigravity CLI GUI that takes each change all the way to the merge | Antigravity CLI GUI: a desktop app for agy · Oxide | Is there a GUI for Antigravity CLI? Oxide is an open-source desktop app that drives the agy CLI you already use, from the prompt to the pull request and merge. |
 | `/guides` | Guides | Guides · Oxide | Practical guides to reviewing what coding agents write: a method for AI-generated code, and using Claude Code and Codex together as writer and reviewer. |
 | `/guides/review-ai-generated-code` | How to review AI-generated code before you merge | How to review AI-generated code · Oxide | A four-step method to review AI-generated code: read one Turn at a time, check what actually ran, send feedback where it belongs, undo what you don't want. |
 | `/guides/claude-code-and-codex-together` | Claude Code and Codex together: one writes, the other reviews | Claude Code and Codex together, with Blind review · Oxide | Use Claude Code and Codex together: let one agent write the change and have the other review only the diff and the issue, never the original conversation. |
@@ -262,6 +263,36 @@ Yes. Oxide runs on `⟨platforms⟩`, and on Windows it drives the `codex` CLI i
 
 **Can Claude Code review what Codex wrote?** `#claude-code-reviews-codex`
 Yes. Start a Blind review and pick Claude Code as the reviewer: it sees only the diff and the issue, never the Codex conversation, and its findings become Line comments you keep or dismiss. [The full workflow](/guides/claude-code-and-codex-together).
+
+## `/antigravity-gui` *(outline + locked FAQ)*
+
+**Job**: people who use `agy` in a terminal and wonder whether a GUI exists. Distinct content from the other two Provider pages: this page leads with seeing what the agent changed Turn by Turn, and with using Antigravity CLI next to the other Providers.
+
+**Intro**: key sentence "Yes, there is a GUI for Antigravity CLI: Oxide drives the `agy` CLI you already use and shows what each Turn changed and which checks actually ran." Then `⟨definition⟩`.
+
+| Section heading | Key sentences |
+| --- | --- |
+| What Oxide adds to Antigravity CLI | Every Turn gets its own diff, so you read what one prompt changed instead of scrolling a transcript. The [Verification Dossier](/features#verification-dossier) shows which checks actually ran, which are stale and what no check covers. |
+| Antigravity CLI next to the others | Run Antigravity CLI, Claude Code and Codex in the same Project, one Thread each, each with its own Model. Let one write and another run a [Blind review](/features#blind-review). Links to [Claude Code and Codex together](/guides/claude-code-and-codex-together). |
+| What stays the same | Antigravity CLI still does the work, with your login and your plan. Each Thread is a real `agy` session, and the usage limits it reports are shown next to the Thread. |
+| From the diff to the pull request | Review the change, leave Line comments, commit, push and open the pull request without switching to a browser. Links to [How to review AI-generated code](/guides/review-ai-generated-code). |
+
+### Page FAQ *(locked)*
+
+**Do I need Antigravity CLI installed first?** `#install-antigravity-first`
+Yes. Oxide drives the `agy` CLI rather than replacing it. [Install Antigravity](https://antigravity.google/download), log in once in a terminal, then launch Oxide and Antigravity CLI appears as a Provider. [Requirements](/docs/quick-start#requirements).
+
+**Can I choose the Antigravity model?** `#model`
+Yes. Every Thread has its own Model, picked when you start it and changeable between Turns.
+
+**Does Oxide show my Antigravity usage limits?** `#usage-limits`
+Yes, when Antigravity CLI reports them: they appear in the app, so you see how much is left before you start a long Turn.
+
+**Does Oxide work with Antigravity CLI on Windows?** `#windows`
+Yes. Oxide runs on `⟨platforms⟩`, and on Windows it drives the `agy` CLI installed there.
+
+**Can Antigravity CLI review what Claude Code wrote?** `#antigravity-reviews-claude-code`
+Yes. Start a Blind review and pick Antigravity CLI as the reviewer: it sees only the diff and the issue, never the original conversation, and its findings become Line comments you keep or dismiss. [The full workflow](/guides/claude-code-and-codex-together).
 
 ## `/guides/review-ai-generated-code` *(outline)*
 

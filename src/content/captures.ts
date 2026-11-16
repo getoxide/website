@@ -50,6 +50,11 @@ export const CAPTURE_SLOTS = {
     alt: "Oxide's Diff Surface showing only the files one Turn changed, beside the Claude Code Thread that made them",
     quality: 60,
   },
+  "antigravity-turn": {
+    kind: "image",
+    alt: "Oxide's Diff Surface showing only the files one Turn changed, beside the Antigravity CLI Thread that made them",
+    quality: 60,
+  },
   "codex-dossier": {
     kind: "image",
     alt: "Oxide's Verification Dossier for a Codex Turn: the closing message kept apart from the checks that actually ran",

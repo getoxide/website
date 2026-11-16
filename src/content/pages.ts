@@ -64,6 +64,17 @@ export const PAGES = {
     indexable: true,
     llmsSection: "Pages",
   },
+  antigravityGui: {
+    path: "/antigravity-gui",
+    h1: "An Antigravity CLI GUI that takes each change all the way to the merge",
+    title: "Antigravity CLI GUI: a desktop app for agy · Oxide",
+    description:
+      "Is there a GUI for Antigravity CLI? Oxide is an open-source desktop app that drives the agy CLI you already use, from the prompt to the pull request and merge.",
+    budgetClass: "showcase",
+    structuredData: "WebPage",
+    indexable: true,
+    llmsSection: "Pages",
+  },
   features: {
     path: "/features",
     h1: "Everything between the prompt and the merge",

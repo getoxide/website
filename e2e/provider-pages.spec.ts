@@ -4,11 +4,12 @@ import { PAGES } from "../src/content/pages";
 import { REGISTERED } from "./pages";
 import { SNAPSHOT } from "./snapshot";
 
-// /claude-code-gui and /codex-gui (Copy deck; Page inventory #9): locked FAQs
+// /claude-code-gui, /codex-gui and /antigravity-gui (Copy deck; Page inventory #9): locked FAQs
 // anchored and visible, the required internal links, all with JS off.
 const LANDING = [
   { page: PAGES.claudeCodeGui, copy: PROVIDER_PAGES.claudeCode },
   { page: PAGES.codexGui, copy: PROVIDER_PAGES.codex },
+  { page: PAGES.antigravityGui, copy: PROVIDER_PAGES.antigravity },
 ];
 
 const REQUIRED_LINKS = [
