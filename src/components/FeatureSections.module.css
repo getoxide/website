@@ -24,7 +24,7 @@
 .groupIndex {
   grid-column: 1 / -1;
   font: 400 var(--site-text-mono-xs) var(--site-font-code);
-  color: var(--ox-text-accent);
+  color: var(--ox-text-disabled);
 }
 
 .groupHeading {

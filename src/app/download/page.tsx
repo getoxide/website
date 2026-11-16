@@ -68,7 +68,7 @@ export default function DownloadPage() {
                 )}
               </ul>
             </section>
-            <div className={`${ui.panel} ${ui.glow} ${styles.get}`}>
+            <div className={`${ui.panel} ${styles.get}`}>
               <div className={styles.stepHead}>
                 <span className={styles.step} aria-hidden="true">
                   2

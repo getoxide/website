@@ -157,12 +157,21 @@ A real product capture in a frame: `--site-w-frame`, `--site-radius-frame`, `--o
 
 ### App preview
 
-[ADR-0004](../adr/0004-live-app-preview.md). The Oxide workbench as HTML in the Capture frame's look: title bar, the Threads list, the Thread with its header and composer, the Diff Surface with the Verification Dossier, Risk signals and the changed files. It plays one Turn in thirteen beats: the prompt is typed and sent, the agent reads and edits (each file lands in the Diff), `pnpm test` turns Fresh, the answer streams in, Risk signals appear, Commit & Push opens the pull request, and it merges. Then it loops.
+[ADR-0004](../adr/0004-live-app-preview.md). The Oxide workbench as HTML in the Capture frame's look, **explorable and never moving by itself**: title bar, the Threads list, the Thread or the Code workspace, and the Surfaces (Diff, Files, Terminal, Pull request, Issues). It opens on the hero Capture's Thread, finished and ready to review. The visitor can:
 
-- On the home it rises over the hero in the hero Capture's place (−150px, −110px below 860px); on each Provider landing page it follows the page header, running that Provider.
-- The server HTML is the finished scene (the merged pull request); reduced motion and no-JS keep it. Pieces fade on `--site-dur-base` with `--site-ease-out`.
-- Fixed height (680px; below 860px the Thread at 540px over the Diff Surface, at the app's own 13px text, never scaled down). Between 860px and 1100px the Threads list is hidden.
-- `role="img"` with an accessible name, inner markup `aria-hidden`, marked `data-capture` for the copy gates. A pause/play button in the frame's corner once motion runs.
+- switch between four Threads, each in its own state: a finished Turn, one that asks a question, one waiting on an Approval, one already merged;
+- open the Turn's steps, open a file's hunk, Revert and Undo it, switch the Diff scope, run a Blind review and keep or dismiss its findings;
+- Commit & Push, then Merge, and see the pull request on its Surface;
+- open a file in the Code workspace from the Files Surface;
+- send a follow-up from the composer, which answers that no agent is attached.
+
+Rules:
+
+- On the home it rises over the hero in the hero Capture's place (−150px, −110px below 860px); on each Provider landing page it follows the page header, running that Provider. One caption line under the frame says it can be explored.
+- The server HTML is the starting state; without JavaScript it is a complete, static picture.
+- Fixed height (680px; below 860px the Thread at 540px over the Surfaces at 420px), panes scroll inside it, so nothing it does moves the page. Below 1100px the Threads list becomes a horizontal strip.
+- A named `role="group"` of real buttons and an input, every target at least 24px, focus visible; marked `data-capture` so the copy gates read it like a Capture.
+- Only user actions change it; the "Working" pulse while a reply arrives stops under reduced motion.
 - Provider glyphs are neutral shapes, never the vendors' logos.
 
 ### Definition line
@@ -179,15 +188,15 @@ The CTA block from [Download experience and pre-release state](https://github.co
 
 ### Page header
 
-H1 (`--site-text-h1`) plus an optional lead paragraph, at the top of every page except the home, on a full-bleed band: the hero's static gradient, quieter, and a hairline grid in `--ox-border` masked out from the top left, with a bottom border in `--ox-border`. Above the H1, the page's path in `--site-text-mono-xs` (`oxide / docs / concepts`), decorative. Pages at `--site-w-wide` align the header with their content; the docs sub-nav sits in it.
+H1 (`--site-text-h1`) plus an optional lead paragraph, at the top of every page except the home, on a full-bleed band: a neutral lift of `--ox-elevated-surface-background` from the top left and a hairline grid in `--ox-border` masked out from there, with a bottom border in `--ox-border`. No accent colour. Above the H1, the page's path in `--site-text-mono-xs` (`oxide / docs / concepts`), decorative. Pages at `--site-w-wide` align the header with their content; the docs sub-nav sits in it.
 
 ### Panel
 
-A framed group of content: `--site-radius-frame`, `--ox-border` with a lighter top edge (the Capture frame's), a fill fading from `--ox-surface-background` into the page. A panel that is one link lifts 2px with a deeper shadow and an `--ox-element-border` border on hover and focus-within. A panel carrying the page's main action adds an `--ox-accent` glow from its top-left corner. Icons in panels sit in a 36px `--site-radius-sm` square on `--ox-elevated-surface-background`.
+A framed group of content: `--site-radius-frame`, `--ox-border` with a lighter top edge (the Capture frame's), a fill fading from `--ox-surface-background` into the page. A panel that is one link lifts 2px with a deeper shadow and an `--ox-element-border` border on hover and focus-within. Icons in panels sit in a 36px `--site-radius-sm` square on `--ox-elevated-surface-background`.
 
 ### Rows
 
-Heading-and-answer content (FAQ, Concepts, the Provider pages' sections, the `/download` FAQ): a heading column and a Prose column (5 : 7) at `--site-w-wide`, hairlines between rows, each heading preceded by its two-digit index in `--ox-text-accent` mono. One column below 860px.
+Heading-and-answer content (FAQ, Concepts, the Provider pages' sections, the `/download` FAQ): a heading column and a Prose column (5 : 7) at `--site-w-wide`, hairlines between rows, each heading preceded by its two-digit index in `--ox-text-disabled` mono. One column below 860px.
 
 ### Rail
 
@@ -223,11 +232,11 @@ The link on the first capitalised mention of a Concepts term, to `/docs/concepts
 
 ### Footer
 
-Three columns as decided in Page inventory, with the disclaimers and the trust lines; `--site-text-caption`, `--ox-text-disabled`, a top border in `--ox-border` lit in its centre by an `--ox-text-accent` hairline, a fill fading down from `--ox-surface-background`. Two tiers: the logo (decorative), definition and trust line (a pill) beside the columns; then, under a hairline, the repo links and the credits (Lorenzo Cavallini and Matteo Benassi), and the disclaimers.
+Three columns as decided in Page inventory, with the disclaimers and the trust lines; `--site-text-caption`, `--ox-text-disabled`, a top border in `--ox-border`, a fill fading down from `--ox-surface-background`. Two tiers: the logo (decorative), definition and trust line (a pill) beside the columns; then, under a hairline, the repo links and the credits (Lorenzo Cavallini and Matteo Benassi), and the disclaimers.
 
 ### Closing CTA
 
-Centred after the page's content, as on the home. Off the home it closes the page in a lit panel at `--site-w-wide`: the page header's accent glow and hairline grid on `--ox-surface-background`.
+Centred after the page's content, as on the home. Off the home it closes the page in a panel at `--site-w-wide`: the page header's neutral lift and hairline grid on `--ox-surface-background`.
 
 ### 404
 

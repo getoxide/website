@@ -30,8 +30,8 @@
   margin-top: var(--site-space-3);
 }
 
-/* Off the home the block closes the page in a lit panel: the page header's
-   materials (accent glow, hairline grid) at the frame radius. */
+/* Off the home the block closes the page in a panel: the page header's
+   materials (a neutral lift, hairline grid) at the frame radius. */
 .framed {
   position: relative;
   isolation: isolate;
@@ -55,7 +55,7 @@
   background:
     radial-gradient(
       50% 70% at 50% 0%,
-      color-mix(in srgb, var(--ox-accent) 22%, transparent),
+      var(--ox-elevated-surface-background),
       transparent 75%
     ),
     var(--ox-surface-background);

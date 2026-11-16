@@ -21,7 +21,7 @@ export function ClosingCta({
   framed = false,
 }: {
   snapshot?: Snapshot;
-  /** Off the home: the block sits in a lit panel, closing the page. */
+  /** Off the home: the block sits in a panel, closing the page. */
   framed?: boolean;
 }) {
   const copy = COPY.closingCta;

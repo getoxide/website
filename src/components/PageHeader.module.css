@@ -1,6 +1,6 @@
-/* Design system, Page header: the H1 and lead on a full-bleed band. The band
-   is the hero's static gradient, quieter, plus a hairline grid masked out
-   from the top left; it is static on every page (no shader off the home). */
+/* Design system, Page header: the H1 and lead on a full-bleed band: a neutral
+   lift of the surface from the top left and a hairline grid masked out from
+   there. No accent colour; static on every page (no shader off the home). */
 .header {
   position: relative;
   isolation: isolate;
@@ -18,12 +18,7 @@
   border-bottom: 1px solid var(--ox-border);
   background:
     radial-gradient(
-      40% 90% at 18% 0%,
-      color-mix(in srgb, var(--ox-accent) 16%, transparent) 0%,
-      transparent 70%
-    ),
-    radial-gradient(
-      35% 80% at 82% 10%,
+      45% 90% at 20% 0%,
       var(--ox-elevated-surface-background) 0%,
       transparent 75%
     ),
@@ -52,7 +47,7 @@
 }
 
 .root {
-  color: var(--ox-text-accent);
+  color: var(--ox-text-muted);
 }
 
 .slash {
