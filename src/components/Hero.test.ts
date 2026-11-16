@@ -2,26 +2,12 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import releases from "../../e2e/fixtures/releases.json";
-import type { CaptureManifest } from "@/lib/captures";
 import { SNAPSHOT, type Snapshot } from "@/lib/snapshot";
 import { Hero } from "./Hero";
 
-const manifest: CaptureManifest = {
-  hero: {
-    kind: "image",
-    width: 2880,
-    height: 1800,
-    widths: [640, 960, 1280, 1920, 2560],
-  },
-};
-
-const render = (
-  key: keyof typeof releases | null = "stable",
-  m: CaptureManifest = manifest,
-) =>
+const render = (key: keyof typeof releases | null = "stable") =>
   renderToStaticMarkup(
     createElement(Hero, {
-      manifest: m,
       snapshot: key
         ? {
             ...SNAPSHOT,
@@ -83,16 +69,15 @@ describe("Hero", () => {
     );
   });
 
-  it("rises the hero capture over the hero, not lazy", () => {
+  it("rises the live app preview over the hero, in place of the capture", () => {
     const html = render();
-    expect(html).toContain("<picture>");
-    expect(html).not.toContain('loading="lazy"');
-  });
-
-  it("renders no frame when the hero slot has no source", () => {
-    const html = render("stable", {});
     expect(html).not.toContain("<picture");
-    expect(html).not.toContain("<img");
+    expect(html).toMatch(
+      /<div[^>]*role="img"[^>]*aria-label="Oxide running a Claude Code Thread/,
+    );
+    expect(html).toContain("data-capture");
+    // The server HTML is the finished scene: the merged pull request.
+    expect(text(html)).toContain("#143 · Merged");
   });
 
   // Ticket #39 (Design system, Hero shader and Animated mark; Budgets, Shader).

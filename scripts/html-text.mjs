@@ -23,9 +23,15 @@ export const attrOf = (node, name) =>
 
 export const normalize = (text) => text.replace(/[\s\u0000]+/g, " ").trim();
 
-/** Whether a node's content is never visible. */
+/**
+ * Whether a node's content is never visible, or is not the site's copy: a
+ * `data-capture` subtree is product UI (the live app preview, Design system
+ * App preview), read by the copy gates as they read a Capture's pixels.
+ */
 export const isInvisible = (node) =>
-  INVISIBLE.has(node.nodeName) || attrOf(node, "hidden") !== null;
+  INVISIBLE.has(node.nodeName) ||
+  attrOf(node, "hidden") !== null ||
+  attrOf(node, "data-capture") !== null;
 
 /** Whether a node starts and ends a block of text. */
 export const isBlock = (node) => BLOCK.has(node.nodeName);

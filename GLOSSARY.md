@@ -24,6 +24,10 @@ _Avoid_: page type
 A still or a loop recorded from the real Oxide UI.
 _Avoid_: screenshot, mock-up, render
 
+**App preview**:
+The Oxide workbench rebuilt in HTML, playing one Turn on the home and the Provider landing pages; the only non-recorded product visual (ADR-0004).
+_Avoid_: mock-up, demo
+
 **Locked string**:
 Copy rendered verbatim from the Copy deck.
 

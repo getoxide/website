@@ -1,10 +1,9 @@
 import { Fragment, type CSSProperties } from "react";
 import { COPY, GITHUB_REPO_URL } from "@/content/copy";
 import { PAGES } from "@/content/pages";
-import type { CaptureManifest } from "@/lib/captures";
 import { SNAPSHOT, tokensOf, type Snapshot } from "@/lib/snapshot";
 import { Button } from "./Button";
-import { Capture } from "./Capture";
+import { AppPreview } from "./AppPreview";
 import { HeroMotion } from "./HeroMotion";
 import { OxideMark } from "./OxideMark";
 import styles from "./Hero.module.css";
@@ -16,17 +15,12 @@ const EARLY = `try{document.currentScript.parentElement.setAttribute("data-revea
  * mark and Capture frame): the centred mark, the H1 and subheadline, the two
  * buttons and the platform line, over a static radial gradient in `--ox-*`
  * colours so it is complete without WebGL or JavaScript. The H1 is the LCP
- * element: text in the HTML, never waiting for the capture. The hero capture
- * rises over the bottom of the hero; with no source file there is no frame.
+ * element: text in the HTML, never waiting for anything below it. The live
+ * app preview (Design system, App preview) rises over the bottom of the hero
+ * in place of the hero Capture.
  * While no release exists at all the primary reads "Get Oxide".
  */
-export function Hero({
-  snapshot = SNAPSHOT,
-  manifest,
-}: {
-  snapshot?: Snapshot;
-  manifest?: CaptureManifest;
-}) {
+export function Hero({ snapshot = SNAPSHOT }: { snapshot?: Snapshot }) {
   const copy = COPY.hero;
   const none = snapshot.release.state === "none";
   const platforms = tokensOf(snapshot)("platforms");
@@ -75,7 +69,7 @@ export function Hero({
         </div>
       </section>
       <div className={styles.shot}>
-        <Capture slot="hero" priority manifest={manifest} />
+        <AppPreview />
       </div>
     </>
   );

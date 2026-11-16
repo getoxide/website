@@ -57,6 +57,11 @@ describe("checkConceptLinks", () => {
     expect(check("/faq", main)).toEqual([]);
   });
 
+  it("skips the live app preview, whose text is product UI", () => {
+    const main = `<div role="img" data-capture=""><p>New Thread, one Turn</p></div><p>Review each <a href="/docs/concepts#turn">Turn</a>.</p>`;
+    expect(check("/", main)).toEqual([]);
+  });
+
   it("looks only at the main content, outside code", () => {
     const main = `<pre><code>git checkout Turn</code></pre><p>Use <code>Thread</code> here.</p>`;
     expect(check("/faq", main)).toEqual([]);
