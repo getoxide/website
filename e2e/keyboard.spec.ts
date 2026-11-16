@@ -134,6 +134,7 @@ test.describe("at 1280px", () => {
       "FAQ",
       "Claude Code",
       "Codex",
+      "Antigravity",
       "Docs",
       "Guides",
       "GitHub",
