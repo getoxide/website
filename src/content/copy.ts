@@ -68,8 +68,12 @@ export const COPY = {
     trademarks:
       "Claude Code, Codex and Antigravity are trademarks of their respective owners; Oxide is not affiliated with or endorsed by Anthropic, OpenAI or Google",
     madeBy: {
-      label: "Made by Lorenzo Cavallini",
-      href: "https://cavallinilorenzo.com",
+      lead: "Made by",
+      and: "and",
+      authors: [
+        { label: "Lorenzo Cavallini", href: "https://cavallinilorenzo.com" },
+        { label: "Matteo Benassi", href: "https://benassimatteo.dev" },
+      ] satisfies Link[],
     },
     privacy: { label: "Privacy", href: "/privacy" },
     licence: "Licence",

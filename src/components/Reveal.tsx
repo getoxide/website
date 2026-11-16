@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 
 /**
  * A section reveal (ADR-0001, Rules that follow). The server HTML carries no
@@ -13,9 +13,11 @@ import { useEffect, useRef, type ReactNode } from "react";
  */
 export function Reveal({
   className,
+  style,
   children,
 }: {
   className?: string;
+  style?: CSSProperties;
   children: ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -47,7 +49,7 @@ export function Reveal({
   }, []);
 
   return (
-    <div ref={ref} className={className}>
+    <div ref={ref} className={className} style={style}>
       {children}
     </div>
   );

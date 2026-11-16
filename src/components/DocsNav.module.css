@@ -1,26 +1,32 @@
+/* The two-link docs sub-nav (Design system, Prose: docs), as a segmented
+   control in the app's own style: the current page is the raised segment. */
 .nav {
-  margin-bottom: var(--site-space-7);
-  border-bottom: 1px solid var(--ox-border);
+  margin-top: var(--site-space-3);
 }
 
 .list {
-  display: flex;
-  gap: var(--site-space-5);
+  display: inline-flex;
+  gap: var(--site-space-1);
   margin: 0;
-  padding: 0;
+  padding: var(--site-space-1);
+  border: 1px solid var(--ox-border);
+  border-radius: var(--site-radius-pill);
+  background: var(--ox-surface-background);
   list-style: none;
 }
 
 .link {
   display: inline-flex;
   align-items: center;
-  min-height: 44px;
-  margin-bottom: -1px;
-  border-bottom: 2px solid transparent;
+  min-height: 36px;
+  padding: 0 var(--site-space-4);
+  border-radius: var(--site-radius-pill);
   color: var(--ox-text-muted);
   font: 500 var(--site-text-small) var(--site-font-body);
   text-decoration: none;
-  transition: color var(--site-dur-fast) var(--site-ease-fade);
+  transition:
+    color var(--site-dur-fast) var(--site-ease-fade),
+    background-color var(--site-dur-fast) var(--site-ease-fade);
 }
 
 .link:hover {
@@ -28,6 +34,6 @@
 }
 
 .link[aria-current="page"] {
-  border-bottom-color: var(--ox-text-bright);
+  background: var(--ox-element-background);
   color: var(--ox-text-bright);
 }

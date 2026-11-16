@@ -1,20 +1,22 @@
-/* `/download`: one reading column (Design system, Download block; Prose). */
-.page {
+/* `/download` (Design system, Download block; Panel): the two steps, the
+   Provider and then the app, as panels; the signing and verify notes in a
+   panel beside them; the page FAQ in rows. One column below the breakpoint,
+   in the same order. */
+.layout {
   display: grid;
-  gap: var(--site-space-7);
-  width: 100%;
-  max-width: var(--site-w-prose);
-  margin: 0 auto;
-  padding-bottom: var(--site-space-9);
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  align-items: start;
+  gap: var(--site-space-5);
 }
 
-.page h2 {
+.main {
+  display: grid;
+  gap: var(--site-space-5);
+}
+
+.layout h2 {
   font: 500 var(--site-text-h3) var(--site-font-heading);
   letter-spacing: -0.03em;
-}
-
-.page p {
-  margin: 0;
 }
 
 .byoa a,
@@ -22,43 +24,94 @@
   color: var(--ox-text-accent);
 }
 
+.stepHead {
+  display: flex;
+  align-items: center;
+  gap: var(--site-space-3);
+}
+
+/* The step number on a proof-path node, lit. */
+.step {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 31px;
+  height: 31px;
+  border: 1px solid var(--ox-text-accent);
+  border-radius: 50%;
+  background: var(--ox-background);
+  box-shadow: 0 0 0 4px
+    color-mix(in srgb, var(--ox-text-accent) 14%, transparent);
+  color: var(--ox-text-bright);
+  font: 500 13px / 1 var(--site-font-code);
+}
+
 .byoa {
   display: grid;
-  gap: var(--site-space-3);
+  gap: var(--site-space-4);
+  color: var(--ox-text-muted);
 }
 
 /* One card per Provider: name above, install link below, so a long link
    never wraps a row unevenly. */
 .providers {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
   gap: var(--site-space-3);
-  margin: 0;
+  margin: var(--site-space-2) 0 0;
   padding: 0;
   list-style: none;
   font: var(--site-text-small) var(--site-font-body);
-  color: var(--ox-text-muted);
 }
 
 .providers li {
   display: grid;
-  gap: var(--site-space-1);
+  gap: var(--site-space-2);
+  font-size: 14px;
   padding: var(--site-space-4);
   border: 1px solid var(--ox-border);
-  border-radius: var(--site-radius);
-  background: var(--ox-surface-background);
+  border-radius: var(--site-radius-sm);
+  background: var(--ox-background);
   overflow-wrap: anywhere;
+  transition: border-color var(--site-dur-fast) var(--site-ease-fade);
+}
+
+.providers li:hover {
+  border-color: var(--ox-element-border);
 }
 
 .provider {
-  color: var(--ox-text);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--site-space-2);
+  color: var(--ox-text-bright);
   font-weight: 500;
+}
+
+.provider svg {
+  color: var(--ox-text-muted);
+}
+
+.get {
+  display: grid;
+  gap: var(--site-space-5);
+}
+
+.mark {
+  display: inline-flex;
+  margin-left: auto;
+  color: var(--ox-text-bright);
+}
+
+.mark svg {
+  width: 40px;
+  height: 40px;
 }
 
 /* Signing note, verify link and the unsupported-platform line: quiet. */
 .notes {
   display: grid;
-  gap: var(--site-space-3);
+  gap: var(--site-space-4);
   font: var(--site-text-small) var(--site-font-body);
   color: var(--ox-text-muted);
 }
@@ -69,22 +122,31 @@
 }
 
 .unsupported {
-  padding-top: var(--site-space-3);
+  padding-top: var(--site-space-4);
   border-top: 1px solid var(--ox-border);
 }
 
-.faq {
-  display: grid;
-  gap: var(--site-space-7);
-  padding-top: var(--site-space-5);
-}
-
-.faq h3 {
-  font: 500 var(--site-text-body) var(--site-font-body);
-  color: var(--ox-text-bright);
-  scroll-margin-top: var(--site-space-6);
-}
-
-.page code {
+.notes code,
+.byoa code {
   font: var(--site-text-mono-xs) var(--site-font-code);
+}
+
+.faq {
+  margin-top: var(--site-space-9);
+}
+
+.faqHeading {
+  margin-bottom: var(--site-space-6);
+  font: 500 var(--site-text-h2) var(--site-font-heading);
+  letter-spacing: -0.03em;
+}
+
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .faq {
+    margin-top: var(--site-space-8);
+  }
 }

@@ -72,3 +72,61 @@ pre {
 .skip-link:focus-visible {
   transform: none;
 }
+
+/* Page transitions (ADR-0001, Where motion lives): every site link is a full
+   page load, so a cross-document View Transition cross-fades one page into
+   the next, with no JavaScript. The main content rises a little as it comes
+   in; reduced motion keeps only a short cross-fade. Browsers without it swap
+   instantly. */
+@view-transition {
+  navigation: auto;
+}
+
+main {
+  view-transition-name: main;
+}
+
+::view-transition-group(root),
+::view-transition-group(main) {
+  animation-duration: var(--site-dur-fast);
+}
+
+::view-transition-old(main) {
+  animation: var(--site-dur-fast) var(--site-ease-fade) both page-out;
+}
+
+::view-transition-new(main) {
+  animation:
+    var(--site-dur-base) var(--site-ease-out) both page-rise,
+    var(--site-dur-fast) var(--site-ease-fade) both page-in;
+}
+
+@keyframes page-rise {
+  from {
+    transform: translateY(12px);
+  }
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes page-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: var(--site-dur-reduced);
+  }
+
+  ::view-transition-new(main) {
+    animation: var(--site-dur-reduced) var(--site-ease-fade) both page-in;
+  }
+}

@@ -85,7 +85,7 @@ Three variable fonts, Latin subset, self-hosted with `next/font/local`, `font-di
 | `--site-radius-frame` | 12px | Capture frames (image and video) |
 | `--site-radius-sm` | 8px | Code blocks, chips |
 
-Round things (proof-path nodes) use `50%`. No other radius exists.
+Round things (proof-path nodes) use `50%`. No other radius exists, except inside the App preview, which keeps the app's own small radii (4–6px) so it reads as the product.
 
 ### Widths
 
@@ -94,7 +94,7 @@ Round things (proof-path nodes) use `50%`. No other radius exists.
 | `--site-w-wide` | 1240px | Proof path, feature sections |
 | `--site-w-frame` | 1160px | Capture frames |
 | `--site-w-text` | 820px | Centred text blocks (definition line) |
-| `--site-w-prose` | 68ch | Docs, guides, changelog, FAQ |
+| `--site-w-prose` | 68ch | Running text: guides, and the prose column of docs, changelog and FAQ rows |
 
 One breakpoint: **860px** (header collapses, proof path goes vertical). CSS custom properties cannot drive media queries, so it is a documented constant, not a token.
 
@@ -111,11 +111,13 @@ One breakpoint: **860px** (header collapses, proof path goes vertical). CSS cust
 | `--site-ease-in-out` | `cubic-bezier(.65, 0, .2, 1)` | Line draw |
 | `--site-ease-fade` | `ease` | Opacity-only fades |
 
+**Page transitions.** Every site link is a full page load, so a cross-document View Transition (`@view-transition { navigation: auto }`, CSS only) cross-fades the page over `--site-dur-fast` while the main content rises 12px over `--site-dur-base`. Reduced motion keeps only a `--site-dur-reduced` cross-fade; browsers without it swap instantly.
+
 The mark's eye timings are **local to the animated mark**, not tokens. If Motion (tier 3) is ever installed, it reads these values from a small TS module with a test asserting parity with `tokens.css`; that module does not exist until then. Reduced-motion behaviour is fixed by Motion approach and not restated here.
 
 ## Components
 
-Sixteen. Each is a React component with a CSS Module. All content renders without JavaScript; JS only adds motion and the copy button.
+Each is a React component with a CSS Module; the shared Panel, Rows and Rail live in `src/styles/surfaces.module.css`. All content renders without JavaScript; JS only adds motion and the copy button.
 
 ### Header
 
@@ -151,7 +153,17 @@ The full-bleed raw-WebGL thin-film shader behind the home hero, tier 2 of ADR-00
 
 ### Capture frame
 
-A real product capture in a frame: `--site-w-frame`, `--site-radius-frame`, `--ox-surface-background`, `--ox-element-border` border with a lighter top edge, and a deep drop shadow, as in the prototype. Two variants: **image** and **video**, the latter behaving as decided in Motion approach. On the home it rises over the hero (−150px, −110px below 860px). Never a mock-up or a DOM recreation of the app.
+A real product capture in a frame: `--site-w-frame`, `--site-radius-frame`, `--ox-surface-background`, `--ox-element-border` border with a lighter top edge, and a deep drop shadow, as in the prototype. Two variants: **image** and **video**, the latter behaving as decided in Motion approach. Never a mock-up or a DOM recreation of the app; the one exception is the App preview.
+
+### App preview
+
+[ADR-0004](../adr/0004-live-app-preview.md). The Oxide workbench as HTML in the Capture frame's look: title bar, the Threads list, the Thread with its header and composer, the Diff Surface with the Verification Dossier, Risk signals and the changed files. It plays one Turn in thirteen beats: the prompt is typed and sent, the agent reads and edits (each file lands in the Diff), `pnpm test` turns Fresh, the answer streams in, Risk signals appear, Commit & Push opens the pull request, and it merges. Then it loops.
+
+- On the home it rises over the hero in the hero Capture's place (−150px, −110px below 860px); on each Provider landing page it follows the page header, running that Provider.
+- The server HTML is the finished scene (the merged pull request); reduced motion and no-JS keep it. Pieces fade on `--site-dur-base` with `--site-ease-out`.
+- Fixed height (680px; below 860px the Thread at 540px over the Diff Surface, at the app's own 13px text, never scaled down). Between 860px and 1100px the Threads list is hidden.
+- `role="img"` with an accessible name, inner markup `aria-hidden`, marked `data-capture` for the copy gates. A pause/play button in the frame's corner once motion runs.
+- Provider glyphs are neutral shapes, never the vendors' logos.
 
 ### Definition line
 
@@ -167,17 +179,29 @@ The CTA block from [Download experience and pre-release state](https://github.co
 
 ### Page header
 
-H1 (`--site-text-h1`) plus an optional lead paragraph, at the top of every page except the home.
+H1 (`--site-text-h1`) plus an optional lead paragraph, at the top of every page except the home, on a full-bleed band: the hero's static gradient, quieter, and a hairline grid in `--ox-border` masked out from the top left, with a bottom border in `--ox-border`. Above the H1, the page's path in `--site-text-mono-xs` (`oxide / docs / concepts`), decorative. Pages at `--site-w-wide` align the header with their content; the docs sub-nav sits in it.
+
+### Panel
+
+A framed group of content: `--site-radius-frame`, `--ox-border` with a lighter top edge (the Capture frame's), a fill fading from `--ox-surface-background` into the page. A panel that is one link lifts 2px with a deeper shadow and an `--ox-element-border` border on hover and focus-within. A panel carrying the page's main action adds an `--ox-accent` glow from its top-left corner. Icons in panels sit in a 36px `--site-radius-sm` square on `--ox-elevated-surface-background`.
+
+### Rows
+
+Heading-and-answer content (FAQ, Concepts, the Provider pages' sections, the `/download` FAQ): a heading column and a Prose column (5 : 7) at `--site-w-wide`, hairlines between rows, each heading preceded by its two-digit index in `--ox-text-accent` mono. One column below 860px.
+
+### Rail
+
+The proof path, vertical: a hairline in `--ox-element-border` with a node per item, lit in `--ox-text-accent`. The Quick start steps (nodes numbered), the guide sections (plain nodes in the left margin, hidden below 860px), the changelog releases and the `/download` steps use it.
 
 ### Feature section
 
-An anchored section on `/features`: `<h2 id>`, the README lead-in, a capture frame. Anchors are fixed in the Copy deck.
+An anchored section on `/features`: `<h2 id>`, the README lead-in, a capture frame. Anchors are fixed in the Copy deck. Each group opens with its two-digit index, heading and sentence; its sections are Panels in two columns, each with a decorative Octicon, revealing on scroll with the second column one `--site-stagger` later. A section with a capture, and the last of an odd group, span both columns.
 
 ### Prose
 
 Styles for MDX and derived Markdown on docs, guides, changelog and FAQ, at `--site-w-prose`: heading rhythm from the type scale, links in `--ox-text-accent`, inline code in `--site-text-mono`, tables with `--ox-border` rules.
 
-- `/docs/*`: under the page header, a two-link sub-nav (Quick start · Concepts). **No sidebar and no table of contents.**
+- `/docs/*`: in the page header, a two-link sub-nav (Quick start · Concepts) as a segmented pill control, the current page raised on `--ox-element-background`. **No sidebar and no table of contents.** Quick start puts the Requirements in a Panel beside the Steps on a Rail; Concepts are Rows.
 - Concepts: each of the nine terms is an `<h2 id>` with an anchor link revealed on hover and focus.
 - Guides: linear prose, ending with a link to the other guide and the download block.
 
@@ -191,7 +215,7 @@ Headings and visible answers, no JS. Each question is a heading with an `id` and
 
 ### Changelog entry
 
-One release on `/changelog`: version and date as a heading with an anchor, then the Breaking / Features / Fixes groups from the snapshot, in Prose.
+One release on `/changelog`: version and date as a heading with an anchor, then the Breaking / Features / Fixes groups from the snapshot, in Prose. Releases sit on a Rail (the latest node lit), version and date in a sticky left column; each group heading is a pill chip with a dot in `--ox-error`, `--ox-success` or `--ox-text-accent`. With no stable release, the one line sits in a dashed panel.
 
 ### Concept link
 
@@ -199,7 +223,11 @@ The link on the first capitalised mention of a Concepts term, to `/docs/concepts
 
 ### Footer
 
-Three columns as decided in Page inventory, with the disclaimers and the trust lines; `--site-text-caption`, `--ox-text-disabled`, a top border in `--ox-border`.
+Three columns as decided in Page inventory, with the disclaimers and the trust lines; `--site-text-caption`, `--ox-text-disabled`, a top border in `--ox-border` lit in its centre by an `--ox-text-accent` hairline, a fill fading down from `--ox-surface-background`. Two tiers: the logo (decorative), definition and trust line (a pill) beside the columns; then, under a hairline, the repo links and the credits (Lorenzo Cavallini and Matteo Benassi), and the disclaimers.
+
+### Closing CTA
+
+Centred after the page's content, as on the home. Off the home it closes the page in a lit panel at `--site-w-wide`: the page header's accent glow and hairline grid on `--ox-surface-background`.
 
 ### 404
 

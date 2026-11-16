@@ -1,16 +1,31 @@
-/* `/guides`: two guide entries, separated by hairlines (Design system,
-   Prose: Guides). No cards, no dates. */
+/* `/guides`: the guides as two panels side by side, each one link (the
+   title's link covers the panel). No dates. */
 .list {
-  border-top: 1px solid var(--ox-border);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  gap: var(--site-space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .item {
-  padding: var(--site-space-6) 0;
-  border-bottom: 1px solid var(--ox-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--site-space-4);
+  min-height: 300px;
+  padding: var(--site-space-6);
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--site-space-5);
 }
 
 .title {
-  font: 500 var(--site-text-h3) var(--site-font-heading);
+  font: 500 clamp(22px, 2.2vw, 28px) / 1.2 var(--site-font-heading);
   letter-spacing: -0.03em;
   text-wrap: balance;
 }
@@ -18,16 +33,55 @@
 .title a {
   color: var(--ox-text-bright);
   text-decoration: none;
-  transition: color var(--site-dur-fast) var(--site-ease-fade);
 }
 
-.title a:hover {
-  color: var(--ox-text-accent);
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
+/* The link covers the panel, so the whole panel is the target. */
+.title a::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  border-radius: inherit;
+}
+
+.title a:focus-visible {
+  outline: none;
+}
+
+.title a:focus-visible::after {
+  outline: 2px solid var(--ox-focus-ring);
+  outline-offset: 2px;
 }
 
 .summary {
-  margin-top: var(--site-space-2);
+  max-width: 34em;
   color: var(--ox-text-muted);
+}
+
+.arrow {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin-top: auto;
+  border: 1px solid var(--ox-element-border);
+  border-radius: 50%;
+  color: var(--ox-text-muted);
+  transition:
+    color var(--site-dur-fast) var(--site-ease-fade),
+    border-color var(--site-dur-fast) var(--site-ease-fade),
+    transform var(--site-dur-base) var(--site-ease-out);
+}
+
+.item:hover .arrow,
+.item:focus-within .arrow {
+  border-color: var(--ox-text-accent);
+  color: var(--ox-text-accent);
+  transform: translateX(4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item:hover .arrow,
+  .item:focus-within .arrow {
+    transform: none;
+  }
 }

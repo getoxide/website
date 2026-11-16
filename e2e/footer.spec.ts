@@ -66,7 +66,8 @@ for (const entry of REGISTERED) {
     ).toBeVisible();
 
     const links: [string, string][] = [
-      ["Made by Lorenzo Cavallini", "https://cavallinilorenzo.com"],
+      ["Lorenzo Cavallini", "https://cavallinilorenzo.com"],
+      ["Matteo Benassi", "https://benassimatteo.dev"],
       ["Privacy", "/privacy"],
       ["Licence", oxideFileUrl("LICENSE")],
     ];

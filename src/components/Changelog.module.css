@@ -1,17 +1,159 @@
-/* Design system, Changelog entry: one release per section, in Prose. */
+/* Design system, Changelog entry, on the proof path's rail: one node per
+   release on a hairline, the version and date beside it, the notes in Prose.
+   Each group heading is a chip with the status colour of its kind. */
+.timeline {
+  position: relative;
+}
+
+.timeline::before {
+  position: absolute;
+  top: var(--site-space-3);
+  bottom: 0;
+  left: 7px;
+  width: 1px;
+  content: "";
+  background: linear-gradient(var(--ox-element-border) 85%, transparent);
+}
+
+.entry {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 8fr);
+  gap: var(--site-space-4) var(--site-space-8);
+  padding-left: var(--site-space-7);
+}
+
 .entry + .entry {
   margin-top: var(--site-space-8);
 }
 
-.entry h2 {
+.entry::before {
+  position: absolute;
+  top: 9px;
+  left: 0;
+  width: 15px;
+  height: 15px;
+  content: "";
+  border: 1px solid var(--ox-element-border);
+  border-radius: 50%;
+  background: var(--ox-background);
+}
+
+/* The latest release's node is lit, as the proof path's. */
+.entry:first-child::before {
+  border-color: var(--ox-text-accent);
+  box-shadow: 0 0 0 3px
+    color-mix(in srgb, var(--ox-text-accent) 16%, transparent);
+}
+
+/* The version and date stay in view while the release's notes scroll. */
+.when {
+  position: sticky;
+  top: var(--site-space-6);
+  align-self: start;
+}
+
+.when h2 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--site-space-3);
   font: 500 var(--site-text-h3) var(--site-font-heading);
   letter-spacing: -0.03em;
 }
 
+.version {
+  font: 500 var(--site-text-h3) var(--site-font-heading);
+}
+
+/* The separator is for text and assistive tech; the layout breaks the line. */
+.sep {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .entry time {
+  flex-basis: 100%;
+  font: 400 var(--site-text-mono-xs) var(--site-font-code);
   color: var(--ox-text-muted);
+  letter-spacing: 0;
+}
+
+.entry .group {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--site-space-2);
+  padding: 2px var(--site-space-3) 2px var(--site-space-2);
+  border: 1px solid var(--ox-border);
+  border-radius: var(--site-radius-pill);
+  background: var(--ox-surface-background);
+  font: 500 var(--site-text-caption) var(--site-font-body);
+  letter-spacing: 0;
+}
+
+.entry .group::before {
+  width: 8px;
+  height: 8px;
+  content: "";
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.entry .breaking::before {
+  background: var(--ox-error);
+}
+
+.entry .features::before {
+  background: var(--ox-success);
+}
+
+.entry .fixes::before {
+  background: var(--ox-text-accent);
+}
+
+/* The first group sits level with the version. */
+.entry > :last-child > .group:first-child,
+.entry > :last-child > :first-child {
+  margin-top: 0;
 }
 
 .older {
   margin-top: var(--site-space-8);
+  padding-left: var(--site-space-7);
+}
+
+@media (max-width: 860px) {
+  .entry {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .when {
+    position: static;
+  }
+}
+
+/* No stable release yet: a dashed panel, as a slot still to be filled. */
+.empty {
+  display: flex;
+  align-items: center;
+  gap: var(--site-space-4);
+  padding: var(--site-space-6);
+  border: 1px dashed var(--ox-element-border);
+  border-radius: var(--site-radius-frame);
+  background: var(--ox-surface-background);
+}
+
+.emptyIcon {
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--ox-element-border);
+  border-radius: 50%;
+  color: var(--ox-text-muted);
 }

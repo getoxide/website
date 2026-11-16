@@ -27,13 +27,18 @@ export default function FeaturesPage() {
   ]);
   return (
     <SiteFrame page={page}>
-      <PageHeader
-        title={page.h1}
-        lead={<DeckText source={keySentence} conceptLinks={introSeen} />}
-      />
-      <p className={styles.intro}>
-        <DeckText source={detail} conceptLinks={detailSeen} />
-      </p>
+      <div className={styles.page}>
+        <PageHeader
+          title={page.h1}
+          path={page.path}
+          width="wide"
+          lead={<DeckText source={keySentence} conceptLinks={introSeen} />}
+        >
+          <p className={styles.intro}>
+            <DeckText source={detail} conceptLinks={detailSeen} />
+          </p>
+        </PageHeader>
+      </div>
       <FeatureSections seen={sectionsSeen} />
     </SiteFrame>
   );

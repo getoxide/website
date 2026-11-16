@@ -142,7 +142,8 @@ test.describe("at 1280px", () => {
       "getoxide/oxide",
       "Privacy",
       "Licence",
-      "Made by Lorenzo Cavallini",
+      "Lorenzo Cavallini",
+      "Matteo Benassi",
     ]);
     expect(new Set(outlines)).toEqual(new Set(["solid"]));
   });

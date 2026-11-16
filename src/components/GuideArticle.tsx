@@ -12,7 +12,8 @@ import { SiteFrame } from "./SiteFrame";
 /**
  * One guide: the page header with the deck's intro key sentence, the outline
  * sections in order, and the closing cross-link, all linear prose at the
- * reading width (Design system, Prose: Guides). The closing CTA block follows
+ * reading width (Design system, Prose: Guides). The sections run down the
+ * proof path's rail, a node at each heading. The closing CTA block follows
  * from `SiteFrame`.
  *
  * The Concepts links come from `seenBefore` over every source in render
@@ -27,18 +28,21 @@ export function GuideArticle({ guide }: { guide: Guide }) {
       <div className={styles.page}>
         <PageHeader
           title={page.h1}
+          path={page.path}
           lead={<DeckText source={intro} conceptLinks={seen[0]} />}
         />
-        {sections.map(({ id, heading, body }, i) => (
-          <section key={id} className={styles.section} aria-labelledby={id}>
-            <AnchoredHeading id={id} label={COPY.anchorLabel(heading)}>
-              {heading}
-            </AnchoredHeading>
-            <Prose>
-              <Markdown source={body} conceptLinks={seen[2 + 2 * i]} />
-            </Prose>
-          </section>
-        ))}
+        <div className={styles.rail}>
+          {sections.map(({ id, heading, body }, i) => (
+            <section key={id} className={styles.section} aria-labelledby={id}>
+              <AnchoredHeading id={id} label={COPY.anchorLabel(heading)}>
+                {heading}
+              </AnchoredHeading>
+              <Prose>
+                <Markdown source={body} conceptLinks={seen[2 + 2 * i]} />
+              </Prose>
+            </section>
+          ))}
+        </div>
         {closing ? (
           <div className={styles.closing}>
             <Prose>

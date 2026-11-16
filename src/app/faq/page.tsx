@@ -9,7 +9,7 @@ import { seenBefore } from "@/lib/concept-links";
 import { faqOf } from "@/lib/faq";
 import { pageMetadata } from "@/lib/metadata";
 import { SNAPSHOT } from "@/lib/snapshot";
-import styles from "../reading.module.css";
+import ui from "@/styles/surfaces.module.css";
 
 export const metadata = pageMetadata(PAGES.faq);
 
@@ -24,18 +24,22 @@ export default function FaqPage() {
   const seen = seenBefore(faq.map((entry) => entry.answer));
   return (
     <SiteFrame page={page}>
-      <div className={styles.page}>
-        <PageHeader title={page.h1} />
-        {faq.map(({ question, id, answer }, i) => (
-          <section key={id} className={styles.section} aria-labelledby={id}>
-            <AnchoredHeading id={id} label={COPY.anchorLabel(question)}>
-              {question}
-            </AnchoredHeading>
-            <Prose>
-              <Markdown source={answer} conceptLinks={seen[i]} />
-            </Prose>
-          </section>
-        ))}
+      <div className={ui.wide}>
+        <PageHeader title={page.h1} path={page.path} width="wide" />
+        <div className={ui.rows}>
+          {faq.map(({ question, id, answer }, i) => (
+            <section key={id} className={ui.row} aria-labelledby={id}>
+              <div>
+                <AnchoredHeading id={id} label={COPY.anchorLabel(question)}>
+                  {question}
+                </AnchoredHeading>
+              </div>
+              <Prose>
+                <Markdown source={answer} conceptLinks={seen[i]} />
+              </Prose>
+            </section>
+          ))}
+        </div>
       </div>
     </SiteFrame>
   );

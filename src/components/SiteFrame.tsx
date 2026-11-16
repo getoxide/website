@@ -27,7 +27,9 @@ export function SiteFrame({
       <main id="main" className={styles.main}>
         {children}
         {/* Page inventory #9, internal linking rule 1. */}
-        {page.path === "/download" ? null : <ClosingCta />}
+        {page.path === "/download" ? null : (
+          <ClosingCta framed={page.path !== "/"} />
+        )}
       </main>
       <SiteFooter path={page.path} />
     </>
