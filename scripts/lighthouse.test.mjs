@@ -1,13 +1,21 @@
 import { describe, expect, it } from "vitest";
-import { assessLighthouse, metricsOf } from "./lighthouse.mjs";
+import { assessLighthouse, metricsOf, verdictOfRounds } from "./lighthouse.mjs";
 
 /** One Lighthouse run, as `metricsOf` reads it. */
-const run = (lcp, tbt, cls, accessibility = 1, performance = 0.99) => ({
+const run = (
+  lcp,
+  tbt,
+  cls,
+  accessibility = 1,
+  performance = 0.99,
+  benchmark = 0,
+) => ({
   lcp,
   tbt,
   cls,
   accessibility,
   performance,
+  benchmark,
 });
 
 describe("assessLighthouse", () => {
@@ -81,8 +89,44 @@ describe("assessLighthouse", () => {
   });
 });
 
+describe("verdictOfRounds", () => {
+  const busyRunner = [run(1064, 168, 0), run(2041, 179, 0), run(1061, 164, 0)];
+  const quietRunner = [run(1057, 73, 0), run(1057, 73, 0), run(1056, 77, 0)];
+
+  it("passes a page on a re-measure after a round a busy runner made slow", () => {
+    const rounds = [
+      assessLighthouse("/", "showcase", busyRunner),
+      assessLighthouse("/", "showcase", quietRunner),
+    ];
+    expect(rounds[0].failures).toEqual([
+      "/: TBT 168 ms > 150 ms (median of 3, showcase)",
+    ]);
+    expect(verdictOfRounds(rounds).failures).toEqual([]);
+  });
+
+  it("fails a regression that breaks every round, reporting the last", () => {
+    const rounds = [
+      assessLighthouse("/", "showcase", busyRunner),
+      assessLighthouse("/", "showcase", busyRunner),
+    ];
+    expect(verdictOfRounds(rounds).failures).toEqual([
+      "/: TBT 168 ms > 150 ms (median of 3, showcase)",
+    ]);
+  });
+
+  it("judges a passing first round on its own", () => {
+    const rounds = [assessLighthouse("/", "showcase", quietRunner)];
+    expect(verdictOfRounds(rounds)).toEqual(rounds[0]);
+  });
+
+  it("refuses to judge no rounds at all", () => {
+    expect(() => verdictOfRounds([])).toThrow(/no Lighthouse round/);
+  });
+});
+
 describe("metricsOf", () => {
   const lhr = {
+    environment: { benchmarkIndex: 1700 },
     audits: {
       "largest-contentful-paint": { numericValue: 1234.5 },
       "total-blocking-time": { numericValue: 12 },
@@ -92,7 +136,7 @@ describe("metricsOf", () => {
   };
 
   it("reads the metrics a run is judged on from a Lighthouse result", () => {
-    expect(metricsOf(lhr)).toEqual(run(1234.5, 12, 0.001, 1, 0.97));
+    expect(metricsOf(lhr)).toEqual(run(1234.5, 12, 0.001, 1, 0.97, 1700));
   });
 
   it("fails loudly on a run Lighthouse could not complete", () => {
