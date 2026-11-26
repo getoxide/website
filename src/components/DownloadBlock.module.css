@@ -25,25 +25,15 @@
   justify-items: start;
 }
 
-:global(html[data-os="windows"]) .windows {
+.macos,
+.windows,
+.linux {
+  order: 0;
+}
+
+:global(html[data-os="windows"]) .windows,
+:global(html[data-os="linux"]) .linux {
   order: -1;
-}
-
-/* Pre-release labels: the primary button names the test pre-release, the
-   secondary one its platform. macOS is primary unless Windows is detected. */
-.windows .asPrimary,
-.macos .asSecondary,
-:global(html[data-os="windows"]) .macos .asPrimary {
-  display: none;
-}
-
-:global(html[data-os="windows"]) .macos .asSecondary,
-:global(html[data-os="windows"]) .windows .asPrimary {
-  display: inline;
-}
-
-:global(html[data-os="windows"]) .windows .asSecondary {
-  display: none;
 }
 
 .sublabel {
@@ -51,6 +41,30 @@
   padding-left: 22px;
   font: var(--site-text-caption) var(--site-font-body);
   color: var(--ox-text-muted);
+}
+
+.extras {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--site-space-2) var(--site-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font: var(--site-text-caption) var(--site-font-body);
+  color: var(--ox-text-muted);
+}
+
+.extras a {
+  color: var(--ox-text-accent);
+  text-decoration: none;
+}
+
+.extras a:hover {
+  text-decoration: underline;
+}
+
+.extraSize {
+  color: var(--ox-text-disabled);
 }
 
 .line {

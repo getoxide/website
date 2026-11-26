@@ -1,6 +1,6 @@
 # Oxide website
 
-The public website of Oxide, the desktop app for agentic coding. Product terms (Project, Thread, Turn, Provider…) belong to the Oxide repo's glossary; these are the site's own.
+The public website of Oxide, the desktop terminal app that knows your GitHub Projects. Product terms (Project, Terminal, Command block, Surface…) belong to the Oxide repo's glossary; these are the site's own.
 
 ## Language
 

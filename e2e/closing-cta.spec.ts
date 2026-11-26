@@ -4,7 +4,7 @@ import { SNAPSHOT } from "./snapshot";
 
 // Copy deck, Closing CTA block; Page inventory #9, internal linking rule 1:
 // every page except /download ends with the same block.
-const HEADING = "Take your next Turn all the way to the merge.";
+const HEADING = "Open a folder and start a clean shell.";
 const PRIMARY =
   SNAPSHOT.release.state === "none" ? "Get Oxide" : "Download Oxide";
 

@@ -37,7 +37,7 @@ const pages = Object.values(PAGES);
 describe("PAGES registry", () => {
   it("reads the Copy deck table", () => {
     expect(deck.get("/")?.h1).toBe(
-      "The complete desktop app for agentic coding.",
+      "A terminal app that knows your GitHub projects.",
     );
     expect(deck.get("/404")?.description).toBeNull();
   });

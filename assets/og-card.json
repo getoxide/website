@@ -2,8 +2,8 @@
   "output": "public/og.png",
   "width": 1200,
   "height": 630,
-  "headline": "The complete desktop app for agentic coding.",
-  "subline": "Prompt, review, pull request and merge, with Claude Code, Codex and Antigravity CLI.",
+  "headline": "A terminal app that knows your GitHub projects.",
+  "subline": "Open a folder, run as many clean shells as you like, and keep code, issues and pull requests at hand.",
   "inputs": [
     "src/lib/hero-shader.ts",
     "src/lib/mark.ts",
@@ -12,7 +12,7 @@
     "src/fonts/inter-latin-wght-normal.woff2",
     "scripts/og-card.mjs"
   ],
-  "hash": "828a74486e0ef869ecfa2fd599e8ca0adfae3a035bfc09f92a672cbd2a76e7df",
-  "cardSha256": "a454889f925262f246486291195ddda266417b0d7f3bde0e263973b5c43c65cc",
+  "hash": "a287323ae9afae2099078799dba782023c2e87041da2d7be54b2966fcef28d2d",
+  "cardSha256": "3e41b69c2dccf012ccbd17ff9be7e371800373554f818f9ac5158b3b5e93b3e0",
   "generatedBy": "pnpm og:card (scripts/og-card.mjs)"
 }

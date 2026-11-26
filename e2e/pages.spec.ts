@@ -59,12 +59,12 @@ test.describe("every registered page", () => {
           ['meta[property="og:image:height"]', "630"],
           [
             'meta[property="og:image:alt"]',
-            "Oxide: The complete desktop app for agentic coding.",
+            "Oxide: A terminal app that knows your GitHub projects.",
           ],
           ['meta[name="twitter:image"]', `${PROD}/og.png`],
           [
             'meta[name="twitter:image:alt"]',
-            "Oxide: The complete desktop app for agentic coding.",
+            "Oxide: A terminal app that knows your GitHub projects.",
           ],
         ] as const) {
           await expect(meta(selector), selector).toHaveAttribute(
@@ -126,16 +126,16 @@ test.describe("home", () => {
   }) => {
     await page.goto("/");
     await expect(page.locator("h1")).toHaveText(
-      "The complete desktop app for agentic coding.",
+      "A terminal app that knows your GitHub projects.",
     );
     const sections = page.locator("main > section");
     // Hero, definition line, proof path, closing CTA.
     await expect(sections).toHaveCount(4);
     await expect(sections.first()).toContainText(
-      "The complete desktop app for agentic coding.",
+      "A terminal app that knows your GitHub projects.",
     );
     await expect(sections.first()).toContainText(
-      "Prompt, review, pull request and merge, with Claude Code, Codex and Antigravity CLI.",
+      "Open a folder, run as many clean shells as you like, and keep code, issues and pull requests at hand.",
     );
     await expect(sections.last()).toHaveAttribute(
       "aria-labelledby",

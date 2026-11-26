@@ -43,14 +43,7 @@ export const BANNED = [
   ["the main app", /\bthe main app\b/i],
 ];
 
-/** Pages where "GUI" may appear anywhere (Copy deck rule 3). */
-const GUI_PAGES = new Set([
-  "/claude-code-gui",
-  "/codex-gui",
-  "/antigravity-gui",
-]);
-/** The derived answer on /faq where "GUI" may appear (Copy deck rule 3). */
-const GUI_FAQ = { path: "/faq", section: "what-is-oxide" };
+/** No page allows "GUI" (Copy deck rule 3). */
 const GUI = /\bGUIs?\b/i;
 
 /** The visible text of a line of Markdown: marks and link targets dropped. */
@@ -93,17 +86,10 @@ export function lintCopy({ path, html, definition }) {
     }
   }
 
-  // Rule 3: "GUI" only on the Provider landing pages and in one FAQ answer.
-  if (!GUI_PAGES.has(path)) {
-    const skip = (node) =>
-      path === GUI_FAQ.path &&
-      attrOf(node, "aria-labelledby") === GUI_FAQ.section;
-    for (const block of blocksOf(document, skip)) {
-      if (GUI.test(block)) {
-        violations.push(
-          `${path}: "GUI" outside /claude-code-gui, /codex-gui, /antigravity-gui and /faq#what-is-oxide in "${block}"`,
-        );
-      }
+  // Rule 3: "GUI" never appears on any page.
+  for (const block of blocksOf(document)) {
+    if (GUI.test(block)) {
+      violations.push(`${path}: "GUI" is not allowed in "${block}"`);
     }
   }
   return violations;

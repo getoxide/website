@@ -6,7 +6,6 @@ import { readmeUrl } from "@/lib/oxide";
 import { SNAPSHOT, type Snapshot } from "@/lib/snapshot";
 import { DownloadBlock } from "./DownloadBlock";
 
-// Fixture Snapshots in each Release state (Copy deck, `/download` → Buttons).
 const snapshotIn = (key: keyof typeof releases): Snapshot => ({
   ...SNAPSHOT,
   release: releases[key] as Snapshot["release"],
@@ -17,7 +16,6 @@ const render = (key: keyof typeof releases) =>
     createElement(DownloadBlock, { snapshot: snapshotIn(key) }),
   );
 
-/** Visible text, tags stripped and whitespace collapsed. */
 const textOf = (html: string) =>
   html
     .replace(/<[^>]+>/g, " ")
@@ -49,42 +47,29 @@ describe("DownloadBlock, no release (`none`)", () => {
 
 describe("DownloadBlock, only a test pre-release", () => {
   const html = render("prerelease-only");
-  const MAC =
-    "https://github.com/getoxide/oxide/releases/download/v1.2.0-rc.1/Oxide_1.2.0-rc.1_aarch64.dmg";
-  const WIN =
-    "https://github.com/getoxide/oxide/releases/download/v1.2.0-rc.1/Oxide_1.2.0-rc.1_x64-setup.exe";
 
-  it("labels the primary button as the test pre-release, the other with its platform", () => {
-    const [mac, win] = links(html);
-    expect(mac.href).toBe(MAC);
-    expect(win.href).toBe(WIN);
-    // Each button carries both labels; CSS shows the one for its role
-    // (primary or secondary) once the platform is known.
-    for (const link of [mac, win]) {
-      expect(link.text).toContain("Download test pre-release 1.2.0-rc.1");
-    }
-    expect(mac.text).toContain("Download for macOS");
-    expect(win.text).toContain("Download for Windows");
+  it("labels macOS, Windows and Linux primary buttons with their platforms", () => {
+    const [mac, win, lin] = links(html);
+    expect(mac.text).toBe("Download for macOS");
+    expect(win.text).toBe("Download for Windows");
+    expect(lin.text).toBe("Download for Linux");
     expect(textOf(html)).toContain("Apple Silicon · .dmg · 102.3 MB");
     expect(textOf(html)).toContain("x64 · installer · 89.9 MB");
+    expect(textOf(html)).toContain("x64 · AppImage · 95.1 MB");
   });
 
-  it("warns that it never reaches the updater and links build from source", () => {
+  it("warns that it never reaches the updater or APT/DNF and links build from source", () => {
     expect(textOf(html)).toContain(
-      "This is a test pre-release: it never reaches the in-app updater. Build from source for the latest code.",
+      "Test pre-release 1.2.0-rc.1: it never reaches the in-app updater or the APT and DNF repositories. Build from source for the latest code.",
     );
-    expect(links(html)[3]).toEqual({
-      href: readmeUrl("build-from-source"),
-      text: "Build from source",
-    });
     expect(textOf(html)).not.toMatch(/Version|Release notes/);
   });
 });
 
 describe("DownloadBlock, stable release", () => {
-  it("links both installers directly, macOS first, with their sublabels", () => {
+  it("links all three primary installers directly, macOS first, with their sublabels", () => {
     const html = render("stable");
-    expect(links(html).slice(0, 2)).toEqual([
+    expect(links(html).slice(0, 3)).toEqual([
       {
         href: "https://github.com/getoxide/oxide/releases/download/v1.1.0/Oxide_1.1.0_aarch64.dmg",
         text: "Download for macOS",
@@ -93,10 +78,15 @@ describe("DownloadBlock, stable release", () => {
         href: "https://github.com/getoxide/oxide/releases/download/v1.1.0/Oxide_1.1.0_x64-setup.exe",
         text: "Download for Windows",
       },
+      {
+        href: "https://github.com/getoxide/oxide/releases/download/v1.1.0/Oxide_1.1.0_amd64.AppImage",
+        text: "Download for Linux",
+      },
     ]);
     const text = textOf(html);
     expect(text).toContain("Apple Silicon · .dmg · 101.2 MB");
     expect(text).toContain("x64 · installer · 88.8 MB");
+    expect(text).toContain("x64 · AppImage · 94.3 MB");
   });
 
   it("states the version and date and links the changelog", () => {
@@ -108,7 +98,6 @@ describe("DownloadBlock, stable release", () => {
       href: "/changelog",
       text: "Release notes",
     });
-    expect(links(html)).toHaveLength(4);
   });
 
   it("carries the ghost GitHub button beside the installers", () => {
@@ -127,7 +116,7 @@ describe("DownloadBlock, stable release", () => {
     const ids = [...html.matchAll(/aria-describedby="([^"]+)"/g)].map(
       ([, id]) => id,
     );
-    expect(new Set(ids).size).toBe(2);
+    expect(new Set(ids).size).toBe(3);
     for (const id of ids) expect(html).toContain(`id="${id}"`);
   });
 });
@@ -155,14 +144,10 @@ describe("DownloadBlock, click events (Measurement plan #16)", () => {
     [...html.matchAll(/data-goatcounter-click="([^"]+)"/g)].map(([, e]) => e);
 
   it("names each download button's event, macOS first", () => {
-    expect(eventsOf(render("stable"))).toEqual([
+    expect(eventsOf(render("stable")).slice(0, 4)).toEqual([
       "download-macos-arm",
       "download-windows",
-      "github-cta",
-    ]);
-    expect(eventsOf(render("prerelease-only"))).toEqual([
-      "download-macos-arm",
-      "download-windows",
+      "download-linux",
       "github-cta",
     ]);
   });

@@ -26,23 +26,19 @@ const allLinks = (html: string) =>
     ([, href, inner]) => ({ href, text: textOf(inner) }),
   );
 const CONCEPT = "/docs/concepts#";
-/** The CTA's buttons, without the Concept links in its copy. */
 const links = (html: string) =>
   allLinks(html).filter((l) => !l.href.startsWith(CONCEPT));
 const conceptLinks = (html: string) =>
   allLinks(html).filter((l) => l.href.startsWith(CONCEPT));
 
-// Copy deck, Closing CTA block (locked).
 describe("ClosingCta", () => {
   it("states the heading and the sentence", () => {
     const html = render("stable");
     const heading = html.match(/<h2[^>]*>(.*?)<\/h2>/)![1];
-    expect(textOf(heading)).toBe(
-      "Take your next Turn all the way to the merge.",
-    );
+    expect(textOf(heading)).toBe("Open a folder and start a clean shell.");
     const sentence = html.match(/<p[^>]*>(.*?)<\/p>/)![1];
     expect(sentence.replace(/<[^>]+>/g, "")).toBe(
-      "Oxide drives the Claude Code, Codex or Antigravity CLI you already use. Open a Project, start a Thread and review what comes back.",
+      "Open a Project from the sidebar, run as many plain Terminals as you like, and keep your Files view, Issues and pull requests beside them.",
     );
   });
 
@@ -63,13 +59,11 @@ describe("ClosingCta", () => {
     ]);
   });
 
-  // Content #12 addendum, point 4: on a page that mentions none of them
-  // before, the CTA holds the first mentions of Turn, Project and Thread.
-  it("links its first mention of Turn, Project and Thread", () => {
+  it("links its first mention of Project, Terminal and Files view", () => {
     expect(conceptLinks(render("stable"))).toEqual([
-      { href: "/docs/concepts#turn", text: "Turn" },
       { href: "/docs/concepts#project", text: "Project" },
-      { href: "/docs/concepts#thread", text: "Thread" },
+      { href: "/docs/concepts#terminal", text: "Terminals" },
+      { href: "/docs/concepts#files-view", text: "Files view" },
     ]);
   });
 

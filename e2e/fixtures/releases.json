@@ -18,10 +18,49 @@
           "name": "Oxide_1.1.0_x64-setup.exe",
           "url": "https://github.com/getoxide/oxide/releases/download/v1.1.0/Oxide_1.1.0_x64-setup.exe",
           "size": 88765432
+        },
+        "windowsArm64": {
+          "name": "Oxide_1.1.0_arm64-setup.exe",
+          "url": "https://github.com/getoxide/oxide/releases/download/v1.1.0/Oxide_1.1.0_arm64-setup.exe",
+          "size": 86543210
+        },
+        "linux": {
+          "name": "Oxide_1.1.0_amd64.AppImage",
+          "url": "https://github.com/getoxide/oxide/releases/download/v1.1.0/Oxide_1.1.0_amd64.AppImage",
+          "size": 94263800
+        },
+        "linuxDeb": {
+          "name": "Oxide_1.1.0_amd64.deb",
+          "url": "https://github.com/getoxide/oxide/releases/download/v1.1.0/Oxide_1.1.0_amd64.deb",
+          "size": 16894530
+        },
+        "linuxRpm": {
+          "name": "Oxide-1.1.0-1.x86_64.rpm",
+          "url": "https://github.com/getoxide/oxide/releases/download/v1.1.0/Oxide-1.1.0-1.x86_64.rpm",
+          "size": 16899955
+        },
+        "linuxArm64": {
+          "name": "Oxide_1.1.0_aarch64.AppImage",
+          "url": "https://github.com/getoxide/oxide/releases/download/v1.1.0/Oxide_1.1.0_aarch64.AppImage",
+          "size": 92580360
+        },
+        "linuxArm64Deb": {
+          "name": "Oxide_1.1.0_arm64.deb",
+          "url": "https://github.com/getoxide/oxide/releases/download/v1.1.0/Oxide_1.1.0_arm64.deb",
+          "size": 17240882
+        },
+        "linuxArm64Rpm": {
+          "name": "Oxide-1.1.0-1.aarch64.rpm",
+          "url": "https://github.com/getoxide/oxide/releases/download/v1.1.0/Oxide-1.1.0-1.aarch64.rpm",
+          "size": 17245847
         }
       }
     },
-    "platforms": ["macOS on Apple Silicon", "Windows x64"],
+    "platforms": [
+      "macOS on Apple Silicon",
+      "Windows (x64, arm64)",
+      "Linux (x64, arm64)"
+    ],
     "platformsFrom": "release"
   },
   "prerelease-only": {
@@ -43,10 +82,49 @@
           "name": "Oxide_1.2.0-rc.1_x64-setup.exe",
           "url": "https://github.com/getoxide/oxide/releases/download/v1.2.0-rc.1/Oxide_1.2.0-rc.1_x64-setup.exe",
           "size": 89876543
+        },
+        "windowsArm64": {
+          "name": "Oxide_1.2.0-rc.1_arm64-setup.exe",
+          "url": "https://github.com/getoxide/oxide/releases/download/v1.2.0-rc.1/Oxide_1.2.0-rc.1_arm64-setup.exe",
+          "size": 87654321
+        },
+        "linux": {
+          "name": "Oxide_1.2.0-rc.1_amd64.AppImage",
+          "url": "https://github.com/getoxide/oxide/releases/download/v1.2.0-rc.1/Oxide_1.2.0-rc.1_amd64.AppImage",
+          "size": 95123456
+        },
+        "linuxDeb": {
+          "name": "Oxide_1.2.0-rc.1_amd64.deb",
+          "url": "https://github.com/getoxide/oxide/releases/download/v1.2.0-rc.1/Oxide_1.2.0-rc.1_amd64.deb",
+          "size": 17000000
+        },
+        "linuxRpm": {
+          "name": "Oxide-1.2.0-rc.1-1.x86_64.rpm",
+          "url": "https://github.com/getoxide/oxide/releases/download/v1.2.0-rc.1/Oxide-1.2.0-rc.1-1.x86_64.rpm",
+          "size": 17010000
+        },
+        "linuxArm64": {
+          "name": "Oxide_1.2.0-rc.1_aarch64.AppImage",
+          "url": "https://github.com/getoxide/oxide/releases/download/v1.2.0-rc.1/Oxide_1.2.0-rc.1_aarch64.AppImage",
+          "size": 93123456
+        },
+        "linuxArm64Deb": {
+          "name": "Oxide_1.2.0-rc.1_arm64.deb",
+          "url": "https://github.com/getoxide/oxide/releases/download/v1.2.0-rc.1/Oxide_1.2.0-rc.1_arm64.deb",
+          "size": 17300000
+        },
+        "linuxArm64Rpm": {
+          "name": "Oxide-1.2.0-rc.1-1.aarch64.rpm",
+          "url": "https://github.com/getoxide/oxide/releases/download/v1.2.0-rc.1/Oxide-1.2.0-rc.1-1.aarch64.rpm",
+          "size": 17310000
         }
       }
     },
-    "platforms": ["macOS on Apple Silicon", "Windows x64"],
+    "platforms": [
+      "macOS on Apple Silicon",
+      "Windows (x64, arm64)",
+      "Linux (x64, arm64)"
+    ],
     "platformsFrom": "release"
   },
   "unresolved": {
@@ -68,17 +146,56 @@
           "name": null,
           "url": "https://github.com/getoxide/oxide/releases/tag/v1.1.0",
           "size": null
+        },
+        "windowsArm64": {
+          "name": null,
+          "url": "https://github.com/getoxide/oxide/releases/tag/v1.1.0",
+          "size": null
+        },
+        "linux": {
+          "name": "Oxide_1.1.0_amd64.AppImage",
+          "url": "https://github.com/getoxide/oxide/releases/download/v1.1.0/Oxide_1.1.0_amd64.AppImage",
+          "size": 94263800
+        },
+        "linuxDeb": {
+          "name": null,
+          "url": "https://github.com/getoxide/oxide/releases/tag/v1.1.0",
+          "size": null
+        },
+        "linuxRpm": {
+          "name": null,
+          "url": "https://github.com/getoxide/oxide/releases/tag/v1.1.0",
+          "size": null
+        },
+        "linuxArm64": {
+          "name": null,
+          "url": "https://github.com/getoxide/oxide/releases/tag/v1.1.0",
+          "size": null
+        },
+        "linuxArm64Deb": {
+          "name": null,
+          "url": "https://github.com/getoxide/oxide/releases/tag/v1.1.0",
+          "size": null
+        },
+        "linuxArm64Rpm": {
+          "name": null,
+          "url": "https://github.com/getoxide/oxide/releases/tag/v1.1.0",
+          "size": null
         }
       }
     },
-    "platforms": ["macOS on Apple Silicon"],
+    "platforms": ["macOS on Apple Silicon", "Linux x64"],
     "platformsFrom": "release"
   },
   "none": {
     "state": "none",
     "releasesUrl": "https://github.com/getoxide/oxide/releases",
     "latest": null,
-    "platforms": ["macOS on Apple Silicon", "Windows x64"],
+    "platforms": [
+      "macOS on Apple Silicon",
+      "Windows (x64, arm64)",
+      "Linux (x64, arm64)"
+    ],
     "platformsFrom": "readme"
   }
 }

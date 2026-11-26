@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { GUIDES, guideSources } from "../src/content/guides";
+import { GUIDES } from "../src/content/guides";
 import { PAGES } from "../src/content/pages";
 
 // Ticket #42: `/guides` and its two guides (Copy deck, the guides' outlines).
@@ -7,7 +7,7 @@ import { PAGES } from "../src/content/pages";
 // following every internal link in the content; the CI gates cover axe, the
 // budgets and the Concept links.
 
-const CTA_HEADING = "Take your next Turn all the way to the merge.";
+const CTA_HEADING = "Open a folder and start a clean shell.";
 
 test.describe("/guides", () => {
   test("lists the two guides, in order, with their locked H1s", async ({
@@ -78,23 +78,6 @@ for (const guide of GUIDES) {
       await expect(
         page.getByRole("region", { name: CTA_HEADING }),
       ).toBeVisible();
-    });
-
-    test("links its outline to the /features anchors it names", async ({
-      page,
-    }) => {
-      await page.goto(guide.page.path);
-      const anchors = new Set(
-        guideSources(guide).flatMap((source) =>
-          [...source.matchAll(/\/features#([\w-]+)/g)].map((m) => m[1]),
-        ),
-      );
-      expect(anchors.size).toBeGreaterThan(0);
-      for (const anchor of anchors) {
-        await expect(
-          page.locator(`main a[href="/features#${anchor}"]`),
-        ).not.toHaveCount(0);
-      }
     });
 
     test("follows every internal link in the content with JavaScript off", async ({

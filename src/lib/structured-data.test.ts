@@ -119,10 +119,7 @@ describe("the home @graph", () => {
           date: "2026-12-10",
           url: "https://github.com/getoxide/oxide/releases/tag/v1.2.3",
           prerelease: false,
-          assets: SNAPSHOT.release.latest?.assets ?? {
-            macos: { name: null, url: "", size: null },
-            windows: { name: null, url: "", size: null },
-          },
+          assets: SNAPSHOT.release.latest!.assets,
         },
       },
     };
@@ -157,7 +154,7 @@ describe("per-page structured data", () => {
       });
     }
     for (const path of [
-      "/guides/review-ai-generated-code",
+      "/guides/running-agents-in-oxide",
       "/docs/quick-start",
     ]) {
       expect(structuredDataFor(page(path), SNAPSHOT)).toMatchObject({

@@ -1,8 +1,7 @@
-// The two guides (ticket #42; Copy deck, the guides' outlines). The headings,
-// the intro key sentences and the meaning of each section's key sentences are
-// the deck's; the running text around them is build-written and Lorenzo
-// or Matteo approves it in review. The second guide is honest about the cost of a
-// second agent and about doing it without Oxide.
+// The two guides (Copy deck, the guides' outlines). The headings, the intro
+// key sentences and the meaning of each section's key sentences are the deck's;
+// the running text around them is build-written and Lorenzo or Matteo approves
+// it in review.
 //
 // Notation as in the Copy deck: `[label](target)` links, `code`, `**bold**`.
 import type { Page } from "./pages";
@@ -26,13 +25,13 @@ export type Guide = {
   intro: string;
   /** The outline sections, in the deck's order. */
   sections: GuideSection[];
-  /** A closing paragraph after the outline (the second guide's cross-link). */
+  /** A closing paragraph after the outline. */
   closing?: string;
 };
 
 /** The /guides index: a lead, then one entry per guide. */
 export const GUIDE_INDEX = {
-  lead: "Two guides to the work that starts when an agent says it is done: a method for reading the change, and a way to put a second agent on the review.",
+  lead: "Two practical guides for Oxide: using coding agent CLIs in plain terminals, and installing or updating Oxide on Linux.",
 } as const;
 
 /**
@@ -49,119 +48,93 @@ export function guideSources(guide: Guide): string[] {
 
 export const GUIDES: Guide[] = [
   {
-    page: PAGES.guidesReview,
+    page: PAGES.guidesAgents,
     summary:
-      "A four-step method for reading the change a piece at a time, checking what ran, commenting on lines and undoing what you don't want.",
+      "Run Claude Code, Codex, Antigravity CLI or any shell tool side by side in Oxide's plain terminals with your own shell config, code editor and GitHub tools.",
     intro:
-      "An agent's summary tells you what it believes it did. Reviewing AI-generated code means checking what it actually changed and what actually ran, one Turn at a time.",
+      "Oxide does not know about agents: every Terminal is a plain shell, so you run `claude`, `codex` or any CLI tool the same way you do outside Oxide.",
     sections: [
       {
-        id: "treat-the-summary-as-a-claim",
-        heading: "Treat the summary as a claim",
-        body: `"Done, tests pass" is a sentence, not evidence. Start from the diff and the commands that ran, and read the summary last.
+        id: "why-plain-shells",
+        heading: "Why plain shells",
+        body: `A Terminal is your own zsh, bash or PowerShell with your startup files, aliases and PATH intact. Oxide adds no launch flags, prompts or wrappers around what runs inside it.
 
-The closing message comes from the same model that wrote the code, so it repeats the same assumptions. It is a useful index of what to look at, not proof that the work is finished. The evidence lives in two places: the diff, which shows the exact lines that changed, and the record of what ran after the last edit.`,
+Because Core owns each PTY process directly and never interprets its output, every interactive TUI, colour theme, spinner and prompt behaves the same as in your standalone terminal. Whatever you run uses its own login and billing, and switching between Projects or Terminals keeps every running process alive.`,
       },
       {
-        id: "read-one-turn-at-a-time",
-        heading: "1. Read one Turn at a time",
-        body: `A Turn is one prompt and everything the agent did in response. Reviewing per Turn keeps each diff small enough to read; in Oxide, Checkpoints make each Turn's diff exact ([Diff by Turn](/features#diff-by-turn)).
+        id: "running-claude-code-and-codex-side-by-side",
+        heading: "Running Claude Code and Codex side by side",
+        body: `Open as many Terminals as you need under one Project: run \`claude\` in one, \`codex\` in another and a test watcher in a third, with Session restore keeping your recent Command blocks across restarts.
 
-A diff of the whole Thread hides the order of events: a change that looked reasonable in one prompt can quietly become a wrong direction by the third. Per Turn, you can see which instruction produced which lines, and stop a bad direction before the next prompt builds on it. If a Turn went the wrong way, Restore puts the files back to the Checkpoint from before it and leaves the rest alone. What ran, and whether that run still covers the change, is the Verification Dossier's job.`,
+Click the \`+\` button on a Project row in the sidebar to open a fresh shell already in that folder. Double-click a Terminal row (or use Rename on its context menu) to label it \`claude\`, \`codex\` or \`tests\`; until you rename it, Oxide shows the active long-running program automatically and returns to the default name once the shell is idle. See [Many terminals](/features#many-terminals) and [Command blocks](/features#command-blocks).`,
       },
       {
-        id: "check-what-actually-ran",
-        heading: "2. Check what actually ran",
-        body: `Look for which tests, type checks and builds ran after the last edit, which went stale, and which languages or paths no check covers. That is what the [Verification Dossier](/features#verification-dossier) computes, without an LLM.
+        id: "code-and-github-next-to-the-shell",
+        heading: "Code and GitHub next to the shell",
+        body: `Open the Files view from the Project row to inspect or edit files in the Code workspace beside the Terminal, then use the Issues and Pull request Surfaces in the right dock.
 
-A green check from before the final edit says nothing about the code you are about to merge. Ask three questions of every change: did a check run, did it cover the file that changed, and did it run after the last line changed? Files with no covering check are the ones to read yourself.`,
+Opening a file splits the centre into a Terminal half and a Code half with a draggable divider, so you can read or edit a file in Monaco while watching an agent or test suite run beside it. When the branch is ready, switch to the [Pull requests](/features#pull-requests) Surface to review checks, comment and merge without leaving the window.`,
       },
       {
-        id: "send-feedback-where-it-belongs",
-        heading: "3. Send feedback where it belongs",
-        body: `Comments on lines, not paragraphs of chat. Send them back to the agent as one prompt, or to the pull request as a review ([Line comments](/features#line-comments)).
+        id: "terminal-priority-for-shortcuts",
+        heading: "Terminal priority for shortcuts",
+        body: `When a Terminal has focus, bare \`Ctrl+<letter>\` and terminal control keys like \`Ctrl+C\`, \`Ctrl+D\` and \`Ctrl+R\` go straight to the PTY unless explicitly rebound in Settings.
 
-Feedback written in the conversation loses the line it refers to, and the agent has to guess. A comment pinned to the line survives the round trip: the agent sees the exact code and the exact request, and the next Turn is smaller. Group the comments into one prompt before you send them, so the agent answers them together instead of one at a time.`,
-      },
-      {
-        id: "undo-what-you-dont-want",
-        heading: "4. Undo what you don't want",
-        body: `Take out one hunk or one file, or put everything back to before a Turn, and keep the rest ([Revert and Restore](/features#restore)).
-
-Not every unwanted change deserves another prompt. Cut the part you don't want, keep what you do, and ask the agent again with less to work with. Both actions can be undone, so it is safe to try the smaller cut first.`,
-      },
-      {
-        id: "before-you-merge",
-        heading: "Before you merge",
-        body: `A short checklist: every Turn read, every Risk signal looked at, checks fresh on the final commit. Optionally publish the Dossier in the pull request body so reviewers see the same evidence.
-
-In practice:
-
-- **Every Turn read.** Review the newest first, so you know what the branch adds.
-- **Every Risk signal looked at.** Explain it, fix it, or remove the change that caused it.
-- **Checks fresh on the final commit.** A pass from an earlier Turn does not cover the last edit.
-- **The Verification Dossier published**, if your team wants the same evidence in the pull request.`,
-      },
-      {
-        id: "going-further-a-second-reviewer",
-        heading: "Going further: a second reviewer",
-        body: `A reviewer that didn't write the change catches a different class of problem, and you can add one without leaving the workflow. [Claude Code and Codex together](/guides/claude-code-and-codex-together) shows how to set up a second agent as the reviewer, what it sees, and when the extra usage is worth it.`,
-      },
-    ],
-  },
-  {
-    page: PAGES.guidesCodex,
-    summary:
-      "Let Claude Code write and Codex review, or the other way round, with the reviewer seeing only the diff and the issue.",
-    intro:
-      "Claude Code and Codex are different agents with different blind spots. Let one write the change and have the other review it, seeing only the diff and the issue.",
-    sections: [
-      {
-        id: "why-a-second-agent",
-        heading: "Why a second agent",
-        body: `A reviewer that didn't write the change, from a different model, catches what the author's context hides.
-
-Every agent has habits: the files it reaches for, the tests it trusts, the edge cases it assumes away. A different model has different habits, so its read of the change covers ground the writer never looked at. The value is not a second opinion on style but a check on the assumptions the first agent never wrote down.
-
-That second reader is most useful as a [Blind review](/docs/concepts#blind-review): it sees the change, not the conversation.`,
-      },
-      {
-        id: "why-the-reviewer-works-blind",
-        heading: "Why the reviewer works blind",
-        body: `The reviewer should see what the change is meant to do and what it actually does, and nothing about how the writer got there. A reviewer that reads the original conversation inherits its assumptions. Given only the diff and the issue, it judges the change on its own terms. That is a [Blind review](/features#blind-review).
-
-The conversation is where the writer explained away the shortcuts, so a reviewer that reads it starts from the same conclusions. Blind, it has to reconstruct the intent from the issue and check whether the diff delivers it.`,
-      },
-      {
-        id: "set-it-up",
-        heading: "Set it up",
-        body: `Both Providers installed and logged in. One Thread with the writer; when its Turn finishes, start a Blind review and pick the other Provider.
-
-In Oxide: open the Project, start a Thread with Claude Code or Codex, and give it the issue. When the Turn ends, open the diff, start a Blind review and choose the other agent as the reviewer. Codex can review a Claude Code change and Claude Code can review a Codex change; the direction does not matter, as long as the reviewer is not the writer.`,
-      },
-      {
-        id: "read-the-findings",
-        heading: "Read the findings",
-        body: `The reviewer's findings arrive as Line comments on the Diff. Keep the ones that hold up, dismiss the rest, and send the kept ones back to the writer as one prompt.
-
-Read a finding as a claim to verify, not a fix to apply. Keep it when it names a real problem: a missed edge case, a test that asserts the wrong thing, a change that reaches outside the issue. Dismiss the style preferences the writer's own instructions already cover. Send the kept comments back together, so the writer answers them in a single Turn.`,
-      },
-      {
-        id: "when-its-worth-it",
-        heading: "When it's worth it",
-        body: `A Blind review spends usage on a second Provider. Use it where it pays: changes that touch sensitive paths, trigger Risk signals, or lack tests.
-
-A review of every Turn doubles the tokens for the Thread and adds a wait before you merge. Spend it on the changes where a miss is expensive: authentication, payments, data migrations, files with no tests, and anything the Verification Dossier flags. For a copy fix or a dependency bump, your own read is usually enough.`,
-      },
-      {
-        id: "without-oxide",
-        heading: "Without Oxide",
-        body: `You can do this by hand: give the second agent a fresh session with only the diff and the issue, and paste its findings back. Oxide removes the copying and keeps the reviewer from seeing the conversation.
-
-The manual version is the same method with more steps: export the diff and the issue into a fresh session, ask the reviewer to comment line by line, then paste the findings into the writer's conversation. It works. What you lose is the certainty that the reviewer never saw the original Thread, and the time spent moving text between two windows.`,
+Interactive CLIs that ask for \`Ctrl+C\` twice to exit, shell history search with \`Ctrl+R\`, and editor bindings inside the shell all work out of the box. If you want custom VS Code-inspired shortcuts for Oxide's own panels, configure them in Settings → Shortcuts.`,
       },
     ],
     closing:
-      "If you'd rather start from the review itself, [How to review AI-generated code](/guides/review-ai-generated-code) covers the four steps that come before and after a second reviewer.",
+      "On Linux? [Installing and updating Oxide on Linux](/guides/linux-packages-and-updates) covers AppImage, `.deb` (APT) and `.rpm` (DNF) builds.",
+  },
+  {
+    page: PAGES.guidesLinux,
+    summary:
+      "Install Oxide on Linux with AppImage, .deb or .rpm for x64 and arm64, configure the signed APT and DNF repositories, and verify every download.",
+    intro:
+      "Oxide ships official Linux builds for x64 and arm64 as AppImage, `.deb` and `.rpm`, with signed APT and DNF repositories for updates.",
+    sections: [
+      {
+        id: "choose-your-package-format",
+        heading: "Choose your package format",
+        body: `Pick an AppImage if you want a portable binary with In-app update, or install the \`.deb\` or \`.rpm\` Package install so your system package manager handles upgrades.
+
+When you use an AppImage, Oxide checks for updates automatically and replaces the AppImage file in place from the titlebar or Settings → Updates. When you use a \`.deb\` or \`.rpm\`, Oxide leaves upgrades to \`apt\` or \`dnf\` and shows the command to run when a new stable release is out.`,
+      },
+      {
+        id: "signed-apt-repository",
+        heading: "Signed APT repository (Debian, Ubuntu)",
+        body: `Add the Oxide repository key and source list once, then install and upgrade \`oxide\` through \`apt\` on x64 or arm64.
+
+\`\`\`sh
+sudo install -d -m 0755 /usr/share/keyrings
+curl -fsSL https://updates.getoxide.dev/apt/oxide-repository.gpg | sudo tee /usr/share/keyrings/oxide.gpg > /dev/null
+echo "deb [signed-by=/usr/share/keyrings/oxide.gpg] https://updates.getoxide.dev/apt/ ./" | sudo tee /etc/apt/sources.list.d/oxide.list
+sudo apt update && sudo apt install oxide
+\`\`\`
+
+Installing a stable \`.deb\` from [Download Oxide](/download) also configures this repository for you. The APT repository serves stable releases only; test pre-releases never appear there.`,
+      },
+      {
+        id: "signed-dnf-repository",
+        heading: "Signed DNF repository (Fedora, RHEL, openSUSE)",
+        body: `Add \`/etc/yum.repos.d/oxide.repo\` once and install \`oxide\` with \`dnf\`; \`dnf\` imports the repository key on first use and checks both packages and metadata.
+
+\`\`\`sh
+sudo curl -fsSL -o /etc/yum.repos.d/oxide.repo https://updates.getoxide.dev/rpm/oxide.repo
+sudo dnf install oxide
+\`\`\`
+
+The \`.repo\` file sets \`skip_if_unavailable=1\`, so an unreachable Oxide repository never blocks the rest of \`dnf\`. Future releases arrive with \`sudo dnf upgrade\`.`,
+      },
+      {
+        id: "verifying-downloads-and-requirements",
+        heading: "Verifying downloads and requirements",
+        body: `Every release lists SHA-256 checksums and build-provenance attestations; Linux builds require WebKitGTK 4.1 (\`libwebkit2gtk-4.1\`).
+
+Verify any downloaded file with \`sha256sum\` against the release notes, or run \`gh attestation verify <file> --repo getoxide/oxide\`. If you also want to run coding agent CLIs inside Oxide, see [Running Claude Code, Codex and any CLI in Oxide](/guides/running-agents-in-oxide).`,
+      },
+    ],
+    closing:
+      "Ready to install? Grab the AppImage, `.deb` or `.rpm` on [Download Oxide](/download).",
   },
 ];

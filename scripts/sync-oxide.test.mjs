@@ -67,9 +67,28 @@ describe("buildIco", () => {
   });
 });
 
-const BRAND = "assets/brand/oxide";
-const TOKENS = ":root { --ox-background: #1C1C1E; }\n";
-const LOGO = '<svg viewBox="0 0 570 192"><title>Oxide</title></svg>';
+const TOKENS_JSON = JSON.stringify({
+  name: "Oxide Titanium",
+  color: {
+    dark: {
+      background: "#1C1C1E",
+      "text.bright": "#FFFFFF",
+      syntax: { comment: { color: "#9A9892" } },
+    },
+    light: {
+      background: "#FBFBFA",
+      "text.bright": "#1C1C1E",
+      syntax: { comment: { color: "#62615C" } },
+    },
+  },
+  typography: {
+    software: { ui: { family: "Inter" }, code: { family: "JetBrains Mono" } },
+    website: {
+      heading: { family: "Space Grotesk" },
+      body: { family: "Inter" },
+    },
+  },
+});
 
 /** A README with every site marker, shaped like the Oxide one. */
 const README = `<!-- The site:* markers below feed the Oxide website. Do not remove them. -->
@@ -142,30 +161,23 @@ No. [Build it yourself](#build-from-source).
 
 const TERMS = [
   "Project",
-  "Thread",
-  "Turn",
-  "Provider",
+  "Terminal",
+  "Command block",
   "Surface",
-  "Checkpoint",
-  "Verification Dossier",
-  "Blind review",
-  "Restore",
+  "Files view",
+  "Code workspace",
+  "Session restore",
+  "In-app update",
+  "Package install",
 ];
 const GLOSSARY =
   "# Oxide\n\n## Language\n\n" +
   TERMS.map((t) => `**${t}**:\nThe ${t} definition.\n_Avoid_: x\n`).join("\n") +
-  "\n**Board Thread**:\nA Thread in a worktree. See [ADR-0011](docs/adr/0011.md).\n";
+  "\n**Open Project**:\nA Project in the sidebar.\n";
 
 function source() {
   return new Map([
-    [`${BRAND}/palette/oxide-tokens.css`, Buffer.from(TOKENS)],
-    [`${BRAND}/oxide-favicon.svg`, Buffer.from("<svg/>")],
-    [`${BRAND}/oxide-logo.svg`, Buffer.from(LOGO)],
-    [`${BRAND}/png/favicon/16x16.png`, fakePng(16)],
-    [`${BRAND}/png/favicon/32x32.png`, fakePng(32)],
-    [`${BRAND}/png/favicon/48x48.png`, fakePng(48)],
-    [`${BRAND}/png/favicon/64x64.png`, fakePng(64)],
-    [`${BRAND}/png/avatar/180x180.png`, fakePng(180)],
+    ["assets/palette/oxide-tokens.json", Buffer.from(TOKENS_JSON)],
     ["README.md", Buffer.from(README)],
     ["GLOSSARY.md", Buffer.from(GLOSSARY)],
   ]);
@@ -188,6 +200,11 @@ const STABLE = {
       name: "Oxide_1.1.0_x64-setup.exe",
       size: 90,
       browser_download_url: "https://example.test/win.exe",
+    },
+    {
+      name: "Oxide_1.1.0_amd64.AppImage",
+      size: 95,
+      browser_download_url: "https://example.test/linux.AppImage",
     },
   ],
 };
@@ -222,24 +239,14 @@ async function run(
 }
 
 describe("syncOxide: brand kit", () => {
-  it("copies the tokens CSS verbatim and the icon set at the pinned ref", async () => {
+  it("generates oxide-tokens.css from oxide-tokens.json at the pinned ref", async () => {
     const { fetched, written } = await run(source(), { ref: "v1.2.3" });
 
     expect(fetched.every((f) => f.startsWith("commit-of-v1.2.3:"))).toBe(true);
-    expect(
-      written.get("content/oxide/brand/oxide-tokens.css")?.toString(),
-    ).toBe(TOKENS);
-    expect(written.get("src/app/icon.svg")?.toString()).toBe("<svg/>");
-    expect(written.get("content/oxide/brand/oxide-logo.svg")?.toString()).toBe(
-      LOGO,
-    );
-    expect(written.get("src/app/apple-icon.png")?.readUInt32BE(16)).toBe(180);
-
-    const ico = written.get("src/app/favicon.ico");
-    expect(ico?.readUInt16LE(4)).toBe(4);
-    expect([0, 1, 2, 3].map((i) => ico?.[6 + i * 16])).toEqual([
-      16, 32, 48, 64,
-    ]);
+    const css = written.get("content/oxide/brand/oxide-tokens.css")?.toString();
+    expect(css).toContain("--ox-background: #1C1C1E;");
+    expect(css).toContain("--ox-text-bright: #FFFFFF;");
+    expect(css).toContain("--ox-syntax-comment: #9A9892;");
 
     expect(
       JSON.parse(written.get("content/oxide/source.json").toString()),
@@ -250,10 +257,10 @@ describe("syncOxide: brand kit", () => {
     });
   });
 
-  it("fails when the logo is missing", async () => {
+  it("fails when oxide-tokens.json is missing", async () => {
     const files = source();
-    files.delete(`${BRAND}/oxide-logo.svg`);
-    await expect(run(files)).rejects.toThrow(/oxide-logo\.svg/);
+    files.delete("assets/palette/oxide-tokens.json");
+    await expect(run(files)).rejects.toThrow(/oxide-tokens\.json/);
   });
 });
 
@@ -319,12 +326,12 @@ describe("syncOxide: snapshot", () => {
     const { snapshot, result } = await run(source(), { logs });
     expect(snapshot.concepts).toHaveLength(9);
     expect(snapshot.concepts[2]).toEqual({
-      term: "Turn",
-      id: "turn",
-      definition: "The Turn definition.",
+      term: "Command block",
+      id: "command-block",
+      definition: "The Command block definition.",
     });
-    expect(result.unlisted).toEqual(["Board Thread"]);
-    expect(logs).toContain("Glossary terms not on the site: Board Thread");
+    expect(result.unlisted).toEqual(["Open Project"]);
+    expect(logs).toContain("Glossary terms not on the site: Open Project");
   });
 
   it("writes the release state and the changelog", async () => {
@@ -386,10 +393,10 @@ describe("syncOxide: failures write nothing", () => {
     expect(written.size).toBe(0);
   }
 
-  it("a missing brand file", async () => {
+  it("a missing tokens file", async () => {
     const files = source();
-    files.delete(`${BRAND}/palette/oxide-tokens.css`);
-    await expectNothingWritten(files, {}, /oxide-tokens\.css/);
+    files.delete("assets/palette/oxide-tokens.json");
+    await expectNothingWritten(files, {}, /oxide-tokens\.json/);
   });
 
   it("a missing marker", async () => {
@@ -397,22 +404,22 @@ describe("syncOxide: failures write nothing", () => {
     files.set(
       "README.md",
       Buffer.from(
-        README.replace("<!-- /site:requirements -->", "").replace(
-          "<!-- site:requirements -->",
+        README.replace("<!-- /site:faq -->", "").replace(
+          "<!-- site:faq -->",
           "",
         ),
       ),
     );
-    await expectNothingWritten(files, {}, /site:requirements/);
+    await expectNothingWritten(files, {}, /site:faq/);
   });
 
   it("a missing allowlisted term", async () => {
     const files = source();
     files.set(
       "GLOSSARY.md",
-      Buffer.from(GLOSSARY.replace("**Restore**:", "**Rewind**:")),
+      Buffer.from(GLOSSARY.replace("**Surface**:", "**Pane**:")),
     );
-    await expectNothingWritten(files, {}, /Restore/);
+    await expectNothingWritten(files, {}, /Surface/);
   });
 
   it("an unreachable Releases API", async () => {

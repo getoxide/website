@@ -18,29 +18,33 @@
     color var(--site-dur-fast) var(--site-ease-fade);
 }
 
-/* The Download block's platform pair (.macos, .windows) swaps looks when the
-   inline script finds Windows: the Windows button turns primary and the
-   macOS one ghost. Without JavaScript `variant` alone decides. */
+/* The Download block's platform buttons (.macos, .windows, .linux) swap looks
+   when the inline script finds Windows or Linux: the detected button turns
+   primary and macOS ghost. Without JavaScript `variant` alone decides. */
 .primary,
-:global(html[data-os="windows"]) .windows {
+:global(html[data-os="windows"]) .windows,
+:global(html[data-os="linux"]) .linux {
   background: var(--ox-accent);
   border-color: transparent;
   color: var(--ox-accent-foreground);
 }
 
 .primary:hover,
-:global(html[data-os="windows"]) .windows:hover {
+:global(html[data-os="windows"]) .windows:hover,
+:global(html[data-os="linux"]) .linux:hover {
   background: var(--ox-accent-hover);
 }
 
 .primary:active,
-:global(html[data-os="windows"]) .windows:active {
+:global(html[data-os="windows"]) .windows:active,
+:global(html[data-os="linux"]) .linux:active {
   background: var(--ox-accent-pressed);
 }
 
 .ghost,
 .nav,
-:global(html[data-os="windows"]) .macos {
+:global(html[data-os="windows"]) .macos,
+:global(html[data-os="linux"]) .macos {
   background: color-mix(in srgb, var(--ox-background) 45%, transparent);
   border-color: var(--ox-element-border);
   color: var(--ox-text);
@@ -49,7 +53,9 @@
 .ghost:hover,
 .nav:hover,
 :global(html[data-os="windows"]) .macos:hover,
-:global(html[data-os="windows"]) .macos:active {
+:global(html[data-os="windows"]) .macos:active,
+:global(html[data-os="linux"]) .macos:hover,
+:global(html[data-os="linux"]) .macos:active {
   background: var(--ox-element-background);
 }
 

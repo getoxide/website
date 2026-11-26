@@ -1,21 +1,56 @@
 import { COPY, GITHUB_REPO_URL } from "@/content/copy";
 import { readmeUrl } from "@/lib/oxide";
 import { OS_SCRIPT } from "@/lib/os";
-import { SNAPSHOT, tokensOf, type Snapshot } from "@/lib/snapshot";
+import {
+  SNAPSHOT,
+  tokensOf,
+  type InstallerKey,
+  type Snapshot,
+} from "@/lib/snapshot";
 import type { ClickEvent } from "@/lib/measurement";
 import { Button } from "./Button";
 import { DeckText } from "./DeckText";
 import styles from "./DownloadBlock.module.css";
 
-type Platform = "macos" | "windows";
+type Platform = "macos" | "windows" | "linux";
 
 /** macOS is primary without JavaScript (Download experience #13). */
-const PLATFORMS: Platform[] = ["macos", "windows"];
+const PLATFORMS: Platform[] = ["macos", "windows", "linux"];
 
 const EVENTS = {
   macos: "download-macos-arm",
   windows: "download-windows",
+  linux: "download-linux",
 } as const satisfies Record<Platform, ClickEvent>;
+
+const EXTRA_PACKAGES: {
+  key: InstallerKey;
+  label: string;
+  event: ClickEvent;
+}[] = [
+  {
+    key: "windowsArm64",
+    label: "Windows arm64 (.exe)",
+    event: "download-windows",
+  },
+  { key: "linuxDeb", label: "Linux x64 (.deb)", event: "download-linux" },
+  { key: "linuxRpm", label: "Linux x64 (.rpm)", event: "download-linux" },
+  {
+    key: "linuxArm64",
+    label: "Linux arm64 (AppImage)",
+    event: "download-linux",
+  },
+  {
+    key: "linuxArm64Deb",
+    label: "Linux arm64 (.deb)",
+    event: "download-linux",
+  },
+  {
+    key: "linuxArm64Rpm",
+    label: "Linux arm64 (.rpm)",
+    event: "download-linux",
+  },
+];
 
 /**
  * The download buttons and the quiet line under them (Design system, Download
@@ -55,20 +90,9 @@ export function DownloadBlock({
 
   const token = tokensOf(snapshot);
   const prerelease = release.state === "prerelease-only";
-  // A test pre-release names itself on the primary button; the secondary
-  // button names its platform. Both labels are in the HTML and CSS shows the
-  // one for the button's role, so detection swaps them without a reflow.
-  const label = (platform: Platform) =>
-    prerelease ? (
-      <>
-        <span className={styles.asPrimary}>
-          {copy.buttons.prerelease(latest.version)}
-        </span>
-        <span className={styles.asSecondary}>{copy.buttons[platform]}</span>
-      </>
-    ) : (
-      copy.buttons[platform]
-    );
+  const extras = EXTRA_PACKAGES.filter(
+    (item) => latest.assets[item.key]?.name != null,
+  );
   return (
     <div className={styles.block}>
       {/* Runs while the page is parsed, before the buttons below exist, so
@@ -94,7 +118,7 @@ export function DownloadBlock({
                 describedBy={id}
                 event={EVENTS[platform]}
               >
-                {label(platform)}
+                {copy.buttons[platform]}
               </Button>
               <p id={id} className={styles.sublabel}>
                 {sublabel}
@@ -115,11 +139,28 @@ export function DownloadBlock({
           </Button>
         </div>
       </div>
+      {extras.length > 0 ? (
+        <ul className={styles.extras} aria-label="Additional installers">
+          {extras.map(({ key, label, event }) => {
+            const size = token(`asset-size:${key}`);
+            return (
+              <li key={key}>
+                <a href={latest.assets[key].url} data-goatcounter-click={event}>
+                  {label}
+                </a>
+                {size ? (
+                  <span className={styles.extraSize}> · {size}</span>
+                ) : null}
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
       <p className={styles.line}>
         <DeckText
           source={
             prerelease
-              ? copy.lines.prerelease
+              ? copy.lines.prerelease(latest.version)
               : copy.lines.stable(token("version")!, token("release-date")!)
           }
         />

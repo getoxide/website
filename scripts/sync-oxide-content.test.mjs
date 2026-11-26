@@ -191,24 +191,22 @@ describe("releaseData", () => {
       { install: INSTALL },
     );
     expect(data.release.state).toBe("prerelease-only");
-    expect(data.release.latest).toEqual({
+    expect(data.release.latest).toMatchObject({
       version: "1.0.0-rc.1",
       tag: "v1.0.0-rc.1",
       date: "2026-11-20",
       url: `${PAGE}/v1.0.0-rc.1`,
       prerelease: true,
-      assets: {
-        macos: {
-          name: "Oxide_1.0.0-rc.1_aarch64.dmg",
-          url: `${DL}/v1.0.0-rc.1/Oxide_1.0.0-rc.1_aarch64.dmg`,
-          size: 101_234_567,
-        },
-        windows: {
-          name: "Oxide_1.0.0-rc.1_x64-setup.exe",
-          url: `${DL}/v1.0.0-rc.1/Oxide_1.0.0-rc.1_x64-setup.exe`,
-          size: 88_765_432,
-        },
-      },
+    });
+    expect(data.release.latest.assets.macos).toEqual({
+      name: "Oxide_1.0.0-rc.1_aarch64.dmg",
+      url: `${DL}/v1.0.0-rc.1/Oxide_1.0.0-rc.1_aarch64.dmg`,
+      size: 101_234_567,
+    });
+    expect(data.release.latest.assets.windows).toEqual({
+      name: "Oxide_1.0.0-rc.1_x64-setup.exe",
+      url: `${DL}/v1.0.0-rc.1/Oxide_1.0.0-rc.1_x64-setup.exe`,
+      size: 88_765_432,
     });
     expect(data.release.platforms).toEqual([
       "macOS on Apple Silicon",
@@ -303,13 +301,15 @@ describe("releaseData", () => {
       ],
       { install: INSTALL },
     );
-    expect(data.release.latest?.assets).toEqual({
-      macos: {
-        name: "Oxide_1.0.0_aarch64.dmg",
-        url: `${DL}/v1.0.0/Oxide_1.0.0_aarch64.dmg`,
-        size: 101,
-      },
-      windows: { name: null, url: `${PAGE}/v1.0.0`, size: null },
+    expect(data.release.latest?.assets.macos).toEqual({
+      name: "Oxide_1.0.0_aarch64.dmg",
+      url: `${DL}/v1.0.0/Oxide_1.0.0_aarch64.dmg`,
+      size: 101,
+    });
+    expect(data.release.latest?.assets.windows).toEqual({
+      name: null,
+      url: `${PAGE}/v1.0.0`,
+      size: null,
     });
     // Platforms follow the assets the release actually ships.
     expect(data.release.platforms).toEqual(["macOS on Apple Silicon"]);
@@ -335,7 +335,7 @@ describe("releaseData", () => {
 
 const GLOSSARY = `# Oxide
 
-A desktop app for agentic engineering.
+A desktop terminal app that knows your GitHub Projects.
 
 ## Language
 
@@ -349,43 +349,38 @@ _Avoid_: Workspace, repo
 A Project the user opened.
 _Avoid_: Pinned
 
-## Threads
+## Terminals
 
-**Thread**:
-One conversation with a single Provider. \`/clear\` starts a new Thread. See ADR-0005.
-_Avoid_: Agent, session
+**Terminal**:
+A shell session in a Project's folder. See ADR-0018.
+_Avoid_: Thread, session
 
-**Turn**:
-One user prompt in a Thread
-and everything the Provider does in response.
-_Avoid_: Run
-
-**Checkpoint**:
-A snapshot of a Thread's files.
-
-## Review
-
-**Verification Dossier**:
-The account of a change's intent, evidence and risk signals.
-_Avoid_: Report
-
-**Blind review**:
-A review of a change by a Provider session that received only the diff.
-
-## Providers
-
-**Provider**:
-An agent CLI that Oxide drives: Claude Code, Codex, or Antigravity CLI (\`agy\`).
-_Avoid_: Agent
+**Command block**:
+One command entered in a Terminal
+and its output.
+_Avoid_: Turn
 
 ## Layout
 
 **Surface**:
-One of the five tools in the right dock.
+One of the two tools in the right dock.
 
-**Restore**:
-Putting the selected Thread's files back.
-_Avoid_: Rewind
+**Files view**:
+The sidebar's other state.
+
+**Code workspace**:
+The Project's editor.
+
+## Settings
+
+**Session restore**:
+A Settings switch, on by default.
+
+**In-app update**:
+How Oxide updates on macOS, Windows and AppImage.
+
+**Package install**:
+Oxide installed from its .deb or .rpm.
 `;
 
 describe("extractConcepts", () => {
@@ -393,31 +388,31 @@ describe("extractConcepts", () => {
     const { concepts } = extractConcepts(GLOSSARY);
     expect(concepts.map((c) => c.term)).toEqual([
       "Project",
-      "Thread",
-      "Turn",
-      "Provider",
+      "Terminal",
+      "Command block",
       "Surface",
-      "Checkpoint",
-      "Verification Dossier",
-      "Blind review",
-      "Restore",
+      "Files view",
+      "Code workspace",
+      "Session restore",
+      "In-app update",
+      "Package install",
     ]);
     expect(concepts.map((c) => c.id)).toEqual([
       "project",
-      "thread",
-      "turn",
-      "provider",
+      "terminal",
+      "command-block",
       "surface",
-      "checkpoint",
-      "verification-dossier",
-      "blind-review",
-      "restore",
+      "files-view",
+      "code-workspace",
+      "session-restore",
+      "in-app-update",
+      "package-install",
     ]);
     expect(concepts[1].definition).toBe(
-      "One conversation with a single Provider. `/clear` starts a new Thread. See ADR-0005.",
+      "A shell session in a Project's folder. See ADR-0018.",
     );
     expect(concepts[2].definition).toBe(
-      "One user prompt in a Thread\nand everything the Provider does in response.",
+      "One command entered in a Terminal\nand its output.",
     );
     expect(concepts.some((c) => c.definition.includes("_Avoid_"))).toBe(false);
   });
@@ -427,13 +422,13 @@ describe("extractConcepts", () => {
   });
 
   it("fails loudly when an allowlisted term is missing", () => {
-    const glossary = GLOSSARY.replace("**Turn**:", "**Round**:");
-    expect(() => extractConcepts(glossary)).toThrow(/Turn/);
+    const glossary = GLOSSARY.replace("**Terminal**:", "**Console**:");
+    expect(() => extractConcepts(glossary)).toThrow(/Terminal/);
   });
 
   it("fails when an allowlisted term has no definition", () => {
     const glossary = GLOSSARY.replace(
-      "**Surface**:\nOne of the five tools in the right dock.\n",
+      "**Surface**:\nOne of the two tools in the right dock.\n",
       "**Surface**:\n",
     );
     expect(() => extractConcepts(glossary)).toThrow(/Surface.*definition/);

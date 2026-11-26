@@ -21,8 +21,7 @@ export const OXIDE_REPO = "getoxide/oxide";
 /** Pinned ref: `main` until Oxide has a stable release tag. */
 export const OXIDE_REF = "main";
 
-const BRAND = "assets/brand/oxide";
-const FAVICON_SIZES = [16, 32, 48, 64];
+const TOKENS_JSON = "assets/palette/oxide-tokens.json";
 
 const PNG_SIGNATURE = Buffer.from([
   0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
@@ -103,6 +102,25 @@ export function extractSection(readme, key) {
 }
 
 /**
+ * Extracts `### Requirements` from the README: uses `site:requirements` markers
+ * when present, otherwise reads the body under `### Requirements` up to the
+ * next `## ` or `### ` heading.
+ * @param {string} readme
+ */
+export function extractRequirements(readme) {
+  if (/<!--\s*site:requirements\s*-->/.test(readme)) {
+    return extractSection(readme, "requirements");
+  }
+  const match = readme.match(
+    /^###\s+Requirements\s*\r?\n([\s\S]*?)(?=^#{2,3}\s|(?![\s\S]))/m,
+  );
+  if (!match) throw new Error("README ### Requirements section missing");
+  const text = match[1].trim();
+  if (!text) throw new Error("README ### Requirements section is empty");
+  return text;
+}
+
+/**
  * The Features groups (`### …`) and each bullet's bold lead-in, the names the
  * `/features` contract checks (Copy #18, feature names). The narrative after
  * each lead-in stays in the README.
@@ -140,14 +158,14 @@ export function extractFeatures(features) {
  */
 export const CONCEPTS = [
   "Project",
-  "Thread",
-  "Turn",
-  "Provider",
+  "Terminal",
+  "Command block",
   "Surface",
-  "Checkpoint",
-  "Verification Dossier",
-  "Blind review",
-  "Restore",
+  "Files view",
+  "Code workspace",
+  "Session restore",
+  "In-app update",
+  "Package install",
 ];
 
 const conceptId = (term) => term.toLowerCase().replace(/\s+/g, "-");
@@ -248,12 +266,82 @@ export function rewriteLinks(markdown, ref, file = "README.md") {
 export const RELEASES_URL = `https://github.com/${OXIDE_REPO}/releases`;
 
 /**
- * The two installers the site links to, and the platform each one means
+ * The installers Oxide ships, and the OS/architecture each one means
  * (Copy deck, Tokens: `⟨platforms⟩`).
  */
 const INSTALLERS = [
-  { key: "macos", suffix: "_aarch64.dmg", platform: "macOS on Apple Silicon" },
-  { key: "windows", suffix: "_x64-setup.exe", platform: "Windows x64" },
+  {
+    key: "macos",
+    file: (v) => `Oxide_${v}_aarch64.dmg`,
+    os: "macOS",
+    arch: "Apple Silicon",
+    platform: "macOS on Apple Silicon",
+    primary: true,
+  },
+  {
+    key: "windows",
+    file: (v) => `Oxide_${v}_x64-setup.exe`,
+    os: "Windows",
+    arch: "x64",
+    platform: "Windows x64",
+    primary: true,
+  },
+  {
+    key: "windowsArm64",
+    file: (v) => `Oxide_${v}_arm64-setup.exe`,
+    os: "Windows",
+    arch: "arm64",
+    platform: "Windows arm64",
+    primary: false,
+  },
+  {
+    key: "linux",
+    file: (v) => `Oxide_${v}_amd64.AppImage`,
+    os: "Linux",
+    arch: "x64",
+    platform: "Linux x64",
+    primary: true,
+  },
+  {
+    key: "linuxDeb",
+    file: (v) => `Oxide_${v}_amd64.deb`,
+    os: "Linux",
+    arch: "x64",
+    platform: "Linux x64",
+    primary: false,
+  },
+  {
+    key: "linuxRpm",
+    file: (v) => `Oxide-${v}-1.x86_64.rpm`,
+    os: "Linux",
+    arch: "x64",
+    platform: "Linux x64",
+    primary: false,
+  },
+  {
+    key: "linuxArm64",
+    file: (v) => `Oxide_${v}_aarch64.AppImage`,
+    os: "Linux",
+    arch: "arm64",
+    platform: "Linux arm64",
+    primary: false,
+  },
+  {
+    key: "linuxArm64Deb",
+    file: (v) => `Oxide_${v}_arm64.deb`,
+    os: "Linux",
+    arch: "arm64",
+    platform: "Linux arm64",
+    primary: false,
+  },
+  {
+    key: "linuxArm64Rpm",
+    file: (v) => `Oxide-${v}-1.aarch64.rpm`,
+    os: "Linux",
+    arch: "arm64",
+    platform: "Linux arm64",
+    primary: false,
+  },
 ];
 
 /** Release notes sections the changelog keeps (Content #12, Changelog). */
@@ -298,12 +386,34 @@ function noteSection(body, name) {
 }
 
 /** The exact installer asset of a release, or the release page instead. */
-function installer(release, version, { suffix }) {
-  const name = `Oxide_${version}${suffix}`;
+function installer(release, version, { file }) {
+  const name = file(version);
   const asset = release.assets?.find((a) => a.name === name);
   return asset
     ? { name, url: asset.browser_download_url, size: asset.size }
     : { name: null, url: release.html_url, size: null };
+}
+
+/**
+ * Formats a list of shipped `{ os, arch }` entries into display strings:
+ * e.g. "macOS on Apple Silicon", "Windows (x64, arm64)", "Linux (x64, arm64)".
+ */
+function formatPlatforms(items) {
+  const order = [];
+  const archs = new Map();
+  for (const { os, arch } of items) {
+    if (!archs.has(os)) {
+      order.push(os);
+      archs.set(os, []);
+    }
+    if (arch && !archs.get(os).includes(arch)) archs.get(os).push(arch);
+  }
+  return order.map((os) => {
+    const list = archs.get(os);
+    if (os === "macOS") return list.length ? `macOS on ${list.join(", ")}` : os;
+    if (list.length === 1) return `${os} ${list[0]}`;
+    return list.length ? `${os} (${list.join(", ")})` : os;
+  });
 }
 
 /**
@@ -370,12 +480,12 @@ export function releaseData(releases, { install }) {
       prerelease: !isStable(newest),
       assets,
     };
-    unresolved = INSTALLERS.filter((i) => assets[i.key].name === null).map(
-      (i) => ({ platform: i.platform, version, tag: newest.tag_name }),
-    );
+    unresolved = INSTALLERS.filter(
+      (i) => i.primary && assets[i.key].name === null,
+    ).map((i) => ({ platform: i.platform, version, tag: newest.tag_name }));
     const shipped = INSTALLERS.filter((i) => assets[i.key].name !== null);
     if (shipped.length) {
-      platforms = shipped.map((i) => i.platform);
+      platforms = formatPlatforms(shipped);
       platformsFrom = "release";
     }
   }
@@ -529,22 +639,63 @@ export function checkSnapshot(s) {
   return s;
 }
 
+/**
+ * Converts Oxide's `assets/palette/oxide-tokens.json` into the CSS custom
+ * properties file (`content/oxide/brand/oxide-tokens.css`).
+ * @param {string} jsonText
+ */
+export function tokensCssFromJson(jsonText) {
+  const tokens = JSON.parse(jsonText);
+  const { typography, color } = tokens;
+  const uiFamily = typography?.software?.ui?.family ?? "Inter";
+  const codeFamily = typography?.software?.code?.family ?? "JetBrains Mono";
+  const headingFamily = typography?.website?.heading?.family ?? "Space Grotesk";
+  const bodyFamily = typography?.website?.body?.family ?? "Inter";
+
+  const themeLines = (palette) => {
+    const lines = [];
+    for (const [key, value] of Object.entries(palette ?? {})) {
+      if (key === "syntax" && value && typeof value === "object") {
+        for (const [synKey, synVal] of Object.entries(value)) {
+          if (synVal && typeof synVal.color === "string") {
+            lines.push(`  --ox-syntax-${synKey}: ${synVal.color};`);
+          }
+        }
+      } else if (typeof value === "string") {
+        lines.push(`  --ox-${key.replace(/[._]/g, "-")}: ${value};`);
+      }
+    }
+    return lines;
+  };
+
+  return [
+    "/* Oxide Titanium design tokens. Source of truth: oxide-tokens.json. */",
+    ":root {",
+    `  --ox-font-ui: "${uiFamily}", system-ui, sans-serif;`,
+    `  --ox-font-code: "${codeFamily}", ui-monospace, monospace;`,
+    `  --ox-font-web-heading: "${headingFamily}", "Inter", sans-serif;`,
+    `  --ox-font-web-body: "${bodyFamily}", system-ui, sans-serif;`,
+    "}",
+    "",
+    ':root, [data-theme="dark"] {',
+    ...themeLines(color?.dark),
+    "}",
+    "",
+    '[data-theme="light"] {',
+    ...themeLines(color?.light),
+    "}",
+    "",
+  ].join("\n");
+}
+
 /** The brand kit files at `ref`, as `[site path, contents]` pairs. */
 async function brandOutputs(ref, fetchFile) {
-  const get = (path) => fetchFile(ref, `${BRAND}/${path}`);
-  const [tokens, logo, iconSvg, appleIcon, ...favicons] = await Promise.all([
-    get("palette/oxide-tokens.css"),
-    get("oxide-logo.svg"),
-    get("oxide-favicon.svg"),
-    get("png/avatar/180x180.png"),
-    ...FAVICON_SIZES.map((s) => get(`png/favicon/${s}x${s}.png`)),
-  ]);
+  const tokensJson = await fetchFile(ref, TOKENS_JSON);
   return [
-    ["content/oxide/brand/oxide-tokens.css", tokens],
-    ["content/oxide/brand/oxide-logo.svg", logo],
-    ["src/app/icon.svg", iconSvg],
-    ["src/app/favicon.ico", buildIco(favicons)],
-    ["src/app/apple-icon.png", appleIcon],
+    [
+      "content/oxide/brand/oxide-tokens.css",
+      tokensCssFromJson(tokensJson.toString("utf8")),
+    ],
   ];
 }
 
@@ -552,7 +703,6 @@ async function brandOutputs(ref, fetchFile) {
 const SECTIONS = {
   definition: "definition",
   install: "install",
-  requirements: "requirements",
   quickStart: "quick-start",
   faq: "faq",
 };
@@ -578,6 +728,7 @@ export function buildSnapshot({
       rewriteLinks(extractSection(readme, marker), linkRef),
     ]),
   );
+  readmeData.requirements = rewriteLinks(extractRequirements(readme), linkRef);
   readmeData.features = extractFeatures(extractSection(readme, "features"));
   const { concepts, unlisted } = extractConcepts(glossary);
   const { release, changelog, unresolved } = releaseData(releases, {

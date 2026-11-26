@@ -1,6 +1,6 @@
 # Copy deck
 
-The site-owned words the build works from. Decided in [Copy deck: locked strings and page outlines](https://github.com/getoxide/website/issues/20), at the fidelity fixed by [Copy: what the spec locks and what the build writes](https://github.com/getoxide/website/issues/18). The hero, the home proof points and the H1, `<title>` and description of `/`, `/features`, `/claude-code-gui` and `/codex-gui` were rewritten in [Copy rewrite: hero, page titles and descriptions](https://github.com/getoxide/website/issues/27).
+The site-owned words the build works from. Updated to reflect Oxide's current architecture: Open Projects and plain terminals, the split Terminal | Code centre, Issues and Pull request Surfaces, and macOS, Windows and Linux (x64 and arm64) releases.
 
 Build issues **cite** this file; they never copy it. A change to a locked string is a PR to this file, approved by Lorenzo or Matteo.
 
@@ -19,21 +19,21 @@ A `⟨…⟩` token is never typed out: the build renders it from the committed 
 | Token | Renders | Source |
 | --- | --- | --- |
 | `⟨definition⟩` | The canonical definition | `site:definition` marker |
-| `⟨platforms⟩` | The supported platforms, e.g. "macOS on Apple Silicon and Windows x64" | Derived from the release assets in the snapshot: an `aarch64.dmg` means macOS on Apple Silicon, an `x64-setup.exe` means Windows x64. Before the first release, from the README Install table. |
-| `⟨requirements⟩` | The Provider table: Provider, command, install link | `site:requirements` marker |
-| `⟨version⟩`, `⟨release-date⟩` | Latest stable version and its date | `latest.json` in the snapshot |
-| `⟨asset-size:macos⟩`, `⟨asset-size:windows⟩` | Installer size | Release metadata in the snapshot |
+| `⟨platforms⟩` | The supported platforms, e.g. "macOS on Apple Silicon, Windows (x64, arm64) and Linux (x64, arm64)" | Derived from the release assets in the snapshot, or from the README Install table before any release exists. |
+| `⟨requirements⟩` | The Requirements section (`git`, optional `gh`) | `### Requirements` in the README |
+| `⟨version⟩`, `⟨release-date⟩` | Latest stable version and its date | GitHub release metadata in the snapshot |
+| `⟨asset-size:macos⟩`, `⟨asset-size:windows⟩`, `⟨asset-size:linux⟩` | Installer size | Release metadata in the snapshot |
 
 `[label](target)` marks a link. A target starting with `README#` points at that README section on GitHub at the pinned tag.
 
 ### Rules every string here follows
 
 1. The canonical definition is never reworded; where it appears, it is `⟨definition⟩`.
-2. None of the banned phrases from Copy (`copy-lint` rule 2) appears. [Copy rewrite: hero, page titles and descriptions](https://github.com/getoxide/website/issues/27) adds three superlatives to that list: "the most complete", "the best" and "the main app" (not bare "the main", which would match "the main branch"). "Complete" itself is allowed, in its absolute form only and only next to the loop that backs it: prompt, review, pull request and merge.
-3. "GUI" appears only on `/claude-code-gui`, `/codex-gui`, `/antigravity-gui` and in the derived `/faq#what-is-oxide`.
-4. Glossary terms are capitalised (Project, Thread, Turn, Provider, Surface, Checkpoint, Verification Dossier, Blind review, Restore, Revert, Line comment, Verification command, Risk signal, Approval, Permission mode). The **first** capitalised mention of one of the nine Concepts terms on a page links to `/docs/concepts#<term>`; that link is the build's job and is not marked below.
+2. None of the banned phrases from Copy (`copy-lint` rule 2) appears: "10x", "magic", "army of agents", "the only", "agentic engineering", "senior", "write code with Oxide", "code with Oxide", "Oxide writes code", "the most complete", "the best" and "the main app" (not bare "the main", which would match "the main branch").
+3. "GUI" never appears on any page.
+4. Glossary terms are capitalised (Project, Terminal, Command block, Surface, Files view, Code workspace, Session restore, In-app update, Package install, Open Project, Project palette, Terminals view, Settings). The **first** capitalised mention of one of the nine Concepts terms on a page links to `/docs/concepts#<term>`; that link is the build's job and is not marked below.
 5. Product facts (platforms, requirements, licence, telemetry, API key, version) are tokens or links, never typed out. Two hand-written exceptions: the footer trust line and the unsupported-platform line on `/download`. "Free" and "open-source" come from the canonical definition, so they count as identity and may appear in titles and descriptions; "MIT" is the licence fact and may not.
-6. Oxide drives the agents; the agent writes the code. Never "write code with Oxide".
+6. Oxide provides plain terminals; whatever runs in them uses its own CLI and login. Never "write code with Oxide".
 
 ## Metadata: every page
 
@@ -41,31 +41,28 @@ Rendered `<title>` follows the template `%s · Oxide` from [Machine-readable lay
 
 | Path | H1 | `<title>` | Meta description |
 | --- | --- | --- | --- |
-| `/` | The complete desktop app for agentic coding. *(frozen)* | Oxide: the complete desktop app for Claude Code and Codex *(frozen)* | Oxide drives Claude Code, Codex and Antigravity CLI through the whole loop in one desktop app: prompt, review each Turn, open the pull request and merge. |
-| `/features` | Everything between the prompt and the merge | Features: from the prompt to the merge · Oxide | Every Oxide feature, from the prompt to the merge: drive three agent CLIs, review each Turn and what actually ran, then open the pull request and merge it. |
-| `/claude-code-gui` | A Claude Code GUI from the first prompt to the merge | Claude Code GUI: an open-source desktop app · Oxide | Oxide is an open-source desktop GUI for Claude Code: keep your claude login and sessions, review each Turn, then open the pull request and merge in one window. |
-| `/codex-gui` | A Codex GUI that takes each change all the way to the merge | Codex GUI: a desktop app for the Codex CLI · Oxide | Is there a GUI for Codex? Oxide is an open-source desktop app that drives the codex CLI you already use, from the prompt to the pull request and the merge. |
-| `/antigravity-gui` | An Antigravity CLI GUI that takes each change all the way to the merge | Antigravity CLI GUI: a desktop app for agy · Oxide | Is there a GUI for Antigravity CLI? Oxide is an open-source desktop app that drives the agy CLI you already use, from the prompt to the pull request and merge. |
-| `/guides` | Guides | Guides · Oxide | Practical guides to reviewing what coding agents write: a method for AI-generated code, and using Claude Code and Codex together as writer and reviewer. |
-| `/guides/review-ai-generated-code` | How to review AI-generated code before you merge | How to review AI-generated code · Oxide | A four-step method to review AI-generated code: read one Turn at a time, check what actually ran, send feedback where it belongs, undo what you don't want. |
-| `/guides/claude-code-and-codex-together` | Claude Code and Codex together: one writes, the other reviews | Claude Code and Codex together, with Blind review · Oxide | Use Claude Code and Codex together: let one agent write the change and have the other review only the diff and the issue, never the original conversation. |
-| `/docs/quick-start` | Quick start | Quick start · Oxide | Install a Provider, open a Project, start a Thread, review the Turn in the Diff Surface, then commit, push and open the pull request. Oxide in five steps. |
-| `/docs/concepts` | Concepts | Concepts · Oxide | The words Oxide uses and what they mean: Project, Thread, Turn, Provider, Surface, Checkpoint, Verification Dossier, Blind review and Restore. |
-| `/faq` | Frequently asked questions | FAQ · Oxide | Answers about Oxide, the open-source desktop app for Claude Code and Codex: what it is, what it is not, where your code goes and how it differs. |
+| `/` | A terminal app that knows your GitHub projects. | Oxide: a desktop terminal app for your GitHub Projects | Open a Project, run as many plain terminals as you like in its folder, and keep your files, GitHub Issues and pull requests in the same window. |
+| `/features` | Everything around your terminals and GitHub | Features: terminals, code and GitHub · Oxide | Open Projects, run many plain terminals with Command blocks, edit files beside them, and handle GitHub Issues and pull requests without leaving Oxide. |
+| `/guides` | Guides | Guides · Oxide | Practical guides for Oxide: running coding agent CLIs side by side in plain terminals, and installing or updating Oxide on Linux with APT, DNF or AppImage. |
+| `/guides/running-agents-in-oxide` | Running Claude Code, Codex and any CLI in Oxide | Running Claude Code and Codex in Oxide · Oxide | Use Claude Code, Codex, Antigravity CLI or any shell tool side by side in Oxide's plain terminals, with your own shell config, code editor and GitHub tools. |
+| `/guides/linux-packages-and-updates` | Installing and updating Oxide on Linux | Linux packages and updates · Oxide | Install Oxide on Linux with AppImage, .deb or .rpm for x64 and arm64, configure the signed APT and DNF repositories, and verify every download. |
+| `/docs/quick-start` | Quick start | Quick start · Oxide | Check what Oxide needs, open a Project, start as many plain terminals as you like, browse Files and open Issues or pull requests in four steps. |
+| `/docs/concepts` | Concepts | Concepts · Oxide | The words Oxide uses and what they mean: Project, Terminal, Command block, Surface, Files view, Code workspace, Session restore and update channels. |
+| `/faq` | Frequently asked questions | FAQ · Oxide | Answers about Oxide, the open-source desktop terminal app for GitHub Projects: what it is, running agent CLIs in it, supported platforms and privacy. |
 | `/changelog` | Changelog | Changelog · Oxide | Every stable Oxide release, newest first: breaking changes, new features and fixes, with a link to the full release notes on GitHub for each version. |
-| `/download` | Download Oxide | Download · Oxide | Download the Oxide desktop app from GitHub Releases, verify the file, and connect the Claude Code, Codex or Antigravity CLI you already have installed. |
+| `/download` | Download Oxide | Download · Oxide | Download Oxide for macOS, Windows and Linux (x64 and arm64) from GitHub Releases, configure the signed APT or DNF repository, and verify the file. |
 | 404 | Page not found | Page not found · Oxide | *(none: not indexable, not in the sitemap)* |
 
 The home description deliberately does not repeat the canonical definition: the definition is already in the body below the hero and in the `SoftwareApplication` description. The home `<title>` is also the home `og:title`.
 
 ## Home
 
-### Hero *(frozen)*
+### Hero *(locked)*
 
-- **H1**: The complete desktop app for agentic coding.
-- **Subheadline**: Prompt, review, pull request and merge, with Claude Code, Codex and Antigravity CLI.
+- **H1**: A terminal app that knows your GitHub projects.
+- **Subheadline**: Open a folder, run as many clean shells as you like, and keep code, issues and pull requests at hand.
 
-The H1 and the subheadline are the share card's two lines, word for word ([Social and share assets](https://github.com/getoxide/website/issues/23)). They always travel together: the subheadline is the loop that backs "complete". The word "drives" is left to `⟨definition⟩` right below. If the hero changes, the card follows it.
+The H1 and the subheadline are the share card's two lines, word for word ([Social and share assets](https://github.com/getoxide/website/issues/23)). If the hero changes, the card follows it.
 - **Primary button** *(locked)*: Download Oxide → `/download`
 - **Secondary button** *(locked)*: View on GitHub → `https://github.com/getoxide/oxide` (event `github-cta`)
 - **Platform line** *(locked)*: `⟨platforms⟩` · Pre-release
@@ -74,25 +71,23 @@ Below the hero, centred: `⟨definition⟩`, then the trust line (fixed by [Page
 
 ### Proof points *(locked)*
 
-Section heading: **From prompt to merge**
+Section heading: **From Project to pull request**
 
-The four steps are the four words of the hero subheadline, in the order of the actual flow, because the visual direction draws them as a four-step path. The `/features` groups follow the same loop. Each step ends with a link labelled **Learn more** to its `/features` anchor. Its accessible name includes the heading ("Learn more about Review").
+Four steps in order, each ending with a link labelled **Learn more** to its `/features` anchor. Its accessible name includes the heading ("Learn more about Projects").
 
 | # | Heading | Sentence | Link |
 | --- | --- | --- | --- |
-| 1 | Prompt | Claude Code, Codex and Antigravity CLI side by side, each Thread a real session of the agent you already use, with the editor and terminal around it. | `/features#multiple-providers` |
-| 2 | Review | See what each Turn changed and which checks actually ran in the Verification Dossier, have a second Provider run a Blind review, and Restore what you don't want. | `/features#diff-by-turn` |
-| 3 | Pull request | Open the pull request without a browser, send Line comments to GitHub as a review, and hand failing checks and review threads back to the agent. | `/features#pull-requests` |
-| 4 | Merge | Merge when GitHub says it's ready, or turn on auto-merge once the checks pass, with the Verification Dossier published in the pull request body. | `/features#verification-dossier` |
-
-Steps 3 and 4 claim the in-app merge, auto-merge and Fix. They rest on the README lead-in **Pull requests, from review to merge.**, which [Align product positioning with the website's canonical definition](https://github.com/getoxide/oxide/issues/416) adds. The site does not ship these lines before the README has them.
+| 1 | Projects | Open any local Git repository or clone from GitHub; each Project keeps its own Terminals, open files and split layout. | `/features#open-projects` |
+| 2 | Terminals | Run a server, an agent CLI and a test watcher in plain shells owned by Core, with Warp-like Command blocks and Session restore. | `/features#many-terminals` |
+| 3 | Code | Browse a Project's Files view in the sidebar and open files in the Code workspace beside the Terminal, with on-demand language servers. | `/features#files` |
+| 4 | GitHub | Read and create Issues, open and review pull requests, check CI status and merge or enable auto-merge from the right dock Surfaces. | `/features#pull-requests` |
 
 ## Closing CTA block *(locked)*
 
 On every page except `/download`, identical everywhere ([Page inventory and site structure](https://github.com/getoxide/website/issues/9), internal linking rule 1).
 
-- **Heading**: Take your next Turn all the way to the merge.
-- **Sentence**: Oxide drives the Claude Code, Codex or Antigravity CLI you already use. Open a Project, start a Thread and review what comes back.
+- **Heading**: Open a folder and start a clean shell.
+- **Sentence**: Open a Project from the sidebar, run as many plain Terminals as you like, and keep your Files view, Issues and pull requests beside them.
 - **Primary button**: Download Oxide → `/download`
   - While the snapshot has no release at all (`none`, pre-launch previews only): **Get Oxide** → `/download`, so no button promises a download that does not exist.
 - **Secondary button**: View on GitHub → `https://github.com/getoxide/oxide` (event `github-cta`)
@@ -105,36 +100,35 @@ On every page except `/download`, identical everywhere ([Page inventory and site
 
 ## `/download`
 
-The block order is fixed by [Download experience and pre-release state](https://github.com/getoxide/website/issues/13): Provider requirement → buttons → signing note and verify link → unsupported-platform line. Then the page FAQ. Install, verify and unsigned-build detail stays in the README, linked.
+The block order is fixed by [Download experience and pre-release state](https://github.com/getoxide/website/issues/13): Requirements → buttons → Linux repositories → signing note and verify link → unsupported-platform line. Then the page FAQ.
 
 ### Reassurance lines *(locked)*
 
-**Bring your own agent** (above the buttons)
+**What Oxide needs** (above the buttons)
 
-- **Heading**: Bring your own agent
-- **Sentence**: Oxide doesn't ship an agent: it drives the one you already have. Install and log in to Claude Code, Codex or Antigravity CLI first; Oxide offers only the ones it finds.
-- Beside it: the three install links from `⟨requirements⟩`.
+- **Heading**: What Oxide needs
+- **Sentence**: `git` is required; the GitHub CLI (`gh`, logged in) is optional and enables Issues and pull requests. Anything else you run in a Terminal — Claude Code, Codex or any CLI — uses its own install and login.
 
-**Buttons** (labels from the download ticket; targets from the snapshot)
+**Buttons** (labels and targets from the snapshot)
 
 | State | Primary | Secondary | Line under the buttons |
 | --- | --- | --- | --- |
-| `stable` | Download for macOS *or* Download for Windows (the detected platform) | the other platform | Version `⟨version⟩` · `⟨release-date⟩` · [Release notes](/changelog) |
-| `prerelease-only` | Download test pre-release `⟨version⟩` | the other platform | This is a test pre-release: it never reaches the in-app updater. [Build from source](README#build-from-source) for the latest code. |
+| `stable` | Download for macOS / Download for Windows / Download for Linux (the detected platform first) | the other platforms | Version `⟨version⟩` · `⟨release-date⟩` · [Release notes](/changelog) |
+| `prerelease-only` | Download for macOS / Download for Windows / Download for Linux (the detected platform first) | the other platforms | Test pre-release `⟨version⟩`: it never reaches the in-app updater or the APT and DNF repositories. [Build from source](README#build-from-source) for the latest code. |
 | `none` | Follow on GitHub → repository (event `github-cta`) | Build from source → `README#build-from-source` | No release yet. Oxide is pre-release software; follow the repository to hear about the first one. |
 
-Each platform button carries a sublabel: macOS "Apple Silicon · .dmg · `⟨asset-size:macos⟩`", Windows "x64 · installer · `⟨asset-size:windows⟩`".
+Each primary platform button carries a sublabel: macOS "Apple Silicon · .dmg · `⟨asset-size:macos⟩`", Windows "x64 · installer · `⟨asset-size:windows⟩`", Linux "x64 · AppImage · `⟨asset-size:linux⟩`". Additional builds (Windows arm64, Linux `.deb` and `.rpm` for x64 and arm64, and Linux arm64 AppImage) are listed directly underneath.
 
 **Signing note** (under the buttons)
 
 - **macOS**: macOS blocks the first launch because the build isn't notarized yet. Open it once, then choose **Open Anyway** in System Settings → Privacy & Security. [Full steps](README#opening-an-unsigned-build)
-  - True only until notarization ([oxide#417](https://github.com/getoxide/oxide/issues/417)). When it lands, this line and the `#macos-cant-be-opened` FAQ answer change in the same PR. No snapshot flag.
 - **Windows**: SmartScreen may warn on first run. Choose **More info → Run anyway** after verifying the file. [Full steps](README#opening-an-unsigned-build)
-- **Verify link**: [Verify your download](README#verifying-a-download) with `SHA256SUMS.txt` and the build attestation.
+- **Linux**: The `.rpm` is signed with the Oxide repository key and the `.deb` is covered by the signed APT `InRelease`; the AppImage is unsigned. Requires WebKitGTK 4.1. [Full steps](README#opening-an-unsigned-build)
+- **Verify link**: [Verify your download](README#verifying-a-download) with SHA-256 checksums and the build attestation.
 
 **Unsupported platforms** (one quiet line)
 
-- Linux, Intel Macs and Windows on ARM aren't packaged yet. [Build from source](README#build-from-source).
+- Intel Macs aren't packaged yet. [Build from source](README#build-from-source).
   - Hand-written exception to rule 5: nothing in the snapshot lists what is *not* supported.
 
 ### Page FAQ *(locked)*
@@ -145,182 +139,68 @@ Each question is an H3 with an anchor; answers are plain text, never collapsed. 
 Oxide's macOS builds aren't notarized by Apple yet, so Gatekeeper stops the first launch. Open the app once, then go to System Settings → Privacy & Security and choose Open Anyway. You only do this once; updates installed through Oxide are unaffected. [Full steps](README#opening-an-unsigned-build).
 
 **How do I check that the download is genuine?** `#verify-download`
-Every release ships a `SHA256SUMS.txt` and a build-provenance attestation that ties each file to the workflow run and commit that built it. Check the hash, or run `gh attestation verify` on the file. [Commands for macOS and Windows](README#verifying-a-download).
+Every release lists SHA-256 checksums in its release notes and ships a build-provenance attestation that ties each file to the workflow run and commit that built it. Check the hash, or run `gh attestation verify` on the file. [Commands for every platform](README#verifying-a-download).
 
-**Which agent should I install first?** `#which-agent`
-Any one of Claude Code, Codex or Antigravity CLI is enough, installed and logged in before you launch Oxide. Add the others whenever you like: Oxide offers every Provider it finds, and you choose one per Thread. [Requirements](/docs/quick-start#requirements).
+**How do Linux packages and updates work?** `#linux-packages`
+Linux builds ship as AppImage, `.deb` and `.rpm` for both x64 and arm64. The AppImage uses In-app update, while a Package install updates through the signed APT and DNF repositories. [Linux installation guide](/guides/linux-packages-and-updates).
 
 **How do I stay up to date?** `#updates`
-Oxide updates itself from Settings → Updates and offers only stable releases; test pre-releases never reach the updater. New versions and what changed are on the [changelog](/changelog). [How updates work](README#updates).
+On macOS, Windows and the Linux AppImage, Oxide checks for updates automatically and installs them from the titlebar or Settings → Updates. Test pre-releases never reach the stable APT and DNF repositories. New versions and what changed are on the [changelog](/changelog). [How updates work](README#updates).
 
 ## `/features` *(outline)*
 
-**H1**: Everything between the prompt and the merge *(locked, above)*
+**H1**: Everything around your terminals and GitHub *(locked, above)*
 
-**Intro key sentence**: Oxide drives the agent CLIs you already use and puts the review, the checks and the undo next to the conversation, so a finished Turn becomes a merge you can stand behind.
+**Intro key sentence**: Oxide gives every GitHub Project a clean set of plain terminals, a side-by-side code editor and GitHub tools in one window.
 
 ### The feature-name contract
 
-One section per README Features lead-in, no more, no fewer. The **lead-in** column is the contract key the test compares with the `site:features` snapshot; the **heading** is what the page shows; the **anchor** is published and stable. The groups come from [Page inventory and site structure](https://github.com/getoxide/website/issues/9). Their order follows the loop, as decided in [Copy rewrite: hero, page titles and descriptions](https://github.com/getoxide/website/issues/27): the agents first, then review through to the merge, then the workspace.
+One section per README Features lead-in, no more, no fewer. The **lead-in** column is the contract key the test compares with the `site:features` snapshot; the **heading** is what the page shows; the **anchor** is published and stable.
 
-#### Group 1: One app, every agent CLI
+#### Group 1: Projects and plain terminals
 
-Group key sentence: The agents keep doing the work; Oxide gives them one window.
-
-| README lead-in | Heading | Anchor | Key sentences |
-| --- | --- | --- | --- |
-| Multiple Providers. | Claude Code, Codex and Antigravity CLI | `#multiple-providers` | Use the three side by side. Oxide detects which ones are installed and offers only those. |
-| Threads. | Threads | `#threads` | Each Thread is one conversation with one Provider, mapped one-to-one to that Provider's own session, with its own Model and Effort. |
-| Permission modes. | Permission modes and Approvals | `#permission-modes` | Choose Ask, Auto-edit or Full access per Thread and answer Approvals inline. The Attention Center collects every Thread waiting on you, across Projects. |
-| Slash commands, attachments and usage limits. | Slash commands, attachments and usage limits | `#slash-commands` | Each Provider's Slash commands and skills in the composer, files and images in the prompt, and the usage limits your Provider reports. |
-| Worktrees. | Worktrees | `#worktrees` | A Thread can work in its own Git worktree, with an optional setup command per Project, so parallel work never collides. Never the lead of the page. |
-
-#### Group 2: Review before you merge
-
-Group key sentence: The part most agent tools leave to you: seeing what changed, what was checked and what stayed unverified.
+Group key sentence: Open a Project, open as many clean shells as you like in its folder, and run whatever you want in them.
 
 | README lead-in | Heading | Anchor | Key sentences |
 | --- | --- | --- | --- |
-| Verification Dossier. | Verification Dossier | `#verification-dossier` | Which Verification commands ran and whether they're still fresh, which languages no check covers, source changed without a test change, sensitive paths. Computed without an LLM, shown as separate signals, never a score; the agent's closing message stays apart as a claim. Links to the [review guide](/guides/review-ai-generated-code). |
-| Blind review. | Blind review | `#blind-review` | A second Provider reviews the change seeing only the diff and the issue, never the original Thread. Its findings become Line comments you keep or dismiss. Links to the [Claude Code and Codex guide](/guides/claude-code-and-codex-together). |
-| Diff by Turn, Uncommitted or Branch. | Diff by Turn | `#diff-by-turn` | See exactly what one Turn changed, thanks to Checkpoints taken when it starts and ends. Switch to everything uncommitted or the whole branch. |
-| Line comments. | Line comments | `#line-comments` | Comment on any line of the Diff and send the comments back to the Thread as one prompt, or submit them to GitHub as a pull request review. |
-| Revert and Restore. | Revert and Restore | `#restore` | Revert takes out one file or hunk; Restore puts a Thread's files back to how they were before any Turn. Both can be undone. |
-| Rule suggestions. | Rule suggestions | `#rule-suggestions` | Feedback you keep giving becomes a proposed rule for the Project's `AGENTS.md`. |
-| Pull requests, from review to merge. | Pull requests | `#pull-requests` | Open the pull request from the Pull request Surface and submit Line comments to GitHub as a review. Fix sends failing checks, conflicts and the review threads you pick back to the agent, in the branch's Thread or a new one. Merge, squash or rebase when GitHub says it's ready, or turn on auto-merge while checks run. |
+| Open Projects. | Open Projects | `#open-projects` | The sidebar lists the Open Projects and, under each, its Terminals. A New terminal control on a Project opens a fresh shell already in its folder. |
+| Many terminals. | Many terminals | `#many-terminals` | Run a server, an agent CLI and a test watcher side by side. The selected Terminal fills the centre; switching keeps each one's scrollback, working directory and running process. |
+| Command blocks. | Command blocks | `#command-blocks` | The Warp-like grouping of command, output and exit status. Each Command block belongs to a persistent shell session. |
 
-#### Group 3: A full workspace around the conversation
+#### Group 2: GitHub at hand
 
-Group key sentence: Everything the review needs, without a second app open.
+Group key sentence: Browse files, edit code beside your terminal and handle GitHub Issues and pull requests without leaving the window.
 
 | README lead-in | Heading | Anchor | Key sentences |
 | --- | --- | --- | --- |
-| Git and GitHub. | Git and GitHub | `#git-and-github` | Branches, commit and push, and Issues, through `git` and the GitHub CLI. Pull requests have their own section, [Pull requests](#pull-requests). |
-| Code editor. | Code editor | `#code-editor` | A Monaco editor with language servers, installed on first use and only when you press Install. |
-| Terminal. | Terminal | `#terminal` | Terminal tabs per Project with Command blocks, kept alive while you switch Threads. |
-| Local dictation. | Local dictation | `#dictation` | Speak into the composer or the terminal; on-device Whisper models, and the audio never leaves your machine. |
-| Keyboard first. | Keyboard first | `#keyboard` | Full keyboard navigation, themes and reduced-motion support. |
+| Issues. | Issues | `#issues` | List, read and create GitHub Issues for the Project through the GitHub CLI, with labels, sub-issues and the Activity Timeline. |
+| Pull requests. | Pull requests | `#pull-requests` | List, read, create, review and merge pull requests, check CI status, or turn on auto-merge while checks run. |
+| Files. | Files and Code workspace | `#files` | Browse the Project's folder from the Files view on its sidebar row and open a file in the Code workspace beside the Terminal, with on-demand language servers. |
 
 Capture captions are constraints-only: the build writes them, describing what the real capture shows.
 
-## `/claude-code-gui` *(outline + locked FAQ)*
+## `/guides/running-agents-in-oxide` *(outline)*
 
-**Job**: people who use `claude` in a terminal and look for a GUI. Distinct content from `/codex-gui`: this page leads with the Turn (what one prompt changed, and undoing it).
+**Job**: people who want to run `claude`, `codex`, `agy` or other CLI tools in Oxide now that Terminals are plain shells.
 
-**Intro** (directly under the H1): key sentence "Oxide is a desktop GUI for the `claude` CLI you already have: the same login, the same sessions, with each Turn's changes and checks in view." Then `⟨definition⟩`.
-
-| Section heading | Key sentences |
-| --- | --- |
-| What Oxide adds to Claude Code | Every Turn gets its own diff, so you read what one prompt changed instead of scrolling a transcript. The [Verification Dossier](/features#verification-dossier) shows which checks actually ran, and Line comments go back to Claude Code as one prompt. |
-| What stays the same | Claude Code still does the work, with your login and your plan. Each Thread maps one-to-one to a Claude Code session, and its Slash commands and skills are in the composer. |
-| Undo a Turn, not just a file | Restore puts the files back to how they were before any Turn, and the Restore itself can be undone. Claude Code is told on its next prompt which files went back. |
-| Let another Provider review it | Have Codex or Antigravity CLI review Claude Code's change in a [Blind review](/features#blind-review), seeing only the diff and the issue. Links to [Claude Code and Codex together](/guides/claude-code-and-codex-together). |
-| GUI or terminal? | The terminal is still the fastest way to fire off a prompt. A GUI pays off at review time: per-Turn diffs, the Dossier, comments on lines and the pull request in one window. Links to [How to review AI-generated code](/guides/review-ai-generated-code). |
-
-### Page FAQ *(locked)*
-
-**Do I need Claude Code installed first?** `#install-claude-code-first`
-Yes. Oxide drives the `claude` CLI; it doesn't replace it. Install Claude Code and log in once in a terminal, then launch Oxide and it shows up as a Provider. [Requirements](/docs/quick-start#requirements).
-
-**Can I keep using my Slash commands and skills?** `#slash-commands-and-skills`
-Yes. The composer lists Claude Code's own Slash commands and skills, because the Thread is a real Claude Code session, not an imitation of one.
-
-**How do permission modes map to Claude Code?** `#permission-modes`
-Each Thread runs in Ask, Auto-edit or Full access, and you can change the mode between Turns. When Claude Code asks for an Approval, you answer it inline; the Attention Center lists every Thread waiting on you.
-
-**Does Oxide work with Claude Code on Windows?** `#windows`
-Yes. Oxide runs on `⟨platforms⟩`, and on Windows it drives the `claude` CLI installed there, with the same Diff, Dossier and Restore as on macOS.
-
-**What happens to my Claude Code sessions?** `#sessions`
-Each Thread maps one-to-one to a Claude Code session. Deleting a Thread removes Oxide's own record of it (Transcript, Checkpoints, worktree) and leaves Claude Code's session files alone.
-
-## `/codex-gui` *(outline + locked FAQ)*
-
-**Job**: people who use `codex` in a terminal and wonder whether a GUI exists. Distinct content from `/claude-code-gui`: this page leads with the gap between what the agent says and what actually ran, and with using Codex alongside Claude Code.
-
-**Intro**: key sentence "Yes, there is a GUI for Codex: Oxide drives the `codex` CLI you already use and shows which checks actually ran before you merge." Then `⟨definition⟩`.
+**Intro key sentence**: Oxide does not know about agents: every Terminal is a plain shell, so you run `claude`, `codex` or any CLI tool the same way you do outside Oxide.
 
 | Section heading | Key sentences |
 | --- | --- |
-| "Tests pass" is a claim | Codex's closing message says what it believes it did. The [Verification Dossier](/features#verification-dossier) keeps that message apart and shows which Verification commands actually ran, which are stale and what no check covers. |
-| Codex next to Claude Code | Run Codex and Claude Code in the same Project, one Thread each, each with its own Model and Effort. Let one write and the other run a [Blind review](/features#blind-review). Links to [Claude Code and Codex together](/guides/claude-code-and-codex-together). |
-| What stays the same | Codex still does the work, with your login and your plan. Its Slash commands are in the composer, and the usage limits Codex reports are shown next to the Thread. |
-| From the diff to the pull request | Review the change, leave Line comments, commit, push and open the pull request without switching to a browser. Links to [How to review AI-generated code](/guides/review-ai-generated-code). |
+| Why plain shells | A Terminal is your own zsh, bash or PowerShell with your startup files, aliases and PATH intact. Oxide adds no launch flags, prompts or wrappers around what runs inside it. |
+| Running Claude Code and Codex side by side | Open as many Terminals as you need under one Project: run `claude` in one, `codex` in another and a test watcher in a third, with Session restore keeping your recent Command blocks across restarts. |
+| Code and GitHub next to the shell | Open the Files view from the Project row to inspect or edit files in the Code workspace beside the Terminal, then use the Issues and Pull request Surfaces in the right dock. |
+| Terminal priority for shortcuts | When a Terminal has focus, bare `Ctrl+<letter>` and terminal control keys like `Ctrl+C`, `Ctrl+D` and `Ctrl+R` go straight to the PTY unless explicitly rebound in Settings. |
 
-### Page FAQ *(locked)*
+## `/guides/linux-packages-and-updates` *(outline)*
 
-**Do I need the Codex CLI installed first?** `#install-codex-first`
-Yes. Oxide drives the `codex` CLI rather than replacing it. Install Codex, log in once in a terminal, then launch Oxide and Codex appears as a Provider. [Requirements](/docs/quick-start#requirements).
+**Job**: people installing and updating Oxide on Linux across AppImage, `.deb` (APT) and `.rpm` (DNF) for x64 and arm64.
 
-**Can I choose the Codex model and reasoning effort?** `#model-and-effort`
-Yes. Every Thread has its own Model and Effort, picked when you start it and changeable between Turns.
-
-**Does Oxide show my Codex usage limits?** `#usage-limits`
-Yes, when Codex reports them: the 5-hour and weekly limits appear in the app, so you see how much is left before you start a long Turn.
-
-**Does Oxide work with Codex on Windows?** `#windows`
-Yes. Oxide runs on `⟨platforms⟩`, and on Windows it drives the `codex` CLI installed there.
-
-**Can Claude Code review what Codex wrote?** `#claude-code-reviews-codex`
-Yes. Start a Blind review and pick Claude Code as the reviewer: it sees only the diff and the issue, never the Codex conversation, and its findings become Line comments you keep or dismiss. [The full workflow](/guides/claude-code-and-codex-together).
-
-## `/antigravity-gui` *(outline + locked FAQ)*
-
-**Job**: people who use `agy` in a terminal and wonder whether a GUI exists. Distinct content from the other two Provider pages: this page leads with seeing what the agent changed Turn by Turn, and with using Antigravity CLI next to the other Providers.
-
-**Intro**: key sentence "Yes, there is a GUI for Antigravity CLI: Oxide drives the `agy` CLI you already use and shows what each Turn changed and which checks actually ran." Then `⟨definition⟩`.
+**Intro key sentence**: Oxide ships official Linux builds for x64 and arm64 as AppImage, `.deb` and `.rpm`, with signed APT and DNF repositories for updates.
 
 | Section heading | Key sentences |
 | --- | --- |
-| What Oxide adds to Antigravity CLI | Every Turn gets its own diff, so you read what one prompt changed instead of scrolling a transcript. The [Verification Dossier](/features#verification-dossier) shows which checks actually ran, which are stale and what no check covers. |
-| Antigravity CLI next to the others | Run Antigravity CLI, Claude Code and Codex in the same Project, one Thread each, each with its own Model. Let one write and another run a [Blind review](/features#blind-review). Links to [Claude Code and Codex together](/guides/claude-code-and-codex-together). |
-| What stays the same | Antigravity CLI still does the work, with your login and your plan. Each Thread is a real `agy` session, and the usage limits it reports are shown next to the Thread. |
-| From the diff to the pull request | Review the change, leave Line comments, commit, push and open the pull request without switching to a browser. Links to [How to review AI-generated code](/guides/review-ai-generated-code). |
-
-### Page FAQ *(locked)*
-
-**Do I need Antigravity CLI installed first?** `#install-antigravity-first`
-Yes. Oxide drives the `agy` CLI rather than replacing it. [Install Antigravity](https://antigravity.google/download), log in once in a terminal, then launch Oxide and Antigravity CLI appears as a Provider. [Requirements](/docs/quick-start#requirements).
-
-**Can I choose the Antigravity model?** `#model`
-Yes. Every Thread has its own Model, picked when you start it and changeable between Turns.
-
-**Does Oxide show my Antigravity usage limits?** `#usage-limits`
-Yes, when Antigravity CLI reports them: they appear in the app, so you see how much is left before you start a long Turn.
-
-**Does Oxide work with Antigravity CLI on Windows?** `#windows`
-Yes. Oxide runs on `⟨platforms⟩`, and on Windows it drives the `agy` CLI installed there.
-
-**Can Antigravity CLI review what Claude Code wrote?** `#antigravity-reviews-claude-code`
-Yes. Start a Blind review and pick Antigravity CLI as the reviewer: it sees only the diff and the issue, never the original conversation, and its findings become Line comments you keep or dismiss. [The full workflow](/guides/claude-code-and-codex-together).
-
-## `/guides/review-ai-generated-code` *(outline)*
-
-**Job**: the review method for the query "how to review AI-generated code". The method stands on its own; Oxide is the tool that puts each step one click apart, never the premise.
-
-**Intro key sentence**: An agent's summary tells you what it believes it did. Reviewing AI-generated code means checking what it actually changed and what actually ran, one Turn at a time.
-
-| Section heading | Key sentences |
-| --- | --- |
-| Treat the summary as a claim | "Done, tests pass" is a sentence, not evidence. Start from the diff and the commands that ran, and read the summary last. |
-| 1. Read one Turn at a time | A Turn is one prompt and everything the agent did in response. Reviewing per Turn keeps each diff small enough to read; in Oxide, Checkpoints make each Turn's diff exact ([Diff by Turn](/features#diff-by-turn)). |
-| 2. Check what actually ran | Look for which tests, type checks and builds ran after the last edit, which went stale, and which languages or paths no check covers. That is what the [Verification Dossier](/features#verification-dossier) computes, without an LLM. |
-| 3. Send feedback where it belongs | Comments on lines, not paragraphs of chat. Send them back to the agent as one prompt, or to the pull request as a review ([Line comments](/features#line-comments)). |
-| 4. Undo what you don't want | Take out one hunk or one file, or put everything back to before a Turn, and keep the rest ([Revert and Restore](/features#restore)). |
-| Before you merge | A short checklist: every Turn read, every Risk signal looked at, checks fresh on the final commit. Optionally publish the Dossier in the pull request body so reviewers see the same evidence. |
-| Going further: a second reviewer | One paragraph pointing to [Claude Code and Codex together](/guides/claude-code-and-codex-together). |
-
-## `/guides/claude-code-and-codex-together` *(outline)*
-
-**Job**: the query "claude code and codex together" and "have Codex review Claude Code". Honest about cost and about doing it without Oxide.
-
-**Intro key sentence**: Claude Code and Codex are different agents with different blind spots. Let one write the change and have the other review it, seeing only the diff and the issue.
-
-| Section heading | Key sentences |
-| --- | --- |
-| Why a second agent | A reviewer that didn't write the change, from a different model, catches what the author's context hides. |
-| Why the reviewer works blind | A reviewer that reads the original conversation inherits its assumptions. Given only the diff and the issue, it judges the change on its own terms. That is a [Blind review](/features#blind-review). |
-| Set it up | Both Providers installed and logged in. One Thread with the writer; when its Turn finishes, start a Blind review and pick the other Provider. |
-| Read the findings | The reviewer's findings arrive as Line comments on the Diff. Keep the ones that hold up, dismiss the rest, and send the kept ones back to the writer as one prompt. |
-| When it's worth it | A Blind review spends usage on a second Provider. Use it where it pays: changes that touch sensitive paths, trigger Risk signals, or lack tests. |
-| Without Oxide | You can do this by hand: give the second agent a fresh session with only the diff and the issue, and paste its findings back. Oxide removes the copying and keeps the reviewer from seeing the conversation. |
+| Choose your package format | Pick an AppImage if you want a portable binary with In-app update, or install the `.deb` or `.rpm` Package install so your system package manager handles upgrades. |
+| Signed APT repository (Debian, Ubuntu) | Add the Oxide repository key and source list once, then install and upgrade `oxide` through `apt` on x64 or arm64. |
+| Signed DNF repository (Fedora, RHEL, openSUSE) | Add `/etc/yum.repos.d/oxide.repo` once and install `oxide` with `dnf`; `dnf` imports the repository key on first use and checks both packages and metadata. |
+| Verifying downloads and requirements | Every release lists SHA-256 checksums and build-provenance attestations; Linux builds require WebKitGTK 4.1 (`libwebkit2gtk-4.1`). |

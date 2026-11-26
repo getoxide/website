@@ -104,34 +104,15 @@ describe("lintCopy: banned phrases", () => {
 });
 
 describe("lintCopy: GUI", () => {
-  const gui = `<p>A desktop GUI for agents.</p>`;
+  const gui = `<p>A desktop GUI for terminals.</p>`;
   const ruleBroken = (path) =>
-    `${path}: "GUI" outside /claude-code-gui, /codex-gui, /antigravity-gui and /faq#what-is-oxide in "A desktop GUI for agents."`;
+    `${path}: "GUI" is not allowed in "A desktop GUI for terminals."`;
 
-  it("fails GUI on any other page", () => {
+  it("fails GUI on every page", () => {
     expect(lint("/changelog", html({ main: gui }))).toEqual([
       ruleBroken("/changelog"),
     ]);
-  });
-
-  it("allows GUI on the three Provider pages", () => {
-    expect(lint("/claude-code-gui", html({ main: gui }))).toEqual([]);
-    expect(lint("/codex-gui", html({ main: gui }))).toEqual([]);
-    expect(lint("/antigravity-gui", html({ main: gui }))).toEqual([]);
-  });
-
-  it("allows GUI in the /faq answer to What is Oxide?, and only there", () => {
-    const section = (id, body) =>
-      `<section aria-labelledby="${id}"><h2 id="${id}">Q</h2>${body}</section>`;
-    expect(lint("/faq", html({ main: section("what-is-oxide", gui) }))).toEqual(
-      [],
-    );
-    expect(lint("/faq", html({ main: section("is-it-free", gui) }))).toEqual([
-      ruleBroken("/faq"),
-    ]);
-    expect(
-      lint("/changelog", html({ main: section("what-is-oxide", gui) })),
-    ).toEqual([ruleBroken("/changelog")]);
+    expect(lint("/faq", html({ main: gui }))).toEqual([ruleBroken("/faq")]);
   });
 
   it("fails GUIs and lowercase gui too, but not words that contain it", () => {
