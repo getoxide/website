@@ -10,7 +10,7 @@ import styles from "./guides.module.css";
 export const metadata = pageMetadata(PAGES.guides);
 
 /** A decorative icon per guide, in the order of `GUIDES`. */
-const ICONS = ["terminal", "package"];
+const ICONS = ["terminal", "cpu", "code", "git-pull-request", "package"];
 
 /**
  * `/guides`: an index of the two guides, nothing else (ticket #42). No dates

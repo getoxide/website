@@ -46,6 +46,16 @@ test("the app preview can be explored: terminals, files/code, issues, PR merge, 
   await preview.scrollIntoViewIfNeeded();
   await expect(preview).toHaveAttribute("data-ready", "");
 
+  // Open Project palette and switch back
+  await preview.getByRole("button", { name: "Open a Project" }).click();
+  const palette = preview.getByRole("dialog", { name: "Project palette" });
+  await expect(palette).toBeVisible();
+  await palette.getByRole("button", { name: /oxide-docs/ }).click();
+  await expect(preview.getByText("pnpm check:copy")).toBeVisible();
+  await preview
+    .getByRole("button", { name: "acme-billing", exact: true })
+    .click();
+
   // Switch Terminal to tests
   await preview.getByRole("button", { name: "tests" }).click();
   await expect(preview.getByText("pnpm test --watch")).toBeVisible();
@@ -60,7 +70,7 @@ test("the app preview can be explored: terminals, files/code, issues, PR merge, 
   await expect(preview.getByText("Merged into main")).toBeVisible();
 
   // Switch to Issues Surface
-  await preview.getByRole("button", { name: "Issues" }).click();
+  await preview.getByRole("tab", { name: "Issues" }).click();
   await expect(
     preview.getByText("Invoice webhooks are lost when the endpoint is down"),
   ).toBeVisible();

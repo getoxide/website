@@ -2,7 +2,7 @@
   "output": "public/og.png",
   "width": 1200,
   "height": 630,
-  "headline": "A terminal app that knows your GitHub projects.",
+  "headline": "The complete desktop app for agentic coding.",
   "subline": "Open a folder, run as many clean shells as you like, and keep code, issues and pull requests at hand.",
   "inputs": [
     "src/lib/hero-shader.ts",
@@ -12,7 +12,7 @@
     "src/fonts/inter-latin-wght-normal.woff2",
     "scripts/og-card.mjs"
   ],
-  "hash": "a287323ae9afae2099078799dba782023c2e87041da2d7be54b2966fcef28d2d",
-  "cardSha256": "3e41b69c2dccf012ccbd17ff9be7e371800373554f818f9ac5158b3b5e93b3e0",
+  "hash": "94695ec926b40f852b0fa4cab94db34328ad4abefef2e15352bcd4e7ebb70444",
+  "cardSha256": "90ae7997eec07c9b8a0d25f4ccd0821e1c8641546e1b2fac0deda046979cba28",
   "generatedBy": "pnpm og:card (scripts/og-card.mjs)"
 }

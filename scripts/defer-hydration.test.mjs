@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   deferClientScripts,
+  inlineSuspenseTemplates,
   loader,
   MAX_WAIT,
   parsesClientRuntime,
@@ -124,5 +125,25 @@ describe("loader", () => {
     return Promise.resolve().then(() => {
       expect(added).toEqual(["/_next/a.js", "/_next/b.js"]);
     });
+  });
+});
+
+describe("inlineSuspenseTemplates", () => {
+  const STREAMED = `<!DOCTYPE html><html><body><div class="shot"><!--$?--><template id="B:0"></template><!--/$--></div><div hidden id="S:0"><figure><div>nested</div></figure></div><script>$RC=function(b,c){};$RC("B:0","S:0")</script></body></html>`;
+
+  it("inlines resolved Suspense templates with nested divs and drops $RC", () => {
+    const html = inlineSuspenseTemplates(STREAMED);
+    expect(html).toContain(
+      '<div class="shot"><!--$--><figure><div>nested</div></figure><!--/$--></div>',
+    );
+    expect(html).not.toContain('id="S:0"');
+    expect(html).not.toContain('id="B:0"');
+    expect(html).not.toContain("$RC(");
+  });
+
+  it("is a no-op when there are no Suspense templates and is idempotent", () => {
+    expect(inlineSuspenseTemplates(PAGE)).toBe(PAGE);
+    const once = inlineSuspenseTemplates(STREAMED);
+    expect(inlineSuspenseTemplates(once)).toBe(once);
   });
 });

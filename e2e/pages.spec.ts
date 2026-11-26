@@ -59,12 +59,12 @@ test.describe("every registered page", () => {
           ['meta[property="og:image:height"]', "630"],
           [
             'meta[property="og:image:alt"]',
-            "Oxide: A terminal app that knows your GitHub projects.",
+            "Oxide: The complete desktop app for agentic coding.",
           ],
           ['meta[name="twitter:image"]', `${PROD}/og.png`],
           [
             'meta[name="twitter:image:alt"]',
-            "Oxide: A terminal app that knows your GitHub projects.",
+            "Oxide: The complete desktop app for agentic coding.",
           ],
         ] as const) {
           await expect(meta(selector), selector).toHaveAttribute(
@@ -126,13 +126,13 @@ test.describe("home", () => {
   }) => {
     await page.goto("/");
     await expect(page.locator("h1")).toHaveText(
-      "A terminal app that knows your GitHub projects.",
+      "The complete desktop app for agentic coding.",
     );
     const sections = page.locator("main > section");
     // Hero, definition line, proof path, closing CTA.
     await expect(sections).toHaveCount(4);
     await expect(sections.first()).toContainText(
-      "A terminal app that knows your GitHub projects.",
+      "The complete desktop app for agentic coding.",
     );
     await expect(sections.first()).toContainText(
       "Open a folder, run as many clean shells as you like, and keep code, issues and pull requests at hand.",

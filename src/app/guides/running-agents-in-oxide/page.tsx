@@ -3,7 +3,7 @@ import { GUIDES } from "@/content/guides";
 import { PAGES } from "@/content/pages";
 import { pageMetadata } from "@/lib/metadata";
 
-const guide = GUIDES[0];
+const guide = GUIDES.find((g) => g.page.path === PAGES.guidesAgents.path)!;
 
 export const metadata = pageMetadata(PAGES.guidesAgents);
 

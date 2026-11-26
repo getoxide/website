@@ -97,7 +97,6 @@ export function SiteFooter({ path }: { path: string }) {
           </p>
           <div className={styles.disclaimers}>
             <p>{footer.notAffiliated}</p>
-            <p>{footer.trademarks}</p>
           </div>
         </div>
       </div>

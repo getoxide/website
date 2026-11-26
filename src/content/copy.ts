@@ -63,8 +63,6 @@ export const COPY = {
     trustLine: "Free and open source (MIT) · Local · No account · No telemetry",
     repo: { label: "getoxide/oxide", href: GITHUB_REPO_URL },
     notAffiliated: "Not affiliated with Oxide Computer Company",
-    trademarks:
-      "Claude Code, Codex and Antigravity are trademarks of their respective owners; Oxide is not affiliated with or endorsed by Anthropic, OpenAI or Google",
     madeBy: {
       lead: "Made by",
       and: "and",
@@ -215,20 +213,16 @@ export const COPY = {
       heading: "Linux package repositories",
       lead: "For `.deb` and `.rpm` installs on x64 and arm64, add the signed APT or DNF repository once and upgrade through your package manager:",
       aptTitle: "APT (Debian, Ubuntu)",
-      aptSnippet: [
-        "```sh",
+      aptCode: [
         "sudo install -d -m 0755 /usr/share/keyrings",
         "curl -fsSL https://updates.getoxide.dev/apt/oxide-repository.gpg | sudo tee /usr/share/keyrings/oxide.gpg > /dev/null",
         'echo "deb [signed-by=/usr/share/keyrings/oxide.gpg] https://updates.getoxide.dev/apt/ ./" | sudo tee /etc/apt/sources.list.d/oxide.list',
         "sudo apt update && sudo apt install oxide",
-        "```",
       ].join("\n"),
       dnfTitle: "DNF (Fedora, RHEL, openSUSE)",
-      dnfSnippet: [
-        "```sh",
+      dnfCode: [
         "sudo curl -fsSL -o /etc/yum.repos.d/oxide.repo https://updates.getoxide.dev/rpm/oxide.repo",
         "sudo dnf install oxide",
-        "```",
       ].join("\n"),
     },
     /** Under the buttons. */

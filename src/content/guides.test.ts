@@ -46,9 +46,12 @@ const mentioned = (text: string) =>
     .map((concept) => concept.term);
 
 describe("the guide pages", () => {
-  it("covers exactly the two deck guides, in the deck's order", () => {
+  it("covers exactly the five deck guides, in the deck's order", () => {
     expect(GUIDES.map((guide) => guide.page.path)).toEqual([
+      "/guides/working-with-projects-and-terminals",
       "/guides/running-agents-in-oxide",
+      "/guides/code-workspace-and-language-servers",
+      "/guides/github-issues-and-pull-requests",
       "/guides/linux-packages-and-updates",
     ]);
   });

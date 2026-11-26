@@ -33,7 +33,7 @@ export type Page = {
 export const PAGES = {
   home: {
     path: "/",
-    h1: "A terminal app that knows your GitHub projects.",
+    h1: "The complete desktop app for agentic coding.",
     title: "Oxide: a desktop terminal app for your GitHub Projects",
     description:
       "Open a Project, run as many plain terminals as you like in its folder, and keep your files, GitHub Issues and pull requests in the same window.",
@@ -58,9 +58,20 @@ export const PAGES = {
     h1: "Guides",
     title: "Guides · Oxide",
     description:
-      "Practical guides for Oxide: running coding agent CLIs side by side in plain terminals, and installing or updating Oxide on Linux with APT, DNF or AppImage.",
+      "Five practical guides for Oxide: Projects and Terminals, running agent CLIs, the Code workspace with LSPs, GitHub workflows and Linux packages.",
     budgetClass: "reading",
     structuredData: "WebPage",
+    indexable: true,
+    llmsSection: "Guides",
+  },
+  guidesProjects: {
+    path: "/guides/working-with-projects-and-terminals",
+    h1: "Working with projects, terminals and command blocks",
+    title: "Projects, terminals and command blocks · Oxide",
+    description:
+      "Open local repositories or clone from GitHub, run parallel Terminals with Command blocks, keep running shells alive and rely on Session restore.",
+    budgetClass: "reading",
+    structuredData: "TechArticle",
     indexable: true,
     llmsSection: "Guides",
   },
@@ -69,7 +80,29 @@ export const PAGES = {
     h1: "Running Claude Code, Codex and any CLI in Oxide",
     title: "Running Claude Code and Codex in Oxide · Oxide",
     description:
-      "Use Claude Code, Codex, Antigravity CLI or any shell tool side by side in Oxide's plain terminals, with your own shell config, code editor and GitHub tools.",
+      "Run Claude Code, Codex or any shell tool side by side in Oxide's plain terminals, keeping your shell config, shortcuts, code editor and GitHub tools.",
+    budgetClass: "reading",
+    structuredData: "TechArticle",
+    indexable: true,
+    llmsSection: "Guides",
+  },
+  guidesCode: {
+    path: "/guides/code-workspace-and-language-servers",
+    h1: "Editing code beside your terminals with on-demand LSPs",
+    title: "Code workspace and language servers · Oxide",
+    description:
+      "Browse a Project's Files view, open files in the split Code workspace beside your Terminal and install language servers for Rust, TS, Python or C/C++.",
+    budgetClass: "reading",
+    structuredData: "TechArticle",
+    indexable: true,
+    llmsSection: "Guides",
+  },
+  guidesGitHub: {
+    path: "/guides/github-issues-and-pull-requests",
+    h1: "From GitHub Issue to merged pull request in Oxide",
+    title: "GitHub Issues and pull requests · Oxide",
+    description:
+      "Triage GitHub Issues with sub-issues and labels, open pull requests, watch CI checks and merge or enable auto-merge from Oxide's right dock Surfaces.",
     budgetClass: "reading",
     structuredData: "TechArticle",
     indexable: true,
@@ -77,10 +110,10 @@ export const PAGES = {
   },
   guidesLinux: {
     path: "/guides/linux-packages-and-updates",
-    h1: "Installing and updating Oxide on Linux",
+    h1: "Installing, verifying and updating Oxide on Linux",
     title: "Linux packages and updates · Oxide",
     description:
-      "Install Oxide on Linux with AppImage, .deb or .rpm for x64 and arm64, configure the signed APT and DNF repositories, and verify every download.",
+      "Install Oxide on Linux with AppImage, .deb or .rpm for x64 and arm64, configure the signed APT and DNF repositories and verify every download.",
     budgetClass: "reading",
     structuredData: "TechArticle",
     indexable: true,
