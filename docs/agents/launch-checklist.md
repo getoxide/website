@@ -38,11 +38,15 @@ are Lorenzo's, in order. Tick each one on #44 as it is observed on production.
 
 ## 3. Content and download
 
-- [ ] Right after the release, dispatch the sync:
+- [ ] Right after the release, dispatch the sync (the hourly run picks it up
+      within the hour otherwise):
       `gh workflow run content-sync.yml -f ref=vX.Y.Z`, or locally
       `pnpm sync:oxide --ref vX.Y.Z` and push the one `chore(content)` commit.
 - [ ] `/download` shows the real version, date and installer sizes, with
-      direct asset links for macOS arm64 and Windows x64; no dead button.
+      direct `releases/latest/download/<asset>` links for macOS, Windows and
+      Linux and the additional builds (ADR-0005); no dead button.
+- [ ] The header Download button opens the menu of direct downloads, the
+      visitor's platform first, then GitHub and All downloads.
 - [ ] The changelog lists the stable release newest first, with Breaking,
       Features and Fixes, or the empty state when there is none.
 - [ ] The proof path shows the Pull requests and Merge steps, and `/features`

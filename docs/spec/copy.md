@@ -95,6 +95,20 @@ On every page except `/download`, identical everywhere ([Page inventory and site
   - While the snapshot has no release at all (`none`, pre-launch previews only): **Get Oxide** → `/download`, so no button promises a download that does not exist.
 - **Secondary button**: View on GitHub → `https://github.com/getoxide/oxide` (event `github-cta`)
 
+## Header Download menu
+
+In the `stable` Release state only, the header's **Download** button opens a menu ([ADR-0005](../adr/0005-versionless-installer-links.md)); otherwise it links to `/download`. Item labels are build-written; the sublabels are the `/download` buttons'.
+
+| Item | Target | Line under it |
+| --- | --- | --- |
+| macOS | macOS installer (event `download-macos-arm`) | the macOS sublabel |
+| Windows | Windows x64 installer (event `download-windows`) | the Windows sublabel |
+| Linux | Linux x64 AppImage (event `download-linux`) | the Linux sublabel |
+| GitHub | repository (event `github-cta`) | none |
+| All downloads | `/download` | none |
+
+The detected platform comes first and is highlighted; without JavaScript the order is the table's.
+
 ## 404 *(locked)*
 
 - **H1**: Page not found
@@ -119,6 +133,8 @@ The block order is fixed by [Download experience and pre-release state](https://
 | `stable` | Download for macOS / Download for Windows / Download for Linux (the detected platform first) | the other platforms | Version `⟨version⟩` · `⟨release-date⟩` · [Release notes](/changelog) |
 | `prerelease-only` | Download for macOS / Download for Windows / Download for Linux (the detected platform first) | the other platforms | Test pre-release `⟨version⟩`: it never reaches the in-app updater or the APT and DNF repositories. [Build from source](README#build-from-source) for the latest code. |
 | `none` | Follow on GitHub → repository (event `github-cta`) | Build from source → `README#build-from-source` | No release yet. Oxide is pre-release software; follow the repository to hear about the first one. |
+
+Every platform link is a direct file download. In the `stable` state it is GitHub's `releases/latest/download/<asset>` redirect, so a newer release is served as soon as it is published; a test pre-release links its tag's own files ([ADR-0005](../adr/0005-versionless-installer-links.md)).
 
 Each primary platform button carries a sublabel: macOS "Apple Silicon · .dmg · `⟨asset-size:macos⟩`", Windows "x64 · installer · `⟨asset-size:windows⟩`", Linux "x64 · AppImage · `⟨asset-size:linux⟩`". Additional builds (Windows arm64, Linux `.deb` and `.rpm` for x64 and arm64, and Linux arm64 AppImage) are listed directly underneath.
 
