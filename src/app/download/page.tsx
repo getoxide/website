@@ -1,8 +1,8 @@
 import { AnchoredHeading } from "@/components/AnchoredHeading";
+import { CodeBlock } from "@/components/CodeBlock";
 import { DeckText } from "@/components/DeckText";
 import { DownloadBlock } from "@/components/DownloadBlock";
 import { Icon } from "@/components/Icon";
-import { Markdown } from "@/components/Markdown";
 import { OxideMark } from "@/components/OxideMark";
 import { PageHeader } from "@/components/PageHeader";
 import { Prose } from "@/components/Prose";
@@ -83,15 +83,11 @@ export default function DownloadPage() {
             <div className={styles.repoGrid}>
               <div className={styles.repoBlock}>
                 <h3>{copy.repos.aptTitle}</h3>
-                <Prose>
-                  <Markdown source={copy.repos.aptSnippet} />
-                </Prose>
+                <CodeBlock code={copy.repos.aptCode} lang="sh" />
               </div>
               <div className={styles.repoBlock}>
                 <h3>{copy.repos.dnfTitle}</h3>
-                <Prose>
-                  <Markdown source={copy.repos.dnfSnippet} />
-                </Prose>
+                <CodeBlock code={copy.repos.dnfCode} lang="sh" />
               </div>
             </div>
           </section>

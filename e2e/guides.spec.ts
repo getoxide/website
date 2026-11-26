@@ -10,7 +10,7 @@ import { PAGES } from "../src/content/pages";
 const CTA_HEADING = "Open a folder and start a clean shell.";
 
 test.describe("/guides", () => {
-  test("lists the two guides, in order, with their locked H1s", async ({
+  test("lists all guides, in order, with their locked H1s", async ({
     page,
   }) => {
     await page.goto(PAGES.guides.path);
@@ -44,10 +44,11 @@ for (const guide of GUIDES) {
       await context.close();
     });
 
-    test("ends with the cross-link to the other guide, then the CTA", async ({
+    test("ends with the cross-link to another guide, then the CTA", async ({
       page,
     }) => {
-      const other = GUIDES.find((g) => g.page.path !== guide.page.path)!;
+      const idx = GUIDES.findIndex((g) => g.page.path === guide.page.path);
+      const other = GUIDES[(idx + 1) % GUIDES.length];
       await page.goto(guide.page.path);
       const order = await page.evaluate((otherPath) => {
         const link = [

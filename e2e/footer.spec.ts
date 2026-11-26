@@ -34,7 +34,6 @@ const COLUMNS: [string, [string, string][]][] = [
 const LINES = [
   "Free and open source (MIT) · Local · No account · No telemetry",
   "Not affiliated with Oxide Computer Company",
-  "Claude Code, Codex and Antigravity are trademarks of their respective owners; Oxide is not affiliated with or endorsed by Anthropic, OpenAI or Google",
 ];
 
 for (const entry of REGISTERED) {
@@ -60,6 +59,7 @@ for (const entry of REGISTERED) {
     for (const line of LINES) {
       await expect(footer.getByText(line, { exact: true })).toBeVisible();
     }
+    await expect(footer).not.toContainText("Anthropic");
     await expect(
       footer.getByText("getoxide/oxide", { exact: true }),
     ).toBeVisible();

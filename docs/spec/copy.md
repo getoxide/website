@@ -43,9 +43,12 @@ Rendered `<title>` follows the template `%s · Oxide` from [Machine-readable lay
 | --- | --- | --- | --- |
 | `/` | A terminal app that knows your GitHub projects. | Oxide: a desktop terminal app for your GitHub Projects | Open a Project, run as many plain terminals as you like in its folder, and keep your files, GitHub Issues and pull requests in the same window. |
 | `/features` | Everything around your terminals and GitHub | Features: terminals, code and GitHub · Oxide | Open Projects, run many plain terminals with Command blocks, edit files beside them, and handle GitHub Issues and pull requests without leaving Oxide. |
-| `/guides` | Guides | Guides · Oxide | Practical guides for Oxide: running coding agent CLIs side by side in plain terminals, and installing or updating Oxide on Linux with APT, DNF or AppImage. |
-| `/guides/running-agents-in-oxide` | Running Claude Code, Codex and any CLI in Oxide | Running Claude Code and Codex in Oxide · Oxide | Use Claude Code, Codex, Antigravity CLI or any shell tool side by side in Oxide's plain terminals, with your own shell config, code editor and GitHub tools. |
-| `/guides/linux-packages-and-updates` | Installing and updating Oxide on Linux | Linux packages and updates · Oxide | Install Oxide on Linux with AppImage, .deb or .rpm for x64 and arm64, configure the signed APT and DNF repositories, and verify every download. |
+| `/guides` | Guides | Guides · Oxide | Five practical guides for Oxide: Projects and Terminals, running agent CLIs, the Code workspace with LSPs, GitHub workflows and Linux packages. |
+| `/guides/working-with-projects-and-terminals` | Working with projects, terminals and command blocks | Projects, terminals and command blocks · Oxide | Open local repositories or clone from GitHub, run parallel Terminals with Command blocks, keep running shells alive and rely on Session restore. |
+| `/guides/running-agents-in-oxide` | Running Claude Code, Codex and any CLI in Oxide | Running Claude Code and Codex in Oxide · Oxide | Run Claude Code, Codex or any shell tool side by side in Oxide's plain terminals, keeping your shell config, shortcuts, code editor and GitHub tools. |
+| `/guides/code-workspace-and-language-servers` | Editing code beside your terminals with on-demand LSPs | Code workspace and language servers · Oxide | Browse a Project's Files view, open files in the split Code workspace beside your Terminal and install language servers for Rust, TS, Python or C/C++. |
+| `/guides/github-issues-and-pull-requests` | From GitHub Issue to merged pull request in Oxide | GitHub Issues and pull requests · Oxide | Triage GitHub Issues with sub-issues and labels, open pull requests, watch CI checks and merge or enable auto-merge from Oxide's right dock Surfaces. |
+| `/guides/linux-packages-and-updates` | Installing, verifying and updating Oxide on Linux | Linux packages and updates · Oxide | Install Oxide on Linux with AppImage, .deb or .rpm for x64 and arm64, configure the signed APT and DNF repositories and verify every download. |
 | `/docs/quick-start` | Quick start | Quick start · Oxide | Check what Oxide needs, open a Project, start as many plain terminals as you like, browse Files and open Issues or pull requests in four steps. |
 | `/docs/concepts` | Concepts | Concepts · Oxide | The words Oxide uses and what they mean: Project, Terminal, Command block, Surface, Files view, Code workspace, Session restore and update channels. |
 | `/faq` | Frequently asked questions | FAQ · Oxide | Answers about Oxide, the open-source desktop terminal app for GitHub Projects: what it is, running agent CLIs in it, supported platforms and privacy. |
@@ -179,9 +182,22 @@ Group key sentence: Browse files, edit code beside your terminal and handle GitH
 
 Capture captions are constraints-only: the build writes them, describing what the real capture shows.
 
+## `/guides/working-with-projects-and-terminals` *(outline)*
+
+**Job**: developers organizing repositories, multiple Terminals, Command blocks and Session restore in Oxide.
+
+**Intro key sentence**: Every Project in Oxide groups its own folder, plain Terminals, Command blocks and Session restore state under one sidebar entry.
+
+| Section heading | Key sentences |
+| --- | --- |
+| Opening and switching Projects | Use Open Project or `Mod+Shift+O` to add a local folder, initialize a new Git repository or clone from GitHub without leaving the window. |
+| Multiple Terminals in one folder | Each Project can hold as many Terminals as you need, with live program titles and `Mod+Shift+T` to start another shell in the same folder. |
+| Command blocks and exit status | Core groups each command's prompt, output, duration and exit status into a Command block with a subtle status rail so failures stand out immediately. |
+| Session restore across restarts | When Session restore is enabled, reopening Oxide brings back your Open Projects, Terminals, open files and recent Command blocks as a record. |
+
 ## `/guides/running-agents-in-oxide` *(outline)*
 
-**Job**: people who want to run `claude`, `codex`, `agy` or other CLI tools in Oxide now that Terminals are plain shells.
+**Job**: people who want to run `claude`, `codex` or other CLI tools in Oxide now that Terminals are plain shells.
 
 **Intro key sentence**: Oxide does not know about agents: every Terminal is a plain shell, so you run `claude`, `codex` or any CLI tool the same way you do outside Oxide.
 
@@ -191,6 +207,32 @@ Capture captions are constraints-only: the build writes them, describing what th
 | Running Claude Code and Codex side by side | Open as many Terminals as you need under one Project: run `claude` in one, `codex` in another and a test watcher in a third, with Session restore keeping your recent Command blocks across restarts. |
 | Code and GitHub next to the shell | Open the Files view from the Project row to inspect or edit files in the Code workspace beside the Terminal, then use the Issues and Pull request Surfaces in the right dock. |
 | Terminal priority for shortcuts | When a Terminal has focus, bare `Ctrl+<letter>` and terminal control keys like `Ctrl+C`, `Ctrl+D` and `Ctrl+R` go straight to the PTY unless explicitly rebound in Settings. |
+
+## `/guides/code-workspace-and-language-servers` *(outline)*
+
+**Job**: developers browsing files, splitting the Code workspace beside a Terminal and using on-demand language servers.
+
+**Intro key sentence**: A Project's Files view opens directly into a split Code workspace beside your Terminal, powered by Monaco and on-demand language servers.
+
+| Section heading | Key sentences |
+| --- | --- |
+| Browsing the Files view | Click the folder button on a Project row or press `Mod+Shift+E` to switch the sidebar to the Project's file tree and search across files. |
+| The split Terminal and Code workspace | Selecting a file opens the Code workspace beside the active Terminal with a draggable divider and `Mod+Shift+Enter` to maximize either half. |
+| On-demand language servers | Oxide supports Rust, TypeScript/JavaScript, Python and C/C++ and installs a language server only when you press Install on the prompt. |
+| Shortcuts that stay out of the shell's way | Saving (`Mod+S` and `Mod+Shift+S`) is scoped to the Code workspace so terminal focus always keeps raw shell shortcuts intact. |
+
+## `/guides/github-issues-and-pull-requests` *(outline)*
+
+**Job**: developers managing GitHub Issues, pull requests, CI checks and merges from the right dock.
+
+**Intro key sentence**: Oxide's right dock pairs your local Terminals with two GitHub Surfaces — Issues and Pull request — backed by the GitHub CLI (`gh`).
+
+| Section heading | Key sentences |
+| --- | --- |
+| Authenticating with the GitHub CLI | Install `gh` and run `gh auth login` once; Oxide reads repository Issues and pull requests through your local `gh` session with no extra tokens. |
+| Triaging Issues and sub-issues | Open the Issues Surface (`Mod+Shift+I`) to filter issues, inspect sub-issues, labels and assignees, comment, close or create a new Issue from templates. |
+| Opening and reviewing pull requests | Switch to the Pull request Surface (`Mod+Shift+G`) to browse open pull requests, inspect branch diffs and create a new pull request from your current branch. |
+| Checks, reviewers and auto-merge | Watch CI checks update in the review view, verify mergeability and choose Squash and merge or Enable auto-merge without leaving your Terminal. |
 
 ## `/guides/linux-packages-and-updates` *(outline)*
 
