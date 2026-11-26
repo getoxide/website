@@ -12,7 +12,7 @@ import {
 } from "@/content/app-preview";
 import styles from "./AppPreview.module.css";
 
-export type PreviewIcons = Record<
+export type PreviewIconName =
   | "repo"
   | "file-directory"
   | "sidebar-expand"
@@ -27,7 +27,6 @@ export type PreviewIcons = Record<
   | "git-merge"
   | "x"
   | "check-circle-fill"
-  | "check"
   | "screen-full"
   | "screen-normal"
   | "chevron-down"
@@ -36,12 +35,16 @@ export type PreviewIcons = Record<
   | "mark-github"
   | "alert"
   | "thumbsup"
-  | "search"
   | "checklist"
   | "people"
-  | "tag",
-  ReactNode
->;
+  | "tag";
+
+export type PreviewIconData = { w: number; p: string };
+export type PreviewIcons = Record<PreviewIconName, PreviewIconData>;
+export type AppPreviewAppProps = {
+  icons: PreviewIcons;
+  className?: string;
+};
 
 type Surface = keyof typeof PREVIEW.surfaces;
 
@@ -107,14 +110,23 @@ function buildTree(files: PreviewFile[]): TreeFolder {
  * Terminal | Code workspace in the centre, and Issues / Pull request Surfaces
  * in the right dock. Never moves by itself; server HTML is the starting state.
  */
-export function AppPreviewApp({
-  icons,
-  className,
-}: {
-  icons: PreviewIcons;
-  className?: string;
-}) {
+export function AppPreviewApp({ icons, className }: AppPreviewAppProps) {
   const p = PREVIEW;
+  const icon = (name: PreviewIconName) => {
+    const { w, p: path } = icons[name];
+    return (
+      <svg
+        viewBox={`0 0 ${w} 16`}
+        width={w}
+        height={16}
+        fill="currentColor"
+        aria-hidden="true"
+        focusable="false"
+        dangerouslySetInnerHTML={{ __html: path }}
+      />
+    );
+  };
+
   const [projectId, setProjectId] = useState(PREVIEW_PROJECTS[0].id);
   const [terminalId, setTerminalId] = useState(
     PREVIEW_PROJECTS[0].terminals[0].id,
@@ -252,7 +264,7 @@ export function AppPreviewApp({
 
   const showTerminal = maximized !== "code";
   const showCode = Boolean(codeFile) && maximized !== "terminal";
-  const tree = buildTree(project.files);
+  const tree = filesView ? buildTree(project.files) : null;
 
   const renderTree = (folder: TreeFolder, prefix = "", depth = 0) => {
     return (
@@ -270,9 +282,9 @@ export function AppPreviewApp({
                 onClick={() => toggleDir(dirPath)}
               >
                 <span className={styles.treeChevron}>
-                  {collapsed ? icons["chevron-right"] : icons["chevron-down"]}
+                  {collapsed ? icon("chevron-right") : icon("chevron-down")}
                 </span>
-                {icons["file-directory"]}
+                {icon("file-directory")}
                 <span className={styles.treeName}>{sub.name}</span>
               </button>
               {!collapsed ? (
@@ -295,7 +307,7 @@ export function AppPreviewApp({
               aria-label={f.path}
               onClick={() => openCodeFile(f.path)}
             >
-              {icons.file}
+              {icon("file")}
               <span className={styles.treeName}>{f.name}</span>
             </button>
           </li>
@@ -304,11 +316,13 @@ export function AppPreviewApp({
     );
   };
 
-  const filteredPalette = PALETTE_PROJECTS.filter(
-    (item) =>
-      item.name.toLowerCase().includes(paletteQuery.toLowerCase()) ||
-      item.path.toLowerCase().includes(paletteQuery.toLowerCase()),
-  );
+  const filteredPalette = paletteOpen
+    ? PALETTE_PROJECTS.filter(
+        (item) =>
+          item.name.toLowerCase().includes(paletteQuery.toLowerCase()) ||
+          item.path.toLowerCase().includes(paletteQuery.toLowerCase()),
+      )
+    : [];
 
   return (
     <figure
@@ -328,7 +342,7 @@ export function AppPreviewApp({
             aria-label="Toggle Tools panel"
             onClick={() => setToolsOpen((o) => !o)}
           >
-            {icons["sidebar-expand"]}
+            {icon("sidebar-expand")}
           </button>
         </div>
 
@@ -342,13 +356,15 @@ export function AppPreviewApp({
                   className={styles.backBtn}
                   onClick={() => setFilesView(false)}
                 >
-                  {icons["arrow-left"]}
+                  {icon("arrow-left")}
                   <span className={styles.backProject}>{project.name}</span>
                   <span className={styles.backSuffix}>
                     · {p.backToTerminals}
                   </span>
                 </button>
-                <ul className={styles.fileList}>{renderTree(tree)}</ul>
+                <ul className={styles.fileList}>
+                  {tree ? renderTree(tree) : null}
+                </ul>
               </div>
             ) : (
               <>
@@ -358,7 +374,7 @@ export function AppPreviewApp({
                     className={styles.openProjectBtn}
                     onClick={() => setPaletteOpen((o) => !o)}
                   >
-                    {icons.repo}
+                    {icon("repo")}
                     {p.openProject}
                   </button>
                 </div>
@@ -383,7 +399,7 @@ export function AppPreviewApp({
                             onClick={() => selectProject(proj.id)}
                           >
                             <span className={styles.projectIcon}>
-                              {icons.repo}
+                              {icon("repo")}
                             </span>
                             <span className={styles.projectName}>
                               {proj.name}
@@ -396,7 +412,7 @@ export function AppPreviewApp({
                               aria-label={`Files of ${proj.name}`}
                               onClick={() => openFilesFor(proj.id)}
                             >
-                              {icons["file-directory"]}
+                              {icon("file-directory")}
                             </button>
                             <button
                               type="button"
@@ -404,7 +420,7 @@ export function AppPreviewApp({
                               aria-label={`New terminal in ${proj.name}`}
                               onClick={() => spawnTerminal(proj.id)}
                             >
-                              {icons.plus}
+                              {icon("plus")}
                             </button>
                           </div>
                         </div>
@@ -425,7 +441,7 @@ export function AppPreviewApp({
                                     selectTerminal(proj.id, term.id)
                                   }
                                 >
-                                  {icons.terminal}
+                                  {icon("terminal")}
                                   <span>{term.name}</span>
                                 </button>
                               </li>
@@ -439,7 +455,7 @@ export function AppPreviewApp({
               </>
             )}
             <div className={styles.sideFoot}>
-              {icons.gear}
+              {icon("gear")}
               <span>{p.settings}</span>
             </div>
           </div>
@@ -455,7 +471,7 @@ export function AppPreviewApp({
                 aria-label="Terminal"
               >
                 <header className={styles.halfHeader}>
-                  {icons.terminal}
+                  {icon("terminal")}
                   <strong>{terminal.shell}</strong>
                   <span className={styles.cwd}>{terminal.cwd}</span>
                   {codeFile ? (
@@ -474,8 +490,8 @@ export function AppPreviewApp({
                       }
                     >
                       {maximized === "terminal"
-                        ? icons["screen-normal"]
-                        : icons["screen-full"]}
+                        ? icon("screen-normal")
+                        : icon("screen-full")}
                     </button>
                   ) : null}
                 </header>
@@ -568,7 +584,7 @@ export function AppPreviewApp({
                         setMaximized(null);
                       }}
                     >
-                      {icons.x}
+                      {icon("x")}
                     </button>
                   </div>
                   <div className={styles.codeTabsActions}>
@@ -583,8 +599,8 @@ export function AppPreviewApp({
                       }
                     >
                       {maximized === "code"
-                        ? icons["screen-normal"]
-                        : icons["screen-full"]}
+                        ? icon("screen-normal")
+                        : icon("screen-full")}
                     </button>
                   </div>
                 </header>
@@ -602,7 +618,7 @@ export function AppPreviewApp({
                 </div>
                 <footer className={styles.codeStatus}>
                   <span className={styles.codeDiag}>
-                    {icons.alert}
+                    {icon("alert")}
                     <span>0 errors · 0 warnings</span>
                   </span>
                   <span className={styles.codeLang}>
@@ -629,7 +645,7 @@ export function AppPreviewApp({
                     )}
                     onClick={() => setSurface("issues")}
                   >
-                    {icons["issue-opened"]}
+                    {icon("issue-opened")}
                     {p.surfaces.issues}
                   </button>
                   <button
@@ -642,7 +658,7 @@ export function AppPreviewApp({
                     )}
                     onClick={() => setSurface("pr")}
                   >
-                    {icons["git-pull-request"]}
+                    {icon("git-pull-request")}
                     {p.surfaces.pr}
                   </button>
                 </div>
@@ -652,7 +668,7 @@ export function AppPreviewApp({
                   aria-label="Close Tools panel"
                   onClick={() => setToolsOpen(false)}
                 >
-                  {icons.x}
+                  {icon("x")}
                 </button>
               </div>
 
@@ -665,12 +681,12 @@ export function AppPreviewApp({
                         className={styles.backSurfaceBtn}
                         onClick={() => setPrNum(null)}
                       >
-                        {icons["arrow-left"]}
+                        {icon("arrow-left")}
                         <span>{p.pr.back}</span>
                       </button>
                       <span className={styles.toolbarIcons} aria-hidden="true">
-                        {icons.link}
-                        {icons["mark-github"]}
+                        {icon("link")}
+                        {icon("mark-github")}
                       </span>
                     </div>
 
@@ -691,8 +707,8 @@ export function AppPreviewApp({
                           )}
                         >
                           {prMerged && activePr.number === "#143"
-                            ? icons["git-merge"]
-                            : icons["git-pull-request"]}
+                            ? icon("git-merge")
+                            : icon("git-pull-request")}
                           {prMerged && activePr.number === "#143"
                             ? "Merged"
                             : "Open"}
@@ -726,8 +742,8 @@ export function AppPreviewApp({
                         >
                           <span>Description</span>
                           {descOpen
-                            ? icons["chevron-down"]
-                            : icons["chevron-right"]}
+                            ? icon("chevron-down")
+                            : icon("chevron-right")}
                         </button>
                         {descOpen ? (
                           <p className={styles.cardBody}>
@@ -739,13 +755,13 @@ export function AppPreviewApp({
                       <div className={styles.surfaceCard}>
                         <div className={styles.checkRow}>
                           <span className={styles.checkOk}>
-                            {icons["check-circle-fill"]}
+                            {icon("check-circle-fill")}
                           </span>
                           <span>{p.pr.noConflicts}</span>
                         </div>
                         <div className={styles.checkRow}>
                           <span className={styles.checkOk}>
-                            {icons["check-circle-fill"]}
+                            {icon("check-circle-fill")}
                           </span>
                           <span>{p.pr.allChecksPassed}</span>
                         </div>
@@ -763,7 +779,7 @@ export function AppPreviewApp({
                           {activePr.checks.map((c) => (
                             <li key={c.name}>
                               <span className={styles.checkOk}>
-                                {icons["check-circle-fill"]}
+                                {icon("check-circle-fill")}
                               </span>
                               <span className={styles.checkName}>{c.name}</span>
                               {c.optional ? (
@@ -780,7 +796,9 @@ export function AppPreviewApp({
                       <div className={styles.surfaceCard}>
                         <div className={styles.cardHead}>
                           <strong>Reviewers</strong>
-                          <span className={styles.metaText}>{icons.gear}</span>
+                          <span className={styles.metaText}>
+                            {icon("gear")}
+                          </span>
                         </div>
                         <div className={styles.reviewerRow}>
                           <span className={styles.avatar}>M</span>
@@ -793,7 +811,7 @@ export function AppPreviewApp({
                       {prMerged && activePr.number === "#143" ? (
                         <div className={styles.mergedStatus}>
                           <span className={styles.mergedIcon}>
-                            {icons["git-merge"]}
+                            {icon("git-merge")}
                           </span>
                           <span>{p.pr.merged}</span>
                         </div>
@@ -801,13 +819,13 @@ export function AppPreviewApp({
                         <>
                           <div className={styles.readyLine}>
                             <span className={styles.checkOk}>
-                              {icons["check-circle-fill"]}
+                              {icon("check-circle-fill")}
                             </span>
                             <span>{p.pr.ready}</span>
                           </div>
                           <div className={styles.prActions}>
                             <button type="button" className={styles.secBtn}>
-                              {icons.x}
+                              {icon("x")}
                               {p.pr.close}
                             </button>
                             <button
@@ -815,7 +833,7 @@ export function AppPreviewApp({
                               className={styles.primaryBtn}
                               onClick={() => setPrMerged(true)}
                             >
-                              {icons["git-merge"]}
+                              {icon("git-merge")}
                               {p.pr.merge}
                             </button>
                           </div>
@@ -859,12 +877,12 @@ export function AppPreviewApp({
                       className={styles.backSurfaceBtn}
                       onClick={() => setIssueNum(null)}
                     >
-                      {icons["arrow-left"]}
+                      {icon("arrow-left")}
                       <span>{p.issue.back}</span>
                     </button>
                     <span className={styles.toolbarIcons} aria-hidden="true">
-                      {icons.link}
-                      {icons["mark-github"]}
+                      {icon("link")}
+                      {icon("mark-github")}
                     </span>
                   </div>
 
@@ -888,8 +906,8 @@ export function AppPreviewApp({
                             )}
                           >
                             {isClosed
-                              ? icons["issue-closed"]
-                              : icons["issue-opened"]}
+                              ? icon("issue-closed")
+                              : icon("issue-opened")}
                             {isClosed ? "Closed" : "Open"}
                           </span>
                         );
@@ -916,7 +934,7 @@ export function AppPreviewApp({
                       </ul>
                       {activeIssue.reactions > 0 ? (
                         <div className={styles.reactionPill}>
-                          {icons.thumbsup}
+                          {icon("thumbsup")}
                           <span>{activeIssue.reactions}</span>
                         </div>
                       ) : null}
@@ -925,7 +943,7 @@ export function AppPreviewApp({
                     {activeIssue.subIssues.length > 0 ? (
                       <div className={styles.surfaceCard}>
                         <div className={styles.checksHead}>
-                          {icons.checklist}
+                          {icon("checklist")}
                           <strong>Sub-issues</strong>
                           <span className={styles.metaText}>
                             {activeIssue.subIssues.filter((s) => s.done).length}
@@ -942,8 +960,8 @@ export function AppPreviewApp({
                                 }
                               >
                                 {sub.done
-                                  ? icons["issue-closed"]
-                                  : icons["issue-opened"]}
+                                  ? icon("issue-closed")
+                                  : icon("issue-opened")}
                               </span>
                               <span className={styles.checkName}>
                                 {sub.title}
@@ -960,10 +978,10 @@ export function AppPreviewApp({
                     <div className={styles.surfaceCard}>
                       <div className={styles.cardHead}>
                         <span className={styles.cardLabel}>
-                          {icons.people}
+                          {icon("people")}
                           <strong>Assignees</strong>
                         </span>
-                        <span className={styles.metaText}>{icons.gear}</span>
+                        <span className={styles.metaText}>{icon("gear")}</span>
                       </div>
                       <div className={styles.reviewerRow}>
                         <span className={styles.avatar}>
@@ -976,10 +994,10 @@ export function AppPreviewApp({
                     <div className={styles.surfaceCard}>
                       <div className={styles.cardHead}>
                         <span className={styles.cardLabel}>
-                          {icons.tag}
+                          {icon("tag")}
                           <strong>Labels</strong>
                         </span>
-                        <span className={styles.metaText}>{icons.gear}</span>
+                        <span className={styles.metaText}>{icon("gear")}</span>
                       </div>
                       <div className={styles.labelRow}>
                         {activeIssue.labels.map((label) => (
@@ -1083,7 +1101,7 @@ export function AppPreviewApp({
                         onClick={() => selectProject(item.id)}
                       >
                         <span className={styles.paletteName}>
-                          {icons.repo}
+                          {icon("repo")}
                           <span>{item.name}</span>
                           {item.open ? (
                             <span className={styles.openBadge}>open</span>

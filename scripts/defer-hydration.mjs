@@ -59,6 +59,66 @@ export function loader(sources) {
 }
 
 /**
+ * Inlines React streaming Suspense templates (`<!--$?--><template id="B:N"></template><!--/$-->`
+ * + `<div hidden id="S:N">...</div>` + `$RC("B:N","S:N")`) at build time so
+ * statically exported pages render their full content with zero JavaScript and
+ * zero layout shift (`CLS = 0`).
+ * @param {string} html
+ * @returns {string}
+ */
+export function inlineSuspenseTemplates(html) {
+  let out = html;
+  const startRe = /<div\b[^>]*\bhidden(?:="")?[^>]*\bid="S:(\d+)"[^>]*>/g;
+  const replacements = [];
+
+  for (let match; (match = startRe.exec(html)) !== null;) {
+    const id = match[1];
+    const openStart = match.index;
+    const contentStart = openStart + match[0].length;
+    const divRe = /<div\b|<\/div\s*>/gi;
+    divRe.lastIndex = contentStart;
+    let depth = 1;
+    let closeStart = -1;
+    let closeEnd = -1;
+    for (let tag; (tag = divRe.exec(html)) !== null;) {
+      if (tag[0].startsWith("</")) {
+        depth--;
+        if (depth === 0) {
+          closeStart = tag.index;
+          closeEnd = divRe.lastIndex;
+          break;
+        }
+      } else {
+        depth++;
+      }
+    }
+    if (closeStart === -1) continue;
+    const placeholder = `<!--$?--><template id="B:${id}"></template><!--/$-->`;
+    if (!out.includes(placeholder)) continue;
+    const content = html.slice(contentStart, closeStart);
+    replacements.push({ id, openStart, closeEnd, placeholder, content });
+  }
+
+  if (replacements.length === 0) return html;
+
+  for (const { placeholder, content } of replacements) {
+    out = out.replace(placeholder, () => `<!--$-->${content}<!--/$-->`);
+  }
+  for (let i = replacements.length - 1; i >= 0; i--) {
+    const { id, openStart, closeEnd } = replacements[i];
+    const divBlock = html.slice(openStart, closeEnd);
+    out = out.replace(divBlock, "");
+    out = out.replace(new RegExp(`\\$RC\\("B:${id}","S:${id}"\\);?`, "g"), "");
+  }
+
+  out = out.replace(
+    /<script>\s*(?:\$RC=function[\s\S]*?)?\s*<\/script>/g,
+    (tag) => (tag.includes("$RC(") ? tag : ""),
+  );
+  return out;
+}
+
+/**
  * Moves the Next scripts out of the parsing document and re-inserts them on
  * `load`, in order. The `noModule` legacy chunk stays where it is: modern
  * browsers ignore it, so it never costs a byte, and leaving it does not put a
@@ -69,7 +129,8 @@ export function loader(sources) {
 export function deferClientScripts(html) {
   /** @type {string[]} */
   const sources = [];
-  const moved = html.replace(TAG, (tag) => {
+  const inlined = inlineSuspenseTemplates(html);
+  const moved = inlined.replace(TAG, (tag) => {
     if (/^<script/i.test(tag)) {
       const src = attrOf(tag, "src");
       if (!src?.startsWith(NEXT_SRC) || NO_MODULE.test(tag)) return tag;
@@ -78,7 +139,7 @@ export function deferClientScripts(html) {
     }
     return isNextScriptResource(tag) ? "" : tag;
   });
-  if (sources.length === 0) return html;
+  if (sources.length === 0) return inlined;
   return moved.replace("</body>", `${loader(sources)}</body>`);
 }
 
