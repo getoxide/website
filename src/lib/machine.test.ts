@@ -29,7 +29,7 @@ describe("robots.txt", () => {
         "User-agent: *",
         "Allow: /",
         "",
-        "Sitemap: https://oxide.cavallinilorenzo.com/sitemap.xml",
+        "Sitemap: https://getoxide.dev/sitemap.xml",
         "",
       ].join("\n"),
     );
@@ -49,14 +49,12 @@ describe("sitemap.xml", () => {
     for (const page of indexable) {
       const url =
         page.path === "/"
-          ? "https://oxide.cavallinilorenzo.com"
-          : `https://oxide.cavallinilorenzo.com${page.path}`;
+          ? "https://getoxide.dev"
+          : `https://getoxide.dev${page.path}`;
       expect(xml).toContain(`<loc>${url}</loc>`);
     }
     expect(xml).not.toContain("/404");
-    expect(xml).not.toContain(
-      "<loc>https://oxide.cavallinilorenzo.com/docs</loc>",
-    );
+    expect(xml).not.toContain("<loc>https://getoxide.dev/docs</loc>");
   });
 
   it("carries lastmod only on /changelog and /download", () => {
@@ -99,8 +97,8 @@ describe("llms.txt", () => {
     for (const page of indexable) {
       const url =
         page.path === "/"
-          ? "https://oxide.cavallinilorenzo.com"
-          : `https://oxide.cavallinilorenzo.com${page.path}`;
+          ? "https://getoxide.dev"
+          : `https://getoxide.dev${page.path}`;
       expect(text, page.path).toContain(`](${url})`);
     }
     expect(text).not.toContain("/404");
@@ -108,9 +106,7 @@ describe("llms.txt", () => {
 
   it("puts the repo, releases and changelog under Optional, and links the contributor file", () => {
     const optional = llmsTxt(pages, snapshot).split("## Optional")[1];
-    expect(optional).toContain(
-      "[Changelog](https://oxide.cavallinilorenzo.com/changelog)",
-    );
+    expect(optional).toContain("[Changelog](https://getoxide.dev/changelog)");
     expect(optional).toContain(
       "[GitHub repository](https://github.com/getoxide/oxide)",
     );

@@ -3,7 +3,7 @@ import { PAGES } from "../src/content/pages";
 import { REGISTERED, UNKNOWN_PATH, urlOf } from "./pages";
 import { oxideFileUrl } from "./snapshot";
 
-const PROD = "https://oxide.cavallinilorenzo.com";
+const PROD = "https://getoxide.dev";
 
 test.describe("every registered page", () => {
   for (const page of REGISTERED) {

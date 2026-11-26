@@ -98,6 +98,6 @@ describe("PAGES registry", () => {
   });
 
   it("builds every URL from the production SITE_URL", () => {
-    expect(SITE_URL).toBe("https://oxide.cavallinilorenzo.com");
+    expect(SITE_URL).toBe("https://getoxide.dev");
   });
 });

@@ -4,7 +4,7 @@
 // strings; a test compares them with the deck.
 
 /** Production origin. Canonicals and absolute URLs are built from it. */
-export const SITE_URL = "https://oxide.cavallinilorenzo.com";
+export const SITE_URL = "https://getoxide.dev";
 
 /** Performance tier of a page (docs/spec/budgets.md, Budget classes). */
 export type BudgetClass = "showcase" | "reading";

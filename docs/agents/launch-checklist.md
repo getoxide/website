@@ -1,6 +1,6 @@
 # Launch checklist (#44)
 
-The site goes live on `oxide.cavallinilorenzo.com` with the first downloadable
+The site goes live on `getoxide.dev` with the first downloadable
 Oxide release. The code side is merged and verified locally; the steps below
 are Lorenzo's, in order. Tick each one on #44 as it is observed on production.
 
@@ -11,25 +11,24 @@ are Lorenzo's, in order. Tick each one on #44 as it is observed on production.
       captions and alt texts are approved. An empty slot renders no frame.
 - [ ] `pnpm build` on `main` is green and `git status` is clean.
 
-## 1. Vercel project
+## 1. Cloudflare Workers project
 
-- [ ] `getoxide/website` is public (Hobby cannot deploy a private repository
-      owned by an organization).
-- [ ] The Vercel project builds with `pnpm build` (pinned in `vercel.json`) on
-      Node 22.18+.
+- [ ] The Cloudflare Workers project connects to `getoxide/website` (`main`
+      branch), builds with `pnpm build` on Node 22.18+, and deploys with
+      `npx wrangler deploy` (reading `wrangler.jsonc`).
 - [ ] `NEXT_PUBLIC_GOATCOUNTER_CODE` is set to the real GoatCounter site code.
       Leaving it unset warns; setting it to `oxide` in production fails.
 - [ ] `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` is set to the Search Console
       token. Same guard.
 - [ ] A preview answers `X-Robots-Tag: noindex`:
-      `curl -sI https://<preview>.vercel.app | grep -i x-robots-tag`.
+      `curl -sI https://<preview>.workers.dev | grep -i x-robots-tag`.
 
 ## 2. Domain and headers
 
-- [ ] `oxide.cavallinilorenzo.com` is bound to the project and its DNS record
-      exists on `cavallinilorenzo.com`; the certificate is valid.
+- [ ] `getoxide.dev` is bound to the Worker as a Custom Domain on Cloudflare;
+      the certificate is valid.
 - [ ] Production answers without the noindex header:
-      `curl -sI https://oxide.cavallinilorenzo.com | grep -i x-robots-tag`
+      `curl -sI https://getoxide.dev | grep -i x-robots-tag`
       returns nothing.
 - [ ] `/docs` answers `308` to `/docs/quick-start`; `/foo/` normalises without
       a trailing slash; `/nope` answers `404`.
@@ -70,7 +69,7 @@ are Lorenzo's, in order. Tick each one on #44 as it is observed on production.
 
 - [ ] `ci.yml` runs on the PR and on `main` after merge.
 - [ ] `content-sync.yml` is dispatched with a ref that changes the Snapshot:
-      one `chore(content)` commit lands on `main` and Vercel deploys it.
+      one `chore(content)` commit lands on `main` and Cloudflare Workers deploys it.
 - [ ] Dispatched with a ref missing a marker: the run fails and `main` is
       untouched.
 - [ ] Dispatched twice with the same ref: the second run commits nothing.
@@ -80,8 +79,8 @@ are Lorenzo's, in order. Tick each one on #44 as it is observed on production.
 ## 7. Hand-over
 
 - [ ] The `getoxide/oxide` repository's website field is
-      `https://oxide.cavallinilorenzo.com` and its README links to the site.
-- [ ] The portfolio's Oxide card still points at the subdomain.
+      `https://getoxide.dev` and its README links to the site.
+- [ ] The portfolio's Oxide card points at `https://getoxide.dev`.
 
 ## 8. Production smoke over #29
 
