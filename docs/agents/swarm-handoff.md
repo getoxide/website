@@ -18,15 +18,14 @@ repeated 3-run medians). The verification receipt is outside the diff.
 ## Needs Lorenzo before launch
 
 - `NEXT_PUBLIC_GOATCOUNTER_CODE`: the real GoatCounter site code, set in
-  Vercel. Unset warns; explicitly setting the placeholder fails a production
-  build.
+  Cloudflare Workers build variables. Unset warns; explicitly setting the
+  placeholder fails a production build.
 - `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION`: the Search Console token, set in
-  Vercel. Same guard.
+  Cloudflare Workers build variables. Same guard.
 - Real product captures (#15). `assets/captures/hero.png` is still the
   prototype still; feature capture slots are empty, so no frame renders.
-- The `getoxide/website` repository must be public (Vercel Hobby cannot deploy
-  a private organization repository), and the first stable Oxide release must
-  exist.
+- `getoxide/website` is deployed on Cloudflare Workers (`wrangler.jsonc`,
+  `public/_redirects`), and the first stable Oxide release must exist.
 - The GitHub workflows have never run: dispatch `content-sync.yml` and watch
   `ci.yml` on the PR and on `main`.
 

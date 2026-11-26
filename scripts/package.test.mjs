@@ -7,7 +7,7 @@ const pkg = JSON.parse(
 
 describe("package.json", () => {
   // The gate scripts import the TypeScript PAGES registry directly, which
-  // needs Node's type stripping; pin it so CI, Vercel and a laptop agree
+  // needs Node's type stripping; pin it so CI, Cloudflare Workers and a laptop agree
   // (issue #29, item 19).
   it("requires the Node that can strip types", () => {
     expect(pkg.engines?.node).toBe(">=22.18");

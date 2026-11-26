@@ -36,7 +36,7 @@ Shared CI runners are the noise floor: the same commit has measured 73 ms and 16
 ## Per-page ceilings
 
 Counting rules:
-- JS, CSS and HTML are counted **gzip-compressed**. Vercel serves brotli, which is slightly smaller, so these numbers are conservative.
+- JS, CSS and HTML are counted **gzip-compressed**. Cloudflare serves brotli, which is slightly smaller, so these numbers are conservative.
 - Fonts, images and video are counted at **file size**, because they are already compressed.
 - **Initial** means everything requested up to the page's `load`. Lazily loaded assets below the fold are not initial; they count only toward the page total.
 
@@ -113,7 +113,7 @@ GoatCounter is the only allowed third-party origin; it loads async and counts to
 
 ## Enforcement in CI
 
-Everything runs against the static export served locally in CI, never against a Vercel preview.
+Everything runs against the static export served locally in CI, never against a Cloudflare Workers preview.
 
 | Check | Scope | Effect |
 | --- | --- | --- |

@@ -1,6 +1,6 @@
-// Serves the static export in `out/` the way Vercel serves it: clean URLs
+// Serves the static export in `out/` the way Cloudflare Workers serves it: clean URLs
 // (`/privacy` -> `privacy.html`) and `404.html` with status 404 for anything
-// else. Used by Playwright in CI; never a Vercel preview (Budgets, Enforcement
+// else. Used by Playwright in CI; never a Cloudflare Workers preview (Budgets, Enforcement
 // in CI). Usage: `node scripts/serve-out.mjs [--port 3100] [--root out ...]`;
 // with several `--root`s, the n-th is served on port + n (the per-Release-
 // state test exports, see scripts/build-fixtures.mjs).
@@ -89,7 +89,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       const file = resolve(ROOT, url.pathname);
       const path = file ?? join(ROOT, "404.html");
       const type = TYPES[extname(path)] ?? "application/octet-stream";
-      // Vercel compresses text assets (brotli; gzip stands in here), and the
+      // Cloudflare compresses text assets (brotli; gzip stands in here), and the
       // Lighthouse gate's simulated network counts the bytes sent.
       const gzip =
         COMPRESSIBLE.has(extname(path)) &&

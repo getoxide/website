@@ -2,7 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 import { FIXTURES, PORT, fixturePort } from "./e2e/ports";
 
 // Runs against the static export served locally: `pnpm build` first, then
-// `pnpm e2e`. Never against a Vercel preview (Budgets, Enforcement in CI).
+// `pnpm e2e`. Never against a Cloudflare Workers preview (Budgets, Enforcement in CI).
 // Set E2E_PORT if :3130 is busy; the fixture exports take the next ports.
 
 export default defineConfig({

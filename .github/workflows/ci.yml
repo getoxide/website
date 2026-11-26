@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 # Every gate runs against the static export served locally, never against a
-# Vercel preview (docs/spec/budgets.md, Enforcement in CI). The gates read the
+# Cloudflare Workers preview (docs/spec/budgets.md, Enforcement in CI). The gates read the
 # PAGES registry, so a new page is covered without touching this file.
 jobs:
   checks:
