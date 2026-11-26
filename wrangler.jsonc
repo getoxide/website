@@ -6,4 +6,7 @@
     "html_handling": "drop-trailing-slash",
     "not_found_handling": "404-page",
   },
+  // Workers Builds runs `npx wrangler preview` for every PR build; the
+  // command fails without a `previews` block, even an empty one.
+  "previews": {},
 }

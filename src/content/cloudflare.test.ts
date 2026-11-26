@@ -10,6 +10,7 @@ type WranglerConfig = {
     html_handling?: string;
     not_found_handling?: string;
   };
+  previews?: Record<string, unknown>;
 };
 
 function parseJsonc(text: string): unknown {
@@ -52,6 +53,10 @@ describe("Cloudflare Workers config", () => {
       html_handling: "drop-trailing-slash",
       not_found_handling: "404-page",
     });
+  });
+
+  it("declares an empty previews block for the per-PR wrangler preview builds", () => {
+    expect(wrangler.previews).toEqual({});
   });
 
   it("targets getoxide.dev as the production SITE_URL", () => {
