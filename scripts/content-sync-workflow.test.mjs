@@ -17,8 +17,9 @@ const at = (needle) => {
 const stepOf = (cmd) => wf.slice(wf.lastIndexOf("- name:", at(cmd)), at(cmd));
 
 describe("content-sync workflow", () => {
-  it("runs daily and by hand with an optional ref", () => {
-    expect(wf).toMatch(/schedule:\s*\n\s*- cron: "[^"]+"/);
+  it("runs hourly and by hand with an optional ref", () => {
+    // ADR-0005: hourly, so a published release is live within the hour.
+    expect(wf).toMatch(/schedule:\s*\n\s*- cron: "17 \* \* \* \*"/);
     expect(wf).toMatch(/workflow_dispatch:\s*\n\s*inputs:\s*\n\s*ref:/);
     expect(wf).toMatch(/required: false/);
   });

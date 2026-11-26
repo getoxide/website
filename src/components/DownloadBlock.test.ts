@@ -58,6 +58,14 @@ describe("DownloadBlock, only a test pre-release", () => {
     expect(textOf(html)).toContain("x64 · AppImage · 95.1 MB");
   });
 
+  it("links the pre-release's own files, never GitHub's latest redirect", () => {
+    const hrefs = links(html).map((l) => l.href);
+    expect(hrefs).toContain(
+      "https://github.com/getoxide/oxide/releases/download/v1.2.0-rc.1/Oxide.dmg",
+    );
+    expect(hrefs.some((h) => h.includes("/releases/latest/"))).toBe(false);
+  });
+
   it("warns that it never reaches the updater or APT/DNF and links build from source", () => {
     expect(textOf(html)).toContain(
       "Test pre-release 1.2.0-rc.1: it never reaches the in-app updater or the APT and DNF repositories. Build from source for the latest code.",
@@ -67,19 +75,19 @@ describe("DownloadBlock, only a test pre-release", () => {
 });
 
 describe("DownloadBlock, stable release", () => {
-  it("links all three primary installers directly, macOS first, with their sublabels", () => {
+  it("links all three primary installers directly through GitHub's latest redirect, macOS first, with their sublabels", () => {
     const html = render("stable");
     expect(links(html).slice(0, 3)).toEqual([
       {
-        href: "https://github.com/getoxide/oxide/releases/download/v1.1.0/Oxide_1.1.0_aarch64.dmg",
+        href: "https://github.com/getoxide/oxide/releases/latest/download/Oxide.dmg",
         text: "Download for macOS",
       },
       {
-        href: "https://github.com/getoxide/oxide/releases/download/v1.1.0/Oxide_1.1.0_x64-setup.exe",
+        href: "https://github.com/getoxide/oxide/releases/latest/download/Oxide-x64.exe",
         text: "Download for Windows",
       },
       {
-        href: "https://github.com/getoxide/oxide/releases/download/v1.1.0/Oxide_1.1.0_amd64.AppImage",
+        href: "https://github.com/getoxide/oxide/releases/latest/download/Oxide-x64.AppImage",
         text: "Download for Linux",
       },
     ]);
@@ -126,7 +134,7 @@ describe("DownloadBlock, an installer that could not be resolved", () => {
     const html = render("unresolved");
     const [mac, win] = links(html);
     expect(mac.href).toBe(
-      "https://github.com/getoxide/oxide/releases/download/v1.1.0/Oxide_1.1.0_aarch64.dmg",
+      "https://github.com/getoxide/oxide/releases/latest/download/Oxide.dmg",
     );
     expect(win).toEqual({
       href: "https://github.com/getoxide/oxide/releases/tag/v1.1.0",

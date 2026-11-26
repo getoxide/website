@@ -126,6 +126,7 @@ Each is a React component with a CSS Module; the shared Panel, Rows and Rail liv
 - Home: absolutely positioned and transparent over the hero shader. Other pages: the same header in flow on `--ox-background`, with a bottom border in `--ox-border`.
 - Current page link: `--ox-text-bright` and `aria-current="page"`.
 - Below 860px: the four links collapse into a `<details>` menu (works without JS) that opens a full-width panel; the Download button stays visible.
+- **Download menu** ([ADR-0005](../adr/0005-versionless-installer-links.md)): in the `stable` Release state the Download nav button is the `<summary>` of a `<details>` menu (no JS, no hydration; opening it closes the small-screen menu and back). A small panel under the header, right-aligned at the gutter, at most 320px wide: `--ox-surface-background`, `--ox-element-border` with the Panel's lighter top edge, `--site-radius-frame` and the Panel shadow. It lists macOS, Windows and Linux as direct downloads (label in `--ox-text-bright`, the Download block's sublabel in `--site-text-caption` and `--ox-text-muted`, 44px rows, `--site-radius-sm` hover fill in `--ox-element-background`), the detected platform first with its icon and label in `--ox-text-accent`, macOS first without JS; then, under a hairline, GitHub and All downloads (`/download`). In every other state the button links to `/download`.
 
 ### Button
 
@@ -183,7 +184,7 @@ The four-step "From prompt to merge" path: a hairline with a node per step. Each
 
 ### Download block
 
-The CTA block from [Download experience and pre-release state](https://github.com/getoxide/website/issues/13) and the Copy deck: a primary button for the detected OS, a ghost GitHub button, and the quiet line underneath, rendering each release state. Used on the home, the landing pages, the guides and `/download`.
+The CTA block from [Download experience and pre-release state](https://github.com/getoxide/website/issues/13), [ADR-0005](../adr/0005-versionless-installer-links.md) and the Copy deck: three platform buttons (macOS, Windows, Linux), the detected OS's first and primary (macOS without JS), a ghost GitHub button, the additional builds as quiet links, and the quiet line underneath, rendering each release state. Every platform link is a direct file download. Used on the home, the landing pages, the guides and `/download`.
 
 ### Page header
 

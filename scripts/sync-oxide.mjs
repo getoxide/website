@@ -266,13 +266,23 @@ export function rewriteLinks(markdown, ref, file = "README.md") {
 export const RELEASES_URL = `https://github.com/${OXIDE_REPO}/releases`;
 
 /**
+ * GitHub's redirect to a file of the newest stable release. Oxide's installers
+ * have versionless names from v1.0.0 on, so `<LATEST_DOWNLOAD_URL>/<name>`
+ * always resolves to the newest stable build, even before the next sync.
+ */
+export const LATEST_DOWNLOAD_URL = `https://github.com/${OXIDE_REPO}/releases/latest/download`;
+
+/**
  * The installers Oxide ships, and the OS/architecture each one means
- * (Copy deck, Tokens: `⟨platforms⟩`).
+ * (Copy deck, Tokens: `⟨platforms⟩`). `file` is the versionless asset name
+ * every release from v1.0.0 on carries; `legacy` is the versioned name of the
+ * v0.0.x pre-releases, matched only when `file` is missing.
  */
 const INSTALLERS = [
   {
     key: "macos",
-    file: (v) => `Oxide_${v}_aarch64.dmg`,
+    file: "Oxide.dmg",
+    legacy: (v) => `Oxide_${v}_aarch64.dmg`,
     os: "macOS",
     arch: "Apple Silicon",
     platform: "macOS on Apple Silicon",
@@ -280,7 +290,8 @@ const INSTALLERS = [
   },
   {
     key: "windows",
-    file: (v) => `Oxide_${v}_x64-setup.exe`,
+    file: "Oxide-x64.exe",
+    legacy: (v) => `Oxide_${v}_x64-setup.exe`,
     os: "Windows",
     arch: "x64",
     platform: "Windows x64",
@@ -288,7 +299,8 @@ const INSTALLERS = [
   },
   {
     key: "windowsArm64",
-    file: (v) => `Oxide_${v}_arm64-setup.exe`,
+    file: "Oxide-arm64.exe",
+    legacy: (v) => `Oxide_${v}_arm64-setup.exe`,
     os: "Windows",
     arch: "arm64",
     platform: "Windows arm64",
@@ -296,7 +308,8 @@ const INSTALLERS = [
   },
   {
     key: "linux",
-    file: (v) => `Oxide_${v}_amd64.AppImage`,
+    file: "Oxide-x64.AppImage",
+    legacy: (v) => `Oxide_${v}_amd64.AppImage`,
     os: "Linux",
     arch: "x64",
     platform: "Linux x64",
@@ -304,7 +317,8 @@ const INSTALLERS = [
   },
   {
     key: "linuxDeb",
-    file: (v) => `Oxide_${v}_amd64.deb`,
+    file: "Oxide-x64.deb",
+    legacy: (v) => `Oxide_${v}_amd64.deb`,
     os: "Linux",
     arch: "x64",
     platform: "Linux x64",
@@ -312,7 +326,8 @@ const INSTALLERS = [
   },
   {
     key: "linuxRpm",
-    file: (v) => `Oxide-${v}-1.x86_64.rpm`,
+    file: "Oxide-x64.rpm",
+    legacy: (v) => `Oxide-${v}-1.x86_64.rpm`,
     os: "Linux",
     arch: "x64",
     platform: "Linux x64",
@@ -320,7 +335,8 @@ const INSTALLERS = [
   },
   {
     key: "linuxArm64",
-    file: (v) => `Oxide_${v}_aarch64.AppImage`,
+    file: "Oxide-arm64.AppImage",
+    legacy: (v) => `Oxide_${v}_aarch64.AppImage`,
     os: "Linux",
     arch: "arm64",
     platform: "Linux arm64",
@@ -328,7 +344,8 @@ const INSTALLERS = [
   },
   {
     key: "linuxArm64Deb",
-    file: (v) => `Oxide_${v}_arm64.deb`,
+    file: "Oxide-arm64.deb",
+    legacy: (v) => `Oxide_${v}_arm64.deb`,
     os: "Linux",
     arch: "arm64",
     platform: "Linux arm64",
@@ -336,7 +353,8 @@ const INSTALLERS = [
   },
   {
     key: "linuxArm64Rpm",
-    file: (v) => `Oxide-${v}-1.aarch64.rpm`,
+    file: "Oxide-arm64.rpm",
+    legacy: (v) => `Oxide-${v}-1.aarch64.rpm`,
     os: "Linux",
     arch: "arm64",
     platform: "Linux arm64",
@@ -385,12 +403,25 @@ function noteSection(body, name) {
   return section.join("\n").trim() || null;
 }
 
-/** The exact installer asset of a release, or the release page instead. */
-function installer(release, version, { file }) {
-  const name = file(version);
-  const asset = release.assets?.find((a) => a.name === name);
-  return asset
-    ? { name, url: asset.browser_download_url, size: asset.size }
+/**
+ * The installer asset of a release, or the release page instead. A stable
+ * release's versionless asset links through GitHub's `latest` redirect, so a
+ * newer stable release is live on the site the moment it is published; a
+ * pre-release, or a legacy versioned name, keeps its tag's own URL.
+ */
+function installer(release, version, { file, legacy }) {
+  const assets = release.assets ?? [];
+  const current = assets.find((a) => a.name === file);
+  if (current) {
+    const url = isStable(release)
+      ? `${LATEST_DOWNLOAD_URL}/${file}`
+      : current.browser_download_url;
+    return { name: file, url, size: current.size };
+  }
+  const name = legacy(version);
+  const old = assets.find((a) => a.name === name);
+  return old
+    ? { name, url: old.browser_download_url, size: old.size }
     : { name: null, url: release.html_url, size: null };
 }
 
@@ -482,7 +513,11 @@ export function releaseData(releases, { install }) {
     };
     unresolved = INSTALLERS.filter(
       (i) => i.primary && assets[i.key].name === null,
-    ).map((i) => ({ platform: i.platform, version, tag: newest.tag_name }));
+    ).map((i) => ({
+      platform: i.platform,
+      file: i.file,
+      tag: newest.tag_name,
+    }));
     const shipped = INSTALLERS.filter((i) => assets[i.key].name !== null);
     if (shipped.length) {
       platforms = formatPlatforms(shipped);
@@ -813,9 +848,9 @@ export async function syncOxide({
   if (unlisted.length) {
     log(`Glossary terms not on the site: ${unlisted.join(", ")}`);
   }
-  for (const { platform, version, tag } of unresolved) {
+  for (const { platform, file, tag } of unresolved) {
     log(
-      `Warning: no ${platform} installer asset (Oxide_${version}) in ${tag}: the button falls back to the release page.`,
+      `Warning: no ${platform} installer asset (${file}) in ${tag}: the button falls back to the release page.`,
     );
   }
   return { ref, commit, written: outputs.map(([path]) => path), unlisted };

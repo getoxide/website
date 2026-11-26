@@ -11,7 +11,7 @@ Every page belongs to one class. The class is the `budgetClass` field of its ent
 | Class | Pages | Why |
 | --- | --- | --- |
 | `showcase` | `/`, `/features` | Captures, section reveals and, on the home only, the shader |
-| `reading` | `/faq`, `/changelog`, `/docs`, `/guides`, `/guides/running-agents-in-oxide`, `/guides/linux-packages-and-updates`, `/download`, `/privacy`, the 404 | Only page transitions and micro-interactions. `/download` adds just its OS detection |
+| `reading` | `/faq`, `/changelog`, `/docs`, `/guides`, `/guides/running-agents-in-oxide`, `/guides/linux-packages-and-updates`, `/download`, `/privacy`, the 404 | Only page transitions and micro-interactions. Every page carries the header's inline OS detection (a few hundred bytes, no hydration), which the Download menu and `/download` use |
 
 A new page picks a class when it enters `PAGES`.
 

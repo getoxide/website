@@ -25,6 +25,16 @@ export const COPY = {
     ] satisfies Link[],
     github: { label: "GitHub", href: GITHUB_REPO_URL },
     download: { label: "Download", href: "/download" },
+    /**
+     * The Download menu the header button opens in the `stable` Release
+     * state (ADR-0005). Build-written labels, drafts Lorenzo or Matteo
+     * approves in review; the sublabels are the Download block's.
+     */
+    downloadMenu: {
+      platforms: { macos: "macOS", windows: "Windows", linux: "Linux" },
+      github: "GitHub",
+      all: "All downloads",
+    },
     menu: "Menu",
   },
 

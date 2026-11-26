@@ -4,7 +4,7 @@ import { SNAPSHOT, tokensOf, type Snapshot } from "./snapshot";
 
 const asset = (name: string, size: number) => ({
   name,
-  url: `https://github.com/getoxide/oxide/releases/download/v1.1.0/${name}`,
+  url: `https://github.com/getoxide/oxide/releases/latest/download/${name}`,
   size,
 });
 
@@ -22,15 +22,15 @@ const STABLE = withRelease({
     url: "https://github.com/getoxide/oxide/releases/tag/v1.1.0",
     prerelease: false,
     assets: {
-      macos: asset("Oxide_1.1.0_aarch64.dmg", 101_234_567),
-      windows: asset("Oxide_1.1.0_x64-setup.exe", 88_765_432),
-      windowsArm64: asset("Oxide_1.1.0_arm64-setup.exe", 86_543_210),
-      linux: asset("Oxide_1.1.0_amd64.AppImage", 94_263_800),
-      linuxDeb: asset("Oxide_1.1.0_amd64.deb", 16_894_530),
-      linuxRpm: asset("Oxide-1.1.0-1.x86_64.rpm", 16_899_955),
-      linuxArm64: asset("Oxide_1.1.0_aarch64.AppImage", 92_580_360),
-      linuxArm64Deb: asset("Oxide_1.1.0_arm64.deb", 17_240_882),
-      linuxArm64Rpm: asset("Oxide-1.1.0-1.aarch64.rpm", 17_245_847),
+      macos: asset("Oxide.dmg", 101_234_567),
+      windows: asset("Oxide-x64.exe", 88_765_432),
+      windowsArm64: asset("Oxide-arm64.exe", 86_543_210),
+      linux: asset("Oxide-x64.AppImage", 94_263_800),
+      linuxDeb: asset("Oxide-x64.deb", 16_894_530),
+      linuxRpm: asset("Oxide-x64.rpm", 16_899_955),
+      linuxArm64: asset("Oxide-arm64.AppImage", 92_580_360),
+      linuxArm64Deb: asset("Oxide-arm64.deb", 17_240_882),
+      linuxArm64Rpm: asset("Oxide-arm64.rpm", 17_245_847),
     },
   },
   platforms: [

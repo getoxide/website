@@ -5,9 +5,12 @@ name: Content sync
 # straight to main and Cloudflare Workers deploys it. No PR: PRs opened with GITHUB_TOKEN
 # trigger no workflows, and an extra PAT or App token was rejected.
 # Any failure happens before the push, so main keeps the last good Snapshot.
+# Hourly, so a published Oxide release reaches the site within the hour with
+# no cross-repo trigger (that needs an extra token, rejected); a run whose
+# Snapshot is unchanged stops after the sync step (ADR-0005).
 on:
   schedule:
-    - cron: "17 5 * * *"
+    - cron: "17 * * * *"
   workflow_dispatch:
     inputs:
       ref:

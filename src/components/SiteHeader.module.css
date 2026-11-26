@@ -89,6 +89,107 @@
   white-space: nowrap;
 }
 
+/* The Download menu (stable Release state, ADR-0005): the nav pill as a
+   `<summary>`, opening a small panel of direct downloads under the header. */
+.downloadButton {
+  cursor: pointer;
+  list-style: none;
+}
+
+.downloadButton::-webkit-details-marker {
+  display: none;
+}
+
+.download[open] .downloadButton {
+  background: var(--ox-element-background);
+}
+
+.downloadButton[data-current] {
+  color: var(--ox-text-bright);
+}
+
+.download[open] .chevron {
+  transform: rotate(180deg);
+}
+
+/* Anchored to the header, not the button, so it never runs off a phone. */
+.downloadPanel {
+  position: absolute;
+  top: calc(100% - var(--site-space-2));
+  right: var(--site-gutter);
+  display: flex;
+  flex-direction: column;
+  gap: var(--site-space-1);
+  width: min(320px, calc(100% - 2 * var(--site-gutter)));
+  margin: 0;
+  padding: var(--site-space-2);
+  border: 1px solid var(--ox-element-border);
+  border-top-color: color-mix(in srgb, var(--ox-text) 18%, transparent);
+  border-radius: var(--site-radius-frame);
+  background: var(--ox-surface-background);
+  box-shadow: 0 30px 80px -40px color-mix(in srgb, black 80%, transparent);
+  list-style: none;
+}
+
+/* The visitor's platform first, as in the Download block; macOS without JS. */
+.macos,
+.windows,
+.linux {
+  order: 0;
+}
+
+:global(html[data-os="windows"]) .windows,
+:global(html[data-os="linux"]) .linux {
+  order: -1;
+}
+
+.downloadMore {
+  margin-top: var(--site-space-1);
+  padding-top: var(--site-space-2);
+  border-top: 1px solid var(--ox-border);
+}
+
+.downloadLink {
+  display: flex;
+  align-items: center;
+  gap: var(--site-space-3);
+  min-height: 44px;
+  padding: var(--site-space-2) var(--site-space-3);
+  border-radius: var(--site-radius-sm);
+  color: var(--ox-text);
+  text-decoration: none;
+  transition: background-color var(--site-dur-fast) var(--site-ease-fade);
+}
+
+.downloadLink:hover {
+  background: var(--ox-element-background);
+}
+
+.downloadIcon {
+  flex-shrink: 0;
+  color: var(--ox-text-muted);
+}
+
+.downloadText {
+  display: grid;
+}
+
+.downloadLabel {
+  color: var(--ox-text-bright);
+}
+
+.downloadSublabel {
+  font: var(--site-text-caption) var(--site-font-body);
+  color: var(--ox-text-muted);
+}
+
+/* The detected platform is highlighted in the action colour. */
+:global(html[data-os="macos"]) .macos :is(.downloadIcon, .downloadLabel),
+:global(html[data-os="windows"]) .windows :is(.downloadIcon, .downloadLabel),
+:global(html[data-os="linux"]) .linux :is(.downloadIcon, .downloadLabel) {
+  color: var(--ox-text-accent);
+}
+
 /* The menu exists only below the breakpoint. */
 .menu {
   display: none;
