@@ -19,7 +19,7 @@ A new page picks a class when it enters `PAGES`.
 
 The site has too little traffic for field data to exist for months, and the [Measurement plan](https://github.com/getoxide/website/issues/16) allows no second analytics script. The targets are therefore **lab** targets: Lighthouse, mobile preset (simulated slow 4G, 4× CPU slowdown), median of 3 runs. INP cannot be measured in the lab, so TBT stands in for it.
 
-Shared CI runners are the noise floor: the same commit has measured 73 ms and 168 ms of TBT on `/`, with the three runs of a busy round slow together. A round whose median is over a ceiling is therefore measured again before the gate fails (`ROUNDS` in `scripts/lighthouse.mjs`); a real regression breaks both. The ceilings do not move for noise, and a retried round is reported as a warning.
+Shared CI runners are the noise floor: the same commit has measured 73 ms and 168 ms of TBT on `/`, with the three runs of a busy round slow together. A round whose median is over a ceiling is therefore measured again before the gate fails (`ROUNDS` in `scripts/lighthouse.mjs`); a real regression breaks every round. A re-measured runner can stay slow for two full rounds, so the page gets up to two re-measures; the ceilings do not move for noise, and a retried round is reported as a warning.
 
 | Class | LCP | TBT (INP proxy) | CLS |
 | --- | --- | --- | --- |
@@ -119,7 +119,7 @@ Everything runs against the static export served locally in CI, never against a 
 | --- | --- | --- |
 | axe (`@axe-core/playwright`), tags WCAG 2.2 A and AA, zero violations | Every page in `PAGES` | **Fails the build** |
 | `scripts/check-budgets.mjs` | Every exported page, against its class's ceilings | **Fails the build** |
-| Lighthouse CI, median of 3: LCP, TBT and CLS from the table above; accessibility score = 100 | `/` and `/changelog` | **Fails the build** (a round over budget is measured once more first, see Core Web Vitals) |
+| Lighthouse CI, median of 3: LCP, TBT and CLS from the table above; accessibility score = 100 | `/` and `/changelog` | **Fails the build** (a round over budget is measured up to two more times first, see Core Web Vitals) |
 | Shader structure tests (buffer cap, frame cap, blend/backdrop lint) | Home | **Fails the build** |
 | Lighthouse overall performance score | `/` and `/changelog` | Warning only |
 
