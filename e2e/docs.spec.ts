@@ -72,7 +72,7 @@ test.describe("/docs/quick-start", () => {
     await page.goto("/docs/quick-start");
     await expect(page.locator('head link[rel="canonical"]')).toHaveAttribute(
       "href",
-      "https://oxide.cavallinilorenzo.com/docs/quick-start",
+      "https://getoxide.dev/docs/quick-start",
     );
   });
 });

@@ -2,7 +2,7 @@ name: Content sync
 
 # Pulls the latest stable Oxide release into the committed Snapshot
 # (ADR-0003). A changed Snapshot that passes the site's checks is pushed
-# straight to main and Vercel deploys it. No PR: PRs opened with GITHUB_TOKEN
+# straight to main and Cloudflare Workers deploys it. No PR: PRs opened with GITHUB_TOKEN
 # trigger no workflows, and an extra PAT or App token was rejected.
 # Any failure happens before the push, so main keeps the last good Snapshot.
 on:

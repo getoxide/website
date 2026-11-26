@@ -65,12 +65,12 @@ export type Snapshot = {
 /**
  * Test exports only: `SITE_RELEASE_FIXTURE=<key>` swaps the Release for one
  * of e2e/fixtures/releases.json, so Playwright can see every Release state
- * (`scripts/build-fixtures.mjs`). A deploy never sets it, and Vercel refuses.
+ * (`scripts/build-fixtures.mjs`). A deploy never sets it, and Cloudflare Workers Builds refuses.
  */
 function withReleaseFixture(snapshot: Snapshot): Snapshot {
   const key = process.env.SITE_RELEASE_FIXTURE;
   if (!key) return snapshot;
-  if (process.env.VERCEL) {
+  if (process.env.WORKERS_CI || process.env.CF_PAGES) {
     throw new Error("SITE_RELEASE_FIXTURE is for local test exports only");
   }
   const fixtures = releaseFixtures as Record<string, Snapshot["release"]>;

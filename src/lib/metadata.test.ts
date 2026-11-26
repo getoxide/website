@@ -31,10 +31,10 @@ describe("pageMetadata", () => {
 
   it("uses an absolute canonical without a trailing slash", () => {
     expect(pageMetadata(guide).alternates?.canonical).toBe(
-      "https://oxide.cavallinilorenzo.com/guides/review-ai-generated-code",
+      "https://getoxide.dev/guides/review-ai-generated-code",
     );
     expect(pageMetadata(home).alternates?.canonical).toBe(
-      "https://oxide.cavallinilorenzo.com",
+      "https://getoxide.dev",
     );
   });
 
@@ -43,7 +43,7 @@ describe("pageMetadata", () => {
       title: "How to review AI-generated code",
       siteName: "Oxide",
       description: "A four-step method.",
-      url: "https://oxide.cavallinilorenzo.com/guides/review-ai-generated-code",
+      url: "https://getoxide.dev/guides/review-ai-generated-code",
     });
     expect(pageMetadata(home).openGraph?.title).toBe(
       "Oxide: the complete desktop app for Claude Code and Codex",
@@ -69,7 +69,7 @@ describe("pageMetadata", () => {
     for (const page of [guide, home]) {
       expect(pageMetadata(page).openGraph?.images).toEqual([
         {
-          url: "https://oxide.cavallinilorenzo.com/og.png",
+          url: "https://getoxide.dev/og.png",
           width: 1200,
           height: 630,
           type: "image/png",
@@ -78,7 +78,7 @@ describe("pageMetadata", () => {
       ]);
       expect(pageMetadata(page).twitter?.images).toEqual([
         {
-          url: "https://oxide.cavallinilorenzo.com/og.png",
+          url: "https://getoxide.dev/og.png",
           alt: SHARE_CARD.alt,
         },
       ]);

@@ -46,7 +46,7 @@ describe("buildMachine", () => {
     dir = mkdtempSync(join(tmpdir(), "machine-"));
     buildMachine({ outDir: dir, pages: PAGES, snapshot: SNAPSHOT });
     expect(readFileSync(join(dir, "robots.txt"), "utf8")).toContain(
-      "Sitemap: https://oxide.cavallinilorenzo.com/sitemap.xml",
+      "Sitemap: https://getoxide.dev/sitemap.xml",
     );
     expect(readFileSync(join(dir, "sitemap.xml"), "utf8")).toContain(
       "<lastmod>2026-12-10</lastmod>",
@@ -54,7 +54,7 @@ describe("buildMachine", () => {
     const llms = readFileSync(join(dir, "llms.txt"), "utf8");
     expect(llms).toContain("# Oxide");
     expect(llms).toContain(
-      "- [Oxide: the complete desktop app](https://oxide.cavallinilorenzo.com)",
+      "- [Oxide: the complete desktop app](https://getoxide.dev)",
     );
   });
 });
