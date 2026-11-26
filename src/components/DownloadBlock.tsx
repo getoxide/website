@@ -1,6 +1,6 @@
 import { COPY, GITHUB_REPO_URL } from "@/content/copy";
+import { platformDownloads } from "@/lib/downloads";
 import { readmeUrl } from "@/lib/oxide";
-import { OS_SCRIPT } from "@/lib/os";
 import {
   SNAPSHOT,
   tokensOf,
@@ -11,17 +11,6 @@ import type { ClickEvent } from "@/lib/measurement";
 import { Button } from "./Button";
 import { DeckText } from "./DeckText";
 import styles from "./DownloadBlock.module.css";
-
-type Platform = "macos" | "windows" | "linux";
-
-/** macOS is primary without JavaScript (Download experience #13). */
-const PLATFORMS: Platform[] = ["macos", "windows", "linux"];
-
-const EVENTS = {
-  macos: "download-macos-arm",
-  windows: "download-windows",
-  linux: "download-linux",
-} as const satisfies Record<Platform, ClickEvent>;
 
 const EXTRA_PACKAGES: {
   key: InstallerKey;
@@ -65,7 +54,8 @@ export function DownloadBlock({
   const copy = COPY.download;
   const { release } = snapshot;
   const latest = release.latest;
-  if (release.state === "none" || !latest) {
+  const platforms = platformDownloads(snapshot);
+  if (!platforms || !latest) {
     return (
       <div className={styles.block}>
         <div className={styles.buttons}>
@@ -95,15 +85,11 @@ export function DownloadBlock({
   );
   return (
     <div className={styles.block}>
-      {/* Runs while the page is parsed, before the buttons below exist, so
-          they are ordered and styled at first paint (Download experience #13). */}
-      <script dangerouslySetInnerHTML={{ __html: OS_SCRIPT }} />
+      {/* The header's inline script has set `html[data-os]` by the time the
+          buttons below are parsed, so they are ordered and styled at first
+          paint (Download experience #13). */}
       <div className={styles.buttons}>
-        {PLATFORMS.map((platform, i) => {
-          const size = token(`asset-size:${platform}`);
-          const sublabel = [copy.buttons.sublabel[platform], size]
-            .filter(Boolean)
-            .join(" · ");
+        {platforms.map(({ platform, url, sublabel, event }, i) => {
           const id = `download-${platform}-details`;
           return (
             <div
@@ -111,12 +97,12 @@ export function DownloadBlock({
               className={`${styles.option} ${styles[platform]}`}
             >
               <Button
-                href={latest.assets[platform].url}
+                href={url}
                 variant={i === 0 ? "primary" : "ghost"}
                 platform={platform}
                 icon="download"
                 describedBy={id}
-                event={EVENTS[platform]}
+                event={event}
               >
                 {copy.buttons[platform]}
               </Button>

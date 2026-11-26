@@ -10,22 +10,19 @@ const UA = {
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
 };
 
+// Stable: GitHub's `latest` redirect (ADR-0005); a pre-release: its tag.
+const LATEST = "https://github.com/getoxide/oxide/releases/latest/download";
+const RC = "https://github.com/getoxide/oxide/releases/download/v1.2.0-rc.1";
 const ASSET = {
   stable: {
-    macos:
-      "https://github.com/getoxide/oxide/releases/download/v1.1.0/Oxide_1.1.0_aarch64.dmg",
-    windows:
-      "https://github.com/getoxide/oxide/releases/download/v1.1.0/Oxide_1.1.0_x64-setup.exe",
-    linux:
-      "https://github.com/getoxide/oxide/releases/download/v1.1.0/Oxide_1.1.0_amd64.AppImage",
+    macos: `${LATEST}/Oxide.dmg`,
+    windows: `${LATEST}/Oxide-x64.exe`,
+    linux: `${LATEST}/Oxide-x64.AppImage`,
   },
   prerelease: {
-    macos:
-      "https://github.com/getoxide/oxide/releases/download/v1.2.0-rc.1/Oxide_1.2.0-rc.1_aarch64.dmg",
-    windows:
-      "https://github.com/getoxide/oxide/releases/download/v1.2.0-rc.1/Oxide_1.2.0-rc.1_x64-setup.exe",
-    linux:
-      "https://github.com/getoxide/oxide/releases/download/v1.2.0-rc.1/Oxide_1.2.0-rc.1_amd64.AppImage",
+    macos: `${RC}/Oxide.dmg`,
+    windows: `${RC}/Oxide-x64.exe`,
+    linux: `${RC}/Oxide-x64.AppImage`,
   },
 };
 
@@ -275,6 +272,118 @@ test.describe("none", () => {
       "No release yet. Oxide is pre-release software; follow the repository to hear about the first one.",
     );
   });
+});
+
+/** The header Download menu's links in visual order: [label, href, highlighted]. */
+async function menuLinks(page: Page): Promise<[string, string, boolean][]> {
+  const links = page
+    .locator("header details", {
+      has: page.locator("summary", { hasText: "Download" }),
+    })
+    .locator("li a");
+  const shown = await links.evaluateAll((as) => {
+    const probe = document.createElement("span");
+    probe.style.color = "var(--ox-text-accent)";
+    document.body.append(probe);
+    const accent = getComputedStyle(probe).color;
+    probe.remove();
+    return as.map((a) => {
+      // The label is the first span holding no other span.
+      const label = a.querySelector("span:not(:has(span))")!;
+      return {
+        top: a.getBoundingClientRect().top,
+        label: label.textContent!.trim(),
+        href: a.getAttribute("href")!,
+        lit: getComputedStyle(label).color === accent,
+      };
+    });
+  });
+  return shown
+    .sort((a, b) => a.top - b.top)
+    .map(({ label, href, lit }) => [label, href, lit]);
+}
+
+test.describe("header Download menu", () => {
+  const GITHUB = "https://github.com/getoxide/oxide";
+  for (const [platform, ua, js, first] of [
+    ["mac", UA.mac, true, "macos"],
+    ["windows", UA.windows, true, "windows"],
+    ["linux", UA.linux, true, "linux"],
+    ["windows, JavaScript off", UA.windows, false, null],
+  ] as const) {
+    test(`stable on ${platform}: direct downloads, detected first, then GitHub and /download`, async ({
+      browser,
+    }) => {
+      const page = await open(browser, "stable", {
+        ua,
+        js,
+        path: "/privacy",
+      });
+      const banner = page.getByRole("banner");
+      const summary = banner.locator("summary", { hasText: "Download" });
+      await expect(summary).toBeVisible();
+      await expect(banner.getByRole("link", { name: /^macOS/ })).toBeHidden();
+      await summary.click();
+      const label = { macos: "macOS", windows: "Windows", linux: "Linux" };
+      const platforms = (["macos", "windows", "linux"] as const)
+        .map((key) => [label[key], ASSET.stable[key], key === first] as const)
+        .sort((a, b) => Number(b[2]) - Number(a[2]));
+      expect(await menuLinks(page)).toEqual([
+        ...platforms,
+        ["GitHub", GITHUB, false],
+        ["All downloads", "/download", false],
+      ]);
+      await expect(
+        banner.getByRole("link", { name: /^macOS/ }),
+      ).toBeInViewport();
+      await summary.click();
+      await expect(banner.getByRole("link", { name: /^macOS/ })).toBeHidden();
+    });
+  }
+
+  test("stable at 390px: the menu fits the screen and closes the other menu", async ({
+    browser,
+  }) => {
+    const context = await browser.newContext({
+      userAgent: UA.linux,
+      viewport: { width: 390, height: 844 },
+      baseURL: fixtureOrigin("stable"),
+    });
+    const page = await context.newPage();
+    await page.goto("/privacy");
+    const banner = page.getByRole("banner");
+    await banner.getByText("Menu", { exact: true }).click();
+    await expect(banner.getByRole("link", { name: "Features" })).toBeVisible();
+    await banner.locator("summary", { hasText: "Download" }).click();
+    await expect(banner.getByRole("link", { name: "Features" })).toBeHidden();
+    const panel = (await banner.locator("details ul").first().boundingBox())!;
+    expect(panel.x).toBeGreaterThanOrEqual(0);
+    expect(panel.x + panel.width).toBeLessThanOrEqual(390);
+    await expect(banner.getByRole("link", { name: /^Linux/ })).toBeInViewport();
+    const results = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+      .analyze();
+    expect(results.violations).toEqual([]);
+    await context.close();
+  });
+
+  for (const fixture of ["prerelease-only", "none"] as const) {
+    test(`${fixture}: the header Download button links to /download`, async ({
+      browser,
+    }) => {
+      const page = await open(browser, fixture, {
+        ua: UA.mac,
+        path: "/privacy",
+      });
+      const banner = page.getByRole("banner");
+      await expect(
+        banner.getByRole("link", { name: "Download", exact: true }),
+      ).toHaveAttribute("href", "/download");
+      await expect(
+        banner.locator("summary", { hasText: "Download" }),
+      ).toHaveCount(0);
+    });
+  }
 });
 
 test.describe("closing CTA primary", () => {

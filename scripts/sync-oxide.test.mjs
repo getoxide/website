@@ -192,17 +192,17 @@ const STABLE = {
   body: "### Fixes\n\n- a fix\n",
   assets: [
     {
-      name: "Oxide_1.1.0_aarch64.dmg",
+      name: "Oxide.dmg",
       size: 100,
       browser_download_url: "https://example.test/mac.dmg",
     },
     {
-      name: "Oxide_1.1.0_x64-setup.exe",
+      name: "Oxide-x64.exe",
       size: 90,
       browser_download_url: "https://example.test/win.exe",
     },
     {
-      name: "Oxide_1.1.0_amd64.AppImage",
+      name: "Oxide-x64.AppImage",
       size: 95,
       browser_download_url: "https://example.test/linux.AppImage",
     },
@@ -337,8 +337,9 @@ describe("syncOxide: snapshot", () => {
   it("writes the release state and the changelog", async () => {
     const { snapshot } = await run(source(), { releases: [STABLE] });
     expect(snapshot.release.state).toBe("stable");
+    // Stable: GitHub's `latest` redirect, not the tag's own URL.
     expect(snapshot.release.latest.assets.macos.url).toBe(
-      "https://example.test/mac.dmg",
+      "https://github.com/getoxide/oxide/releases/latest/download/Oxide.dmg",
     );
     expect(snapshot.changelog).toEqual([
       {
@@ -525,14 +526,14 @@ describe("syncOxide: unresolved installers are reported (issue #29, item 15)", (
       releases: [
         {
           ...STABLE,
-          assets: STABLE.assets.filter((a) => a.name.includes("aarch64")),
+          assets: STABLE.assets.filter((a) => a.name === "Oxide.dmg"),
         },
       ],
       logs,
     });
     expect(snapshot.release.latest.assets.windows.name).toBeNull();
     expect(logs).toContain(
-      "Warning: no Windows x64 installer asset (Oxide_1.1.0) in v1.1.0: the button falls back to the release page.",
+      "Warning: no Windows x64 installer asset (Oxide-x64.exe) in v1.1.0: the button falls back to the release page.",
     );
   });
 });

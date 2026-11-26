@@ -110,6 +110,20 @@ const INSTALL = `| Platform | File | Notes |
 
 const DL = "https://github.com/getoxide/oxide/releases/download";
 const PAGE = "https://github.com/getoxide/oxide/releases/tag";
+const LATEST = "https://github.com/getoxide/oxide/releases/latest/download";
+
+/** Every installer, by its versionless name (Oxide v1.0.0 on). */
+const VERSIONLESS = [
+  ["macos", "Oxide.dmg"],
+  ["windows", "Oxide-x64.exe"],
+  ["windowsArm64", "Oxide-arm64.exe"],
+  ["linux", "Oxide-x64.AppImage"],
+  ["linuxDeb", "Oxide-x64.deb"],
+  ["linuxRpm", "Oxide-x64.rpm"],
+  ["linuxArm64", "Oxide-arm64.AppImage"],
+  ["linuxArm64Deb", "Oxide-arm64.deb"],
+  ["linuxArm64Rpm", "Oxide-arm64.rpm"],
+];
 
 /** A GitHub Releases API entry, as `GET /repos/{repo}/releases` returns it. */
 function release(tag, { prerelease = false, assets, body = "", date } = {}) {
@@ -124,11 +138,14 @@ function release(tag, { prerelease = false, assets, body = "", date } = {}) {
     body,
     assets: (
       assets ?? [
-        [`Oxide_${version}_aarch64.dmg`, 101_234_567],
-        [`Oxide_${version}_aarch64.app.tar.gz`, 99_000_000],
-        [`Oxide_${version}_x64-setup.exe`, 88_765_432],
+        ["Oxide.dmg", 101_234_567],
+        ["Oxide.app.tar.gz", 99_000_000],
+        ["Oxide.app.tar.gz.sig", 400],
+        ["Oxide-x64.exe", 88_765_432],
+        ["Oxide-x64.exe.sig", 400],
         ["latest.json", 1_234],
         ["SHA256SUMS.txt", 900],
+        ["InRelease", 2_000],
       ]
     ).map(([name, size]) => ({
       name,
@@ -198,14 +215,15 @@ describe("releaseData", () => {
       url: `${PAGE}/v1.0.0-rc.1`,
       prerelease: true,
     });
+    // A pre-release never links through `latest`: its tag's own URL.
     expect(data.release.latest.assets.macos).toEqual({
-      name: "Oxide_1.0.0-rc.1_aarch64.dmg",
-      url: `${DL}/v1.0.0-rc.1/Oxide_1.0.0-rc.1_aarch64.dmg`,
+      name: "Oxide.dmg",
+      url: `${DL}/v1.0.0-rc.1/Oxide.dmg`,
       size: 101_234_567,
     });
     expect(data.release.latest.assets.windows).toEqual({
-      name: "Oxide_1.0.0-rc.1_x64-setup.exe",
-      url: `${DL}/v1.0.0-rc.1/Oxide_1.0.0-rc.1_x64-setup.exe`,
+      name: "Oxide-x64.exe",
+      url: `${DL}/v1.0.0-rc.1/Oxide-x64.exe`,
       size: 88_765_432,
     });
     expect(data.release.platforms).toEqual([
@@ -294,7 +312,7 @@ describe("releaseData", () => {
       [
         release("v1.0.0", {
           assets: [
-            ["Oxide_1.0.0_aarch64.dmg", 101],
+            ["Oxide.dmg", 101],
             ["Oxide_0.9.0_x64-setup.exe", 88],
           ],
         }),
@@ -302,8 +320,8 @@ describe("releaseData", () => {
       { install: INSTALL },
     );
     expect(data.release.latest?.assets.macos).toEqual({
-      name: "Oxide_1.0.0_aarch64.dmg",
-      url: `${DL}/v1.0.0/Oxide_1.0.0_aarch64.dmg`,
+      name: "Oxide.dmg",
+      url: `${LATEST}/Oxide.dmg`,
       size: 101,
     });
     expect(data.release.latest?.assets.windows).toEqual({
@@ -314,6 +332,88 @@ describe("releaseData", () => {
     // Platforms follow the assets the release actually ships.
     expect(data.release.platforms).toEqual(["macOS on Apple Silicon"]);
     expect(data.release.platformsFrom).toBe("release");
+  });
+
+  it("stable: every versionless installer links through GitHub's latest redirect", () => {
+    const data = releaseData(
+      [
+        release("v1.0.0", {
+          assets: [
+            ...VERSIONLESS.map(([, name], i) => [name, 1_000 + i]),
+            ["Oxide.app.tar.gz", 1],
+            ["latest.json", 1],
+            ["Release", 1],
+            ["Packages", 1],
+            ["oxide-repository.gpg", 1],
+          ],
+        }),
+      ],
+      { install: INSTALL },
+    );
+    expect(data.release.state).toBe("stable");
+    expect(data.release.latest?.assets).toEqual(
+      Object.fromEntries(
+        VERSIONLESS.map(([key, name], i) => [
+          key,
+          { name, url: `${LATEST}/${name}`, size: 1_000 + i },
+        ]),
+      ),
+    );
+    expect(data.unresolved).toEqual([]);
+    expect(data.release.platforms).toEqual([
+      "macOS on Apple Silicon",
+      "Windows (x64, arm64)",
+      "Linux (x64, arm64)",
+    ]);
+  });
+
+  it("the versioned names of the v0.0.x pre-releases still resolve, at their tag", () => {
+    const data = releaseData(
+      [
+        release("v0.0.4", {
+          prerelease: true,
+          assets: [
+            ["Oxide_0.0.4_aarch64.dmg", 14],
+            ["Oxide_0.0.4_x64-setup.exe", 11],
+            ["Oxide_0.0.4_arm64-setup.exe", 10],
+            ["Oxide_0.0.4_amd64.AppImage", 94],
+            ["Oxide_0.0.4_amd64.deb", 16],
+            ["Oxide-0.0.4-1.x86_64.rpm", 17],
+            ["Oxide_0.0.4_aarch64.AppImage", 92],
+            ["Oxide_0.0.4_arm64.deb", 18],
+            ["Oxide-0.0.4-1.aarch64.rpm", 19],
+          ],
+        }),
+      ],
+      { install: INSTALL },
+    );
+    const assets = data.release.latest?.assets;
+    expect(assets?.macos).toEqual({
+      name: "Oxide_0.0.4_aarch64.dmg",
+      url: `${DL}/v0.0.4/Oxide_0.0.4_aarch64.dmg`,
+      size: 14,
+    });
+    expect(assets?.linuxArm64Rpm).toEqual({
+      name: "Oxide-0.0.4-1.aarch64.rpm",
+      url: `${DL}/v0.0.4/Oxide-0.0.4-1.aarch64.rpm`,
+      size: 19,
+    });
+    expect(Object.values(assets ?? {}).every((a) => a.name !== null)).toBe(
+      true,
+    );
+    expect(data.unresolved).toEqual([]);
+  });
+
+  it("a stable release with only a versioned name keeps the tag URL, which a newer release cannot break", () => {
+    const data = releaseData(
+      [release("v1.0.0", { assets: [["Oxide_1.0.0_aarch64.dmg", 5]] })],
+      { install: INSTALL },
+    );
+    expect(data.release.latest?.assets.macos).toEqual({
+      name: "Oxide_1.0.0_aarch64.dmg",
+      url: `${DL}/v1.0.0/Oxide_1.0.0_aarch64.dmg`,
+      size: 5,
+    });
   });
 
   it("a release with no installer at all keeps the README platforms", () => {
