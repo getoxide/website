@@ -33,7 +33,7 @@ export type Page = {
 export const PAGES = {
   home: {
     path: "/",
-    h1: "A terminal app that knows your GitHub projects.",
+    h1: "The complete desktop app for agentic coding.",
     title: "Oxide: a desktop terminal app for your GitHub Projects",
     description:
       "Open a Project, run as many plain terminals as you like in its folder, and keep your files, GitHub Issues and pull requests in the same window.",

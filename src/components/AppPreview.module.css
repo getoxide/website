@@ -5,22 +5,34 @@
   position: relative;
   display: grid;
   gap: var(--site-space-3);
-  margin: 0;
+  width: 100%;
+  max-width: var(--site-w-frame);
+  min-width: 0;
+  margin: 0 auto;
 }
 
 .window {
   position: relative;
   display: grid;
   grid-template-rows: 34px minmax(0, 1fr);
+  min-width: 0;
+  max-width: 100%;
   height: 600px;
   overflow: hidden;
   border: 1px solid var(--ox-element-border);
-  border-radius: var(--site-radius-md);
+  border-top-color: color-mix(in srgb, var(--ox-text) 35%, transparent);
+  border-radius: var(--site-radius-frame);
   background: var(--ox-background);
-  box-shadow: var(--site-shadow-frame);
+  box-shadow:
+    0 -1px 0 color-mix(in srgb, var(--ox-text-bright) 6%, transparent),
+    0 50px 120px -30px color-mix(in srgb, var(--ox-background) 90%, transparent);
   color: var(--ox-text);
   font: 13px / 1.45 var(--site-font-body);
   text-align: left;
+}
+
+.window svg {
+  flex-shrink: 0;
 }
 
 /* Minimal 34px titlebar matching Oxide's real window chrome: only the right-dock toggle */
@@ -653,8 +665,9 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  height: 24px;
-  padding: 0 12px;
+  min-height: 24px;
+  height: auto;
+  padding: 3px 10px;
   border-top: 1px solid var(--ox-border);
   background: var(--ox-surface-background);
   color: var(--ox-text-disabled);
@@ -663,11 +676,14 @@
 
 .codeDiag {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   gap: 5px;
+  white-space: nowrap;
 }
 
 .codeLang {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -709,6 +725,7 @@
   background: none;
   color: var(--ox-text-muted);
   font: 500 12.5px / 1 var(--site-font-body);
+  white-space: nowrap;
   cursor: pointer;
 }
 
@@ -841,6 +858,10 @@
 }
 
 .branchChip {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   padding: 2px 8px;
   border: 1px solid var(--ox-border);
   border-radius: 5px;
@@ -931,6 +952,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  min-width: 0;
   font-size: 12px;
 }
 
@@ -943,16 +965,20 @@
 }
 
 .optionalPill {
+  flex-shrink: 0;
   padding: 0 5px;
   border: 1px solid var(--ox-border);
   border-radius: 999px;
   color: var(--ox-text-disabled);
   font-size: 10px;
+  white-space: nowrap;
 }
 
 .checkPass {
+  flex-shrink: 0;
   color: var(--ox-success);
   font-size: 11px;
+  white-space: nowrap;
 }
 
 .cardHead {
@@ -970,6 +996,7 @@
 
 .reviewerRow {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   font-size: 12px;
@@ -989,6 +1016,7 @@
 
 .commentHead {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 6px;
   font-size: 12px;
@@ -1095,6 +1123,7 @@
   padding: 0 10px;
   border-radius: 6px;
   font: 500 12px / 1 var(--site-font-body);
+  white-space: nowrap;
   cursor: pointer;
 }
 
@@ -1194,7 +1223,8 @@
   border: 1px solid var(--ox-element-border);
   border-radius: 10px;
   background: var(--ox-surface-background);
-  box-shadow: var(--site-shadow-frame);
+  box-shadow: 0 24px 64px -16px
+    color-mix(in srgb, var(--ox-background) 90%, transparent);
   overflow: hidden;
 }
 
@@ -1249,8 +1279,10 @@
 
 .paletteName {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   gap: 8px;
+  min-width: 0;
   color: var(--ox-text-bright);
   font-weight: 500;
 }
@@ -1264,6 +1296,10 @@
 }
 
 .palettePath {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--ox-text-disabled);
   font: 11px / 1 var(--site-font-code);
 }
@@ -1275,10 +1311,29 @@
   text-align: center;
 }
 
+@media (max-width: 1120px) {
+  .body {
+    grid-template-columns: 185px minmax(0, 1fr) auto;
+  }
+
+  .dock {
+    width: 265px;
+  }
+
+  .centre {
+    flex-direction: column;
+  }
+
+  .splitTerminal {
+    border-right: 0;
+    border-bottom: 1px solid var(--ox-border);
+  }
+}
+
 @media (max-width: 900px) {
   .window {
     height: auto;
-    min-height: 520px;
+    min-height: 0;
   }
 
   .body {
@@ -1286,13 +1341,74 @@
   }
 
   .sidebar {
+    max-height: 220px;
     border-right: 0;
     border-bottom: 1px solid var(--ox-border);
   }
 
+  .centre {
+    flex-direction: column;
+  }
+
+  .terminalHalf {
+    height: 320px;
+    flex: none;
+  }
+
+  .terminalHalf.splitTerminal {
+    height: 250px;
+    border-right: 0;
+    border-bottom: 1px solid var(--ox-border);
+  }
+
+  .codeHalf {
+    height: 260px;
+    flex: none;
+  }
+
   .dock {
     width: auto;
+    height: 380px;
     border-left: 0;
     border-top: 1px solid var(--ox-border);
+  }
+
+  .paletteBackdrop {
+    padding-top: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .halfHeader {
+    padding: 0 12px;
+  }
+
+  .commandBlock {
+    padding: 8px 12px 10px 24px;
+  }
+
+  .blockPrompt {
+    margin-left: -14px;
+  }
+
+  .blockCmd,
+  .blockOutput {
+    font-size: 11.5px;
+  }
+
+  .promptBar {
+    padding: 0 10px;
+  }
+
+  .paletteRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    padding: 8px 10px;
+  }
+
+  .palettePath {
+    max-width: 100%;
+    padding-left: 22px;
   }
 }

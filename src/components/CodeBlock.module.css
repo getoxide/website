@@ -14,12 +14,18 @@
 
 .code :global(pre) {
   margin: 0;
-  padding: var(--site-space-4) 5rem var(--site-space-4) var(--site-space-5);
+  padding: 44px var(--site-space-5) var(--site-space-4);
   overflow-x: auto;
   border-radius: var(--site-radius-sm);
   background: var(--ox-surface-background);
   font: 400 var(--site-text-mono) var(--site-font-code);
   font-feature-settings: "calt" 0;
+}
+
+@media (max-width: 860px) {
+  .code :global(pre) {
+    padding: 42px var(--site-space-4) var(--site-space-4);
+  }
 }
 
 .code :global(pre):focus-visible {

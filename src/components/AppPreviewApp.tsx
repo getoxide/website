@@ -480,7 +480,12 @@ export function AppPreviewApp({
                   ) : null}
                 </header>
 
-                <div ref={blocksRef} className={styles.blockScroll}>
+                <div
+                  ref={blocksRef}
+                  className={styles.blockScroll}
+                  tabIndex={0}
+                  aria-label="Command history"
+                >
                   {blocks.map((block) => (
                     <article key={block.id} className={styles.commandBlock}>
                       <header className={styles.blockHeader}>
@@ -583,7 +588,11 @@ export function AppPreviewApp({
                     </button>
                   </div>
                 </header>
-                <div className={styles.codeBody}>
+                <div
+                  className={styles.codeBody}
+                  tabIndex={0}
+                  aria-label="Code editor"
+                >
                   {codeFile.lines.map((line, i) => (
                     <div key={i} className={styles.codeLine}>
                       <span className={styles.lineNo}>{i + 1}</span>
@@ -666,12 +675,12 @@ export function AppPreviewApp({
                     </div>
 
                     <div className={styles.surfaceScroll}>
-                      <h3 className={styles.surfaceTitle}>
+                      <p className={styles.surfaceTitle}>
                         {activePr.title}{" "}
                         <span className={styles.surfaceNum}>
                           {activePr.number}
                         </span>
-                      </h3>
+                      </p>
                       <div className={styles.metaRow}>
                         <span
                           className={cx(
@@ -860,12 +869,12 @@ export function AppPreviewApp({
                   </div>
 
                   <div className={styles.surfaceScroll}>
-                    <h3 className={styles.surfaceTitle}>
+                    <p className={styles.surfaceTitle}>
                       {activeIssue.title}{" "}
                       <span className={styles.surfaceNum}>
                         {activeIssue.number}
                       </span>
-                    </h3>
+                    </p>
                     <div className={styles.metaRow}>
                       {(() => {
                         const isClosed =

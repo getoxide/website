@@ -26,7 +26,7 @@ describe("Hero", () => {
   it("has the frozen H1 and subheadline, the H1 first", () => {
     const html = render();
     expect(text(html.match(/<h1[^>]*>(.*?)<\/h1>/)![1])).toBe(
-      "A terminal app that knows your GitHub projects.",
+      "The complete desktop app for agentic coding.",
     );
     expect(text(html)).toContain(
       "Open a folder, run as many clean shells as you like, and keep code, issues and pull requests at hand.",
@@ -94,7 +94,7 @@ describe("Hero", () => {
 
   it("splits the headline into words for the CSS reveal, text intact", () => {
     const html = render();
-    expect(html.match(/<span class="[^"]*word[^"]*"/g)).toHaveLength(8);
+    expect(html.match(/<span class="[^"]*word[^"]*"/g)).toHaveLength(7);
     expect(html).not.toMatch(/opacity:\s*0/);
   });
 

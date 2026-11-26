@@ -41,7 +41,7 @@ Rendered `<title>` follows the template `%s · Oxide` from [Machine-readable lay
 
 | Path | H1 | `<title>` | Meta description |
 | --- | --- | --- | --- |
-| `/` | A terminal app that knows your GitHub projects. | Oxide: a desktop terminal app for your GitHub Projects | Open a Project, run as many plain terminals as you like in its folder, and keep your files, GitHub Issues and pull requests in the same window. |
+| `/` | The complete desktop app for agentic coding. | Oxide: a desktop terminal app for your GitHub Projects | Open a Project, run as many plain terminals as you like in its folder, and keep your files, GitHub Issues and pull requests in the same window. |
 | `/features` | Everything around your terminals and GitHub | Features: terminals, code and GitHub · Oxide | Open Projects, run many plain terminals with Command blocks, edit files beside them, and handle GitHub Issues and pull requests without leaving Oxide. |
 | `/guides` | Guides | Guides · Oxide | Five practical guides for Oxide: Projects and Terminals, running agent CLIs, the Code workspace with LSPs, GitHub workflows and Linux packages. |
 | `/guides/working-with-projects-and-terminals` | Working with projects, terminals and command blocks | Projects, terminals and command blocks · Oxide | Open local repositories or clone from GitHub, run parallel Terminals with Command blocks, keep running shells alive and rely on Session restore. |
@@ -62,7 +62,7 @@ The home description deliberately does not repeat the canonical definition: the 
 
 ### Hero *(locked)*
 
-- **H1**: A terminal app that knows your GitHub projects.
+- **H1**: The complete desktop app for agentic coding.
 - **Subheadline**: Open a folder, run as many clean shells as you like, and keep code, issues and pull requests at hand.
 
 The H1 and the subheadline are the share card's two lines, word for word ([Social and share assets](https://github.com/getoxide/website/issues/23)). If the hero changes, the card follows it.
