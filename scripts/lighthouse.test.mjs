@@ -104,8 +104,21 @@ describe("verdictOfRounds", () => {
     expect(verdictOfRounds(rounds).failures).toEqual([]);
   });
 
+  it("passes a page that clears only on the second re-measure: a runner can stay slow for two full rounds", () => {
+    const rounds = [
+      assessLighthouse("/", "showcase", busyRunner),
+      assessLighthouse("/", "showcase", busyRunner),
+      assessLighthouse("/", "showcase", quietRunner),
+    ];
+    expect(rounds[1].failures).toEqual([
+      "/: TBT 168 ms > 150 ms (median of 3, showcase)",
+    ]);
+    expect(verdictOfRounds(rounds).failures).toEqual([]);
+  });
+
   it("fails a regression that breaks every round, reporting the last", () => {
     const rounds = [
+      assessLighthouse("/", "showcase", busyRunner),
       assessLighthouse("/", "showcase", busyRunner),
       assessLighthouse("/", "showcase", busyRunner),
     ];

@@ -5,7 +5,7 @@
 // score under 100 fail; the overall performance score only warns. Runs `/`
 // and `/changelog` (the heaviest reading page) unless paths are given; each
 // page's class comes from the PAGES registry. A round over budget is measured
-// once more (`ROUNDS`) so a busy CI runner cannot fail a page on its own.
+// again (`ROUNDS`) so a busy CI runner cannot fail a page on its own.
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { registry } from "./exported-pages.mjs";
@@ -26,10 +26,14 @@ export const RUNS = 3;
  * measured again before the gate fails: CI runners share their CPU, and the
  * same commit has measured 73 ms and 168 ms of TBT against the 150 ms
  * showcase ceiling, with the three runs of a busy round all slow together.
- * A real regression breaks every round, so the retry costs the failing case
- * one extra round and never the passing one.
+ * One re-measure is not enough: on 2026-11-26 the same commit measured 116 ms
+ * on one runner and 149-165 ms in every run of two full rounds on a slower
+ * one (the per-run CPU benchmark shows it), so a busy runner can stay busy
+ * through the whole pause. A page therefore needs one of three rounds within
+ * budget; a real regression breaks every round, so the re-measures cost the
+ * failing case two extra rounds and never the passing one.
  */
-export const ROUNDS = 2;
+export const ROUNDS = 3;
 
 /** The pause between two rounds, so a transient CPU burst can clear. */
 const RETRY_PAUSE = 15_000;
@@ -199,7 +203,7 @@ async function main() {
       for (let round = 1; round <= ROUNDS; round++) {
         if (round > 1) {
           console.log(
-            `  ${path}: over budget, re-measuring once after ${RETRY_PAUSE / 1000} s (the ceiling is unchanged)`,
+            `  ${path}: over budget, re-measuring after ${RETRY_PAUSE / 1000} s (round ${round} of ${ROUNDS}; the ceiling is unchanged)`,
           );
           await new Promise((resolve) => setTimeout(resolve, RETRY_PAUSE));
         }
@@ -214,9 +218,12 @@ async function main() {
       console.log(
         `${path} (${budgetClass}), median of ${RUNS}: LCP ${Math.round(m.lcp)} ms (≤ ${c.lcp}), TBT ${Math.round(m.tbt)} ms (≤ ${c.tbt}), CLS ${m.cls.toFixed(3)} (≤ ${c.cls}), accessibility ${Math.round(m.accessibility * 100)}, performance ${Math.round(m.performance * 100)}`,
       );
-      if (rounds.length > 1 && verdict.failures.length === 0) {
+      const failedRounds = rounds.slice(0, -1);
+      if (failedRounds.length > 0 && verdict.failures.length === 0) {
         warnings.push(
-          `${path}: first round over budget (${rounds[0].failures.join("; ")}), passed on the re-measure`,
+          `${path}: ${failedRounds.length} of ${rounds.length} rounds over budget (${failedRounds
+            .flatMap((r) => r.failures)
+            .join("; ")}), passed on the re-measure`,
         );
       }
       failures.push(...verdict.failures);

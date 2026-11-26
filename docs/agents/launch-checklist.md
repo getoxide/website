@@ -15,7 +15,9 @@ are Lorenzo's, in order. Tick each one on #44 as it is observed on production.
 
 - [ ] The Cloudflare Workers project connects to `getoxide/website` (`main`
       branch), builds with `pnpm build` on Node 22.18+, and deploys with
-      `npx wrangler deploy` (reading `wrangler.jsonc`).
+      `npx wrangler deploy` (reading `wrangler.jsonc`); PR previews run
+      `npx wrangler preview`, which fails without the (empty) `previews`
+      block in the same file.
 - [ ] `NEXT_PUBLIC_GOATCOUNTER_CODE` is set to the real GoatCounter site code.
       Leaving it unset warns; setting it to `oxide` in production fails.
 - [ ] `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` is set to the Search Console
