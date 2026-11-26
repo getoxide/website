@@ -15,23 +15,12 @@ import styles from "./FeatureSections.module.css";
 
 /** A decorative Octicon per feature section, by anchor. */
 const FEATURE_ICONS: Record<string, string> = {
-  "multiple-providers": "stack",
-  threads: "comment-discussion",
-  "permission-modes": "shield-lock",
-  "slash-commands": "command-palette",
-  worktrees: "git-branch",
-  "verification-dossier": "checklist",
-  "blind-review": "eye",
-  "diff-by-turn": "file-diff",
-  "line-comments": "comment",
-  restore: "history",
-  "rule-suggestions": "law",
+  "open-projects": "repo",
+  "many-terminals": "terminal",
+  "command-blocks": "rows",
+  issues: "issue-opened",
   "pull-requests": "git-pull-request",
-  "git-and-github": "mark-github",
-  "code-editor": "code",
-  terminal: "terminal",
-  dictation: "unmute",
-  keyboard: "command-palette",
+  files: "file-directory",
 };
 
 /** The paragraphs of one section, in reading order, as Markdown sources. */

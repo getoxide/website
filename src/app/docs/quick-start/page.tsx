@@ -1,3 +1,4 @@
+import { DeckText } from "@/components/DeckText";
 import { DocsNav } from "@/components/DocsNav";
 import { Icon } from "@/components/Icon";
 import { Markdown } from "@/components/Markdown";
@@ -22,13 +23,13 @@ export default function QuickStartPage() {
     token("requirements")!,
     SNAPSHOT.readme.quickStart,
   ];
-  const seen = seenBefore([requirements, steps]);
+  const seen = seenBefore([copy.lead, requirements, steps]);
   return (
     <SiteFrame page={page}>
       <div className={ui.wide}>
         <PageHeader
           title={page.h1}
-          lead={copy.lead}
+          lead={<DeckText source={copy.lead} conceptLinks={seen[0]} />}
           path={page.path}
           width="wide"
         >
@@ -46,7 +47,7 @@ export default function QuickStartPage() {
               {copy.requirements}
             </h2>
             <Prose>
-              <Markdown source={requirements} conceptLinks={seen[0]} />
+              <Markdown source={requirements} conceptLinks={seen[1]} />
             </Prose>
           </section>
           <section className={styles.steps} aria-labelledby="steps">
@@ -57,7 +58,7 @@ export default function QuickStartPage() {
               {copy.steps}
             </h2>
             <Prose>
-              <Markdown source={steps} conceptLinks={seen[1]} />
+              <Markdown source={steps} conceptLinks={seen[2]} />
             </Prose>
           </section>
         </div>

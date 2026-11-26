@@ -21,7 +21,7 @@ Two families of CSS custom properties, and nothing else. No hex value, duration 
 
 ### Colour: `--ox-*`, synced, used directly
 
-- `assets/brand/oxide/palette/oxide-tokens.css` from the Oxide repo is copied **verbatim** into the content snapshot by the existing `pnpm sync:oxide` workflow ([Content sourced from the Oxide repo](https://github.com/getoxide/website/issues/12)), at the same ref as the rest of the snapshot. A missing file fails the sync like a missing marker does.
+- `assets/palette/oxide-tokens.json` from the Oxide repo is converted into `content/oxide/brand/oxide-tokens.css` by the existing `pnpm sync:oxide` workflow ([Content sourced from the Oxide repo](https://github.com/getoxide/website/issues/12)), at the same ref as the rest of the snapshot. A missing file fails the sync like a missing marker does.
 - The site imports that file once, globally, and component CSS uses the `--ox-*` names **directly**: no site aliases for colours.
 - Its `[data-theme="light"]` block is imported but inert: the site never sets `data-theme="light"`.
 - A Vitest test fails if any `var(--ox-…)` used in the site's CSS is not defined in the synced file.
@@ -157,22 +157,21 @@ A real product capture in a frame: `--site-w-frame`, `--site-radius-frame`, `--o
 
 ### App preview
 
-[ADR-0004](../adr/0004-live-app-preview.md). The Oxide workbench as HTML in the Capture frame's look, **explorable and never moving by itself**: title bar, the Threads list, the Thread or the Code workspace, and the Surfaces (Diff, Files, Terminal, Pull request, Issues). It opens on the hero Capture's Thread, finished and ready to review. The visitor can:
+[ADR-0004](../adr/0004-live-app-preview.md). The Oxide workbench as HTML in the Capture frame's look, **explorable and never moving by itself**: title bar, the sidebar (**Terminals view** with Open Projects and their Terminals, or the **Files view** of a Project), the split centre (**Terminal half** with Command blocks and optional **Code half** for the Code workspace), and the right dock Surfaces (**Issues** and **Pull request**). It opens on the hero Capture's Project and Terminal. The visitor can:
 
-- switch between four Threads, each in its own state: a finished Turn, one that asks a question, one waiting on an Approval, one already merged;
-- open the Turn's steps, open a file's hunk, Revert and Undo it, switch the Diff scope, run a Blind review and keep or dismiss its findings;
-- Commit & Push, then Merge, and see the pull request on its Surface;
-- open a file in the Code workspace from the Files Surface;
-- send a follow-up from the composer, which answers that no agent is attached.
+- switch between Projects and their Terminals in the sidebar;
+- enter a command in the Terminal input, which appends a preview Command block saying no shell is attached;
+- open the Files view from a Project row and click a file to open the Code workspace beside the Terminal;
+- maximize or restore the Terminal half or the Code half;
+- switch between the Issues and Pull request Surfaces, inspect an Issue, or merge / enable auto-merge on a pull request.
 
 Rules:
 
-- On the home it rises over the hero in the hero Capture's place (−150px, −110px below 860px); on each Provider landing page it follows the page header, running that Provider. One caption line under the frame says it can be explored.
+- On the home it rises over the hero in the hero Capture's place (−150px, −110px below 860px). One caption line under the frame says it can be explored.
 - The server HTML is the starting state; without JavaScript it is a complete, static picture.
-- Fixed height (680px; below 860px the Thread at 540px over the Surfaces at 420px), panes scroll inside it, so nothing it does moves the page. Below 1100px the Threads list becomes a horizontal strip.
+- Fixed height (680px; below 860px the centre at 540px over the Surfaces at 420px), panes scroll inside it, so nothing it does moves the page. Below 1100px the sidebar becomes a compact strip.
 - A named `role="group"` of real buttons and an input, every target at least 24px, focus visible; marked `data-capture` so the copy gates read it like a Capture.
-- Only user actions change it; the "Working" pulse while a reply arrives stops under reduced motion.
-- Provider glyphs are neutral shapes, never the vendors' logos.
+- Only user actions change it.
 
 ### Definition line
 

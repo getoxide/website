@@ -1,11 +1,6 @@
 import { describe, expect, it } from "vitest";
 import source from "../../content/oxide/source.json";
-import {
-  providerInstalls,
-  SNAPSHOT,
-  tokensOf,
-  type Snapshot,
-} from "./snapshot";
+import { SNAPSHOT, tokensOf, type Snapshot } from "./snapshot";
 
 const asset = (name: string, size: number) => ({
   name,
@@ -29,14 +24,25 @@ const STABLE = withRelease({
     assets: {
       macos: asset("Oxide_1.1.0_aarch64.dmg", 101_234_567),
       windows: asset("Oxide_1.1.0_x64-setup.exe", 88_765_432),
+      windowsArm64: asset("Oxide_1.1.0_arm64-setup.exe", 86_543_210),
+      linux: asset("Oxide_1.1.0_amd64.AppImage", 94_263_800),
+      linuxDeb: asset("Oxide_1.1.0_amd64.deb", 16_894_530),
+      linuxRpm: asset("Oxide-1.1.0-1.x86_64.rpm", 16_899_955),
+      linuxArm64: asset("Oxide_1.1.0_aarch64.AppImage", 92_580_360),
+      linuxArm64Deb: asset("Oxide_1.1.0_arm64.deb", 17_240_882),
+      linuxArm64Rpm: asset("Oxide-1.1.0-1.aarch64.rpm", 17_245_847),
     },
   },
-  platforms: ["macOS on Apple Silicon", "Windows x64"],
+  platforms: [
+    "macOS on Apple Silicon",
+    "Windows (x64, arm64)",
+    "Linux (x64, arm64)",
+  ],
   platformsFrom: "release",
 });
 
 describe("tokens (Copy deck, Tokens)", () => {
-  it("⟨definition⟩ and ⟨requirements⟩ are the marked README sections", () => {
+  it("⟨definition⟩ and ⟨requirements⟩ are the README sections", () => {
     const token = tokensOf(SNAPSHOT);
     expect(token("definition")).toBe(SNAPSHOT.readme.definition);
     expect(token("requirements")).toBe(SNAPSHOT.readme.requirements);
@@ -44,7 +50,7 @@ describe("tokens (Copy deck, Tokens)", () => {
 
   it("⟨platforms⟩ joins the supported platforms in a sentence", () => {
     expect(tokensOf(STABLE)("platforms")).toBe(
-      "macOS on Apple Silicon and Windows x64",
+      "macOS on Apple Silicon, Windows (x64, arm64) and Linux (x64, arm64)",
     );
     const one = withRelease({
       ...STABLE.release,
@@ -59,6 +65,7 @@ describe("tokens (Copy deck, Tokens)", () => {
     expect(token("release-date")).toBe("10 December 2026");
     expect(token("asset-size:macos")).toBe("101.2 MB");
     expect(token("asset-size:windows")).toBe("88.8 MB");
+    expect(token("asset-size:linux")).toBe("94.3 MB");
   });
 
   it("before a stable release there is no version or date to show", () => {
@@ -66,7 +73,11 @@ describe("tokens (Copy deck, Tokens)", () => {
       state: "none",
       releasesUrl: "https://github.com/getoxide/oxide/releases",
       latest: null,
-      platforms: ["macOS on Apple Silicon", "Windows x64"],
+      platforms: [
+        "macOS on Apple Silicon",
+        "Windows (x64, arm64)",
+        "Linux (x64, arm64)",
+      ],
       platformsFrom: "readme",
     });
     for (const name of [
@@ -74,6 +85,7 @@ describe("tokens (Copy deck, Tokens)", () => {
       "release-date",
       "asset-size:macos",
       "asset-size:windows",
+      "asset-size:linux",
     ] as const) {
       expect(tokensOf(none)(name), name).toBeNull();
     }
@@ -84,7 +96,6 @@ describe("tokens (Copy deck, Tokens)", () => {
     });
     expect(tokensOf(rc)("version")).toBeNull();
     expect(tokensOf(rc)("release-date")).toBeNull();
-    // The test pre-release's installers are real files with real sizes.
     expect(tokensOf(rc)("asset-size:macos")).toBe("101.2 MB");
   });
 
@@ -108,8 +119,6 @@ describe("the committed Snapshot", () => {
     expect(tokensOf(SNAPSHOT)("definition")).toMatch(/^Oxide is /);
   });
 
-  // ADR-0003: one source. The site's links read source.json while the page
-  // content reads the Snapshot; a drift between them would split the facts.
   it("agrees with content/oxide/source.json", () => {
     expect(SNAPSHOT.source.repo).toBe(source.repo);
     expect(SNAPSHOT.source.ref).toBe(source.ref);
@@ -120,35 +129,5 @@ describe("the committed Snapshot", () => {
     if (!/^v\d+\.\d+\.\d+$/.test(source.ref)) {
       expect(source.commit).toMatch(/^[0-9a-f]{40}$/);
     }
-  });
-});
-
-describe("providerInstalls (Copy deck, `/download` → Bring your own agent)", () => {
-  const requirements = [
-    "| Provider | Command | Install |",
-    "| --- | --- | --- |",
-    "| Claude Code | `claude` | [docs.claude.com](https://docs.claude.com/en/docs/claude-code) |",
-    "| Codex | `codex` | [github.com/openai/codex](https://github.com/openai/codex) |",
-    "| Antigravity CLI | `agy` | [antigravity.google](https://antigravity.google/download) |",
-    "",
-    "`git` is required.",
-  ].join("\n");
-
-  it("reads each Provider's install cell from the Requirements table", () => {
-    expect(providerInstalls(requirements)).toEqual([
-      {
-        provider: "Claude Code",
-        install:
-          "[docs.claude.com](https://docs.claude.com/en/docs/claude-code)",
-      },
-      {
-        provider: "Codex",
-        install: "[github.com/openai/codex](https://github.com/openai/codex)",
-      },
-      {
-        provider: "Antigravity CLI",
-        install: "[antigravity.google](https://antigravity.google/download)",
-      },
-    ]);
   });
 });

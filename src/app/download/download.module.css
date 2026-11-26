@@ -9,7 +9,7 @@
 
 .main {
   display: grid;
-  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
   gap: var(--site-space-5);
 }
 
@@ -113,6 +113,39 @@
   height: 40px;
 }
 
+.repos {
+  display: grid;
+  gap: var(--site-space-4);
+}
+
+.reposLead {
+  margin: 0;
+  font: var(--site-text-small) var(--site-font-body);
+  color: var(--ox-text-muted);
+}
+
+.reposLead code {
+  font: var(--site-text-mono-xs) var(--site-font-code);
+}
+
+.repoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--site-space-5);
+}
+
+.repoBlock {
+  display: grid;
+  gap: var(--site-space-2);
+  align-content: start;
+}
+
+.repoBlock h3 {
+  margin: 0;
+  font: 500 var(--site-text-small) var(--site-font-body);
+  color: var(--ox-text-bright);
+}
+
 /* Signing note, verify link and the unsupported-platform line: quiet, at
    the reading measure beside their icon. Full width, so the lines with code
    never rewrap when the mono font swaps in (no layout shift). */
@@ -132,7 +165,7 @@
 }
 
 .notes > :first-child {
-  grid-row: span 4;
+  grid-row: span 5;
 }
 
 .notes > p {
@@ -161,6 +194,7 @@
 
 @media (max-width: 860px) {
   .main,
+  .repoGrid,
   .notes {
     grid-template-columns: minmax(0, 1fr);
   }

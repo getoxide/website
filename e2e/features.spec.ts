@@ -2,11 +2,6 @@ import { readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
 import { SNAPSHOT } from "./snapshot";
 
-// /features (ticket #40; Copy deck, `/features` → The feature-name contract):
-// one anchored section per README Features lead-in, with the deck's heading
-// and anchor. The expectations come from the Copy deck table and the
-// committed Snapshot, read independently of the site.
-
 const DECK = readFileSync(
   new URL("../docs/spec/copy.md", import.meta.url),
   "utf8",
@@ -28,7 +23,6 @@ const inSnapshot = new Set(
   SNAPSHOT.readme.features.flatMap((g) => g.leadIns).map(key),
 );
 const rendered = CONTRACT.filter((c) => inSnapshot.has(key(c.leadIn)));
-const absent = CONTRACT.filter((c) => !inSnapshot.has(key(c.leadIn)));
 
 test("the Copy deck lists a section for every Snapshot lead-in", () => {
   expect(rendered).toHaveLength(inSnapshot.size);
@@ -49,49 +43,32 @@ test("every Snapshot lead-in has its section and anchor, with JavaScript off", a
   await context.close();
 });
 
-test("a contract entry the Snapshot does not carry yet renders nothing", async ({
-  page,
-}) => {
-  await page.goto("/features");
-  for (const { anchor } of absent) {
-    await expect(page.locator(`#${anchor}`)).toHaveCount(0);
-    await expect(page.locator(`a[href="#${anchor}"]`)).toHaveCount(0);
-  }
-});
-
-test("the groups follow the loop, and an empty capture slot draws no frame", async ({
+test("the groups follow the README, and every capture figure renders an image", async ({
   page,
 }) => {
   await page.goto("/features");
   await expect(page.locator("main h2:not(#closing-cta)")).toHaveText([
-    "One app, every agent CLI",
-    "Review before you merge",
-    "A full workspace around the conversation",
+    "Projects and plain terminals",
+    "GitHub at hand",
   ]);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "Everything between the prompt and the merge",
+    "Everything around your terminals and GitHub",
   );
-  // Only sections with a capture file get a figure.
   const figures = await page.locator("main figure").count();
   const images = await page.locator("main figure img").count();
+  expect(figures).toBe(rendered.length);
   expect(figures).toBe(images);
 });
 
-test("the Verification Dossier and Blind review sections link their guides", async ({
+test("the Many terminals section links the running-agents guide", async ({
   page,
 }) => {
   await page.goto("/features");
   await expect(
     page
-      .locator("#verification-dossier")
+      .locator("#many-terminals")
       .locator("xpath=ancestor::section[1]")
-      .locator('a[href="/guides/review-ai-generated-code"]'),
-  ).toBeVisible();
-  await expect(
-    page
-      .locator("#blind-review")
-      .locator("xpath=ancestor::section[1]")
-      .locator('a[href="/guides/claude-code-and-codex-together"]'),
+      .locator('a[href="/guides/running-agents-in-oxide"]'),
   ).toBeVisible();
 });
 

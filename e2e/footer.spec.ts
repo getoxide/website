@@ -14,19 +14,18 @@ const COLUMNS: [string, [string, string][]][] = [
     ],
   ],
   [
-    "Use with",
+    "Docs & Guides",
     [
-      ["Claude Code", "/claude-code-gui"],
-      ["Codex", "/codex-gui"],
-      ["Antigravity", "/antigravity-gui"],
+      ["Quick start", "/docs/quick-start"],
+      ["Concepts", "/docs/concepts"],
+      ["Guides", "/guides"],
     ],
   ],
   [
     "Resources",
     [
-      ["Docs", "/docs/quick-start"],
-      ["Guides", "/guides"],
       ["GitHub", "https://github.com/getoxide/oxide"],
+      ["Releases", "https://github.com/getoxide/oxide/releases"],
       ["llms.txt", "/llms.txt"],
     ],
   ],

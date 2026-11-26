@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { SNAPSHOT } from "./snapshot";
-import { plainText, tableRows } from "./markdown";
+import { plainText } from "./markdown";
 import { REGISTERED, urlOf } from "./pages";
 
 // Derived docs pages (Content sourced from the Oxide repo #12; Design
@@ -32,31 +32,17 @@ for (const [current, path] of DOCS) {
 }
 
 test.describe("/docs/quick-start", () => {
-  test("shows the Requirements table under #requirements", async ({ page }) => {
+  test("shows the Requirements prose under #requirements", async ({ page }) => {
     await page.goto("/docs/quick-start#requirements");
     const heading = page.locator("h2#requirements");
     await expect(heading).toHaveText("Requirements");
     await expect(heading).toBeInViewport();
-
-    const table = page.locator("main table");
-    await expect(table).toHaveCount(1);
-    const rows = tableRows(SNAPSHOT.readme.requirements);
-    expect(rows.length).toBeGreaterThan(0);
-    const body = table.locator("tbody tr");
-    await expect(body).toHaveCount(rows.length);
-    for (const [i, cells] of rows.entries()) {
-      await expect(body.nth(i).locator("td")).toHaveText(cells);
-    }
-    await expect(table.locator("thead th")).toHaveText([
-      "Provider",
-      "Command",
-      "Install",
-    ]);
-    const after = SNAPSHOT.readme.requirements.split("\n").at(-1)!;
-    await expect(page.locator("main")).toContainText(plainText(after));
+    await expect(page.locator("main")).toContainText(
+      plainText(SNAPSHOT.readme.requirements),
+    );
   });
 
-  test("shows the five Quick start steps verbatim, in order", async ({
+  test("shows the four Quick start steps verbatim, in order", async ({
     page,
   }) => {
     await page.goto("/docs/quick-start");
@@ -64,7 +50,7 @@ test.describe("/docs/quick-start", () => {
       .split("\n")
       .filter((l) => /^\d+\. /.test(l))
       .map((l) => plainText(l.replace(/^\d+\. /, "")));
-    expect(steps).toHaveLength(5);
+    expect(steps).toHaveLength(4);
     await expect(page.locator("main ol > li")).toHaveText(steps);
   });
 
@@ -79,14 +65,14 @@ test.describe("/docs/quick-start", () => {
 
 const NINE = [
   ["Project", "project"],
-  ["Thread", "thread"],
-  ["Turn", "turn"],
-  ["Provider", "provider"],
+  ["Terminal", "terminal"],
+  ["Command block", "command-block"],
   ["Surface", "surface"],
-  ["Checkpoint", "checkpoint"],
-  ["Verification Dossier", "verification-dossier"],
-  ["Blind review", "blind-review"],
-  ["Restore", "restore"],
+  ["Files view", "files-view"],
+  ["Code workspace", "code-workspace"],
+  ["Session restore", "session-restore"],
+  ["In-app update", "in-app-update"],
+  ["Package install", "package-install"],
 ];
 
 test.describe("/docs/concepts", () => {
@@ -111,28 +97,28 @@ test.describe("/docs/concepts", () => {
     page,
   }) => {
     await page.goto("/docs/concepts");
-    const anchor = page.getByRole("link", { name: "Link to Turn" });
-    await expect(anchor).toHaveAttribute("href", "#turn");
+    const anchor = page.getByRole("link", { name: "Link to Terminal" });
+    await expect(anchor).toHaveAttribute("href", "#terminal");
     await expect(anchor).toHaveCSS("opacity", "0");
     await anchor.focus();
     await expect(anchor).toHaveCSS("opacity", "1");
     await expect(anchor).toHaveCSS("outline-style", "solid");
     await page.locator("main").click({ position: { x: 1, y: 1 } });
-    await page.locator("h2#blind-review").hover();
+    await page.locator("h2#command-block").hover();
     await expect(
-      page.getByRole("link", { name: "Link to Blind review" }),
+      page.getByRole("link", { name: "Link to Command block" }),
     ).toHaveCSS("opacity", "1");
   });
 });
 
-test("/docs/concepts#turn lands on the term with JavaScript off", async ({
+test("/docs/concepts#terminal lands on the term with JavaScript off", async ({
   browser,
 }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
-  await page.goto("/docs/concepts#turn");
-  await expect(page.locator("h2#turn")).toBeInViewport();
-  await expect(page.locator("#turn-definition")).toBeVisible();
+  await page.goto("/docs/concepts#terminal");
+  await expect(page.locator("h2#terminal")).toBeInViewport();
+  await expect(page.locator("#terminal-definition")).toBeVisible();
   await context.close();
 });
 
@@ -154,9 +140,11 @@ test("docs pages load no highlighting code in the browser", async ({
 }) => {
   for (const [, path] of DOCS) {
     await page.goto(path);
-    const scripts = await page
-      .locator("script[src]")
-      .evaluateAll((els) => els.map((s) => s.getAttribute("src")!));
+    const scripts = (
+      await page
+        .locator("script[src]")
+        .evaluateAll((els) => els.map((s) => s.getAttribute("src")!))
+    ).filter((src) => src.startsWith("/"));
     for (const src of scripts) {
       const js = await (await request.get(src)).text();
       expect(js, src).not.toMatch(/shiki|createHighlighter|tokenizeLine/i);

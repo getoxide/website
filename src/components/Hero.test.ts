@@ -22,18 +22,16 @@ const text = (html: string) =>
     .replace(/\s+/g, " ")
     .trim();
 
-// Copy deck, Home → Hero (frozen); Design system, Animated mark and Capture
-// frame.
 describe("Hero", () => {
   it("has the frozen H1 and subheadline, the H1 first", () => {
     const html = render();
     expect(text(html.match(/<h1[^>]*>(.*?)<\/h1>/)![1])).toBe(
-      "The complete desktop app for agentic coding.",
+      "A terminal app that knows your GitHub projects.",
     );
     expect(text(html)).toContain(
-      "Prompt, review, pull request and merge, with Claude Code, Codex and Antigravity CLI.",
+      "Open a folder, run as many clean shells as you like, and keep code, issues and pull requests at hand.",
     );
-    expect(html.indexOf("<h1")).toBeLessThan(html.indexOf("Prompt, review"));
+    expect(html.indexOf("<h1")).toBeLessThan(html.indexOf("Open a folder"));
   });
 
   it("shows the mark above the H1, decorative", () => {
@@ -65,7 +63,7 @@ describe("Hero", () => {
 
   it("states the platforms from the Snapshot, then Pre-release", () => {
     expect(text(render())).toContain(
-      "macOS on Apple Silicon and Windows x64 · Pre-release",
+      "macOS on Apple Silicon, Windows (x64, arm64) and Linux (x64, arm64) · Pre-release",
     );
   });
 
@@ -73,14 +71,12 @@ describe("Hero", () => {
     const html = render();
     expect(html).not.toContain("<picture");
     expect(html).toMatch(
-      /<figure[^>]*role="group"[^>]*aria-label="Interactive preview of Oxide with Claude Code"/,
+      /<figure[^>]*role="group"[^>]*aria-label="Interactive preview of Oxide"/,
     );
     expect(html).toContain("data-capture");
-    // It starts on the finished Turn, ready to review and push.
-    expect(html).toContain("Commit &amp; Push");
+    expect(html).toContain("Squash and merge");
   });
 
-  // Ticket #39 (Design system, Hero shader and Animated mark; Budgets, Shader).
   it("paints the static gradient first, with the shader canvas over it", () => {
     const html = render();
     expect(html.indexOf("gradient")).toBeGreaterThan(-1);
@@ -92,14 +88,13 @@ describe("Hero", () => {
     const html = render();
     const script = html.match(/<script>(.*?)<\/script>/)![1];
     expect(script).toContain("data-reveal");
-    // before the headline, the mark and the canvas
     expect(html.indexOf("<script")).toBeLessThan(html.indexOf("<svg"));
     expect(html.indexOf("<script")).toBeLessThan(html.indexOf("<canvas"));
   });
 
   it("splits the headline into words for the CSS reveal, text intact", () => {
     const html = render();
-    expect(html.match(/<span class="[^"]*word[^"]*"/g)).toHaveLength(7);
+    expect(html.match(/<span class="[^"]*word[^"]*"/g)).toHaveLength(8);
     expect(html).not.toMatch(/opacity:\s*0/);
   });
 

@@ -1,15 +1,10 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import {
-  PREVIEW,
-  PREVIEW_PROVIDERS,
-  PREVIEW_THREADS,
-} from "@/content/app-preview";
+import { PREVIEW, PREVIEW_PROJECTS } from "@/content/app-preview";
 import { AppPreview } from "./AppPreview";
 
-const render = (provider?: "claude" | "codex" | "antigravity") =>
-  renderToStaticMarkup(createElement(AppPreview, { provider }));
+const render = () => renderToStaticMarkup(createElement(AppPreview));
 
 const text = (html: string) =>
   html
@@ -19,14 +14,13 @@ const text = (html: string) =>
     .replace(/\s+/g, " ")
     .trim();
 
-// Design system, App preview; ADR-0004.
 describe("AppPreview", () => {
   it("is a named group of real controls", () => {
     const html = render();
     expect(html).toMatch(
-      /<figure[^>]*role="group"[^>]*aria-label="Interactive preview of Oxide with Claude Code"/,
+      /<figure[^>]*role="group"[^>]*aria-label="Interactive preview of Oxide"/,
     );
-    expect(html.match(/<button/g)!.length).toBeGreaterThan(10);
+    expect(html.match(/<button/g)!.length).toBeGreaterThan(8);
     expect(html).toContain("<input");
   });
 
@@ -34,31 +28,19 @@ describe("AppPreview", () => {
     expect(render()).toContain('data-capture=""');
   });
 
-  it("starts on the hero Capture's Thread, finished and ready to push", () => {
+  it("starts on the hero Capture's Project and Terminal with Command blocks", () => {
     const t = text(render());
-    const [first] = PREVIEW_THREADS;
-    expect(t).toContain(first.prompt);
-    expect(t).toContain(first.answer!.text);
-    expect(t).toContain(PREVIEW.commit);
-    expect(t).not.toContain(PREVIEW.merged);
-  });
-
-  it("lists every Thread as a button", () => {
-    const html = render();
-    for (const thread of PREVIEW_THREADS) {
-      expect(html).toMatch(
-        new RegExp(`<button[^>]*>.*?${thread.title}.*?</button>`),
-      );
-    }
+    const [first] = PREVIEW_PROJECTS;
+    expect(t).toContain(first.name);
+    expect(t).toContain(first.terminals[0].blocks[0].command);
+    expect(t).toContain(PREVIEW.pr.merge);
   });
 
   it("says under the frame that it can be explored", () => {
     expect(render()).toMatch(/<figcaption[^>]*>Interactive preview:/);
   });
 
-  it("runs the Provider it is given, and hides nothing inline", () => {
-    const html = render("codex");
-    expect(text(html)).toContain(PREVIEW_PROVIDERS.codex.model);
-    expect(html).not.toMatch(/opacity:\s*0/);
+  it("hides nothing inline", () => {
+    expect(render()).not.toMatch(/opacity:\s*0/);
   });
 });

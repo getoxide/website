@@ -29,9 +29,8 @@ export const COPY = {
   },
 
   /**
-   * Site footer: columns, trust line and disclaimers verbatim from Page
-   * inventory (#9), Footer. The canonical definition block joins it with the
-   * content snapshot (#32).
+   * Site footer: columns, trust line and disclaimers. The canonical definition
+   * block joins it with the content snapshot (#32).
    */
   footer: {
     columns: [
@@ -45,19 +44,18 @@ export const COPY = {
         ],
       },
       {
-        heading: "Use with",
+        heading: "Docs & Guides",
         links: [
-          { label: "Claude Code", href: "/claude-code-gui" },
-          { label: "Codex", href: "/codex-gui" },
-          { label: "Antigravity", href: "/antigravity-gui" },
+          { label: "Quick start", href: "/docs/quick-start" },
+          { label: "Concepts", href: "/docs/concepts" },
+          { label: "Guides", href: "/guides" },
         ],
       },
       {
         heading: "Resources",
         links: [
-          { label: "Docs", href: "/docs/quick-start" },
-          { label: "Guides", href: "/guides" },
           { label: "GitHub", href: GITHUB_REPO_URL },
+          { label: "Releases", href: `${GITHUB_REPO_URL}/releases` },
           { label: "llms.txt", href: "/llms.txt" },
         ],
       },
@@ -93,7 +91,7 @@ export const COPY = {
       ] satisfies Link[],
     },
     quickStart: {
-      lead: "What Oxide needs on your machine, then the steps from a first prompt to a pull request.",
+      lead: "What Oxide needs on your machine, then the steps from opening a Project to working in its terminals.",
       requirements: "Requirements",
       steps: "Steps",
     },
@@ -130,10 +128,10 @@ export const COPY = {
     },
   },
 
-  /** Copy deck, Home → Hero (frozen). */
+  /** Copy deck, Home → Hero (locked). */
   hero: {
     subheadline:
-      "Prompt, review, pull request and merge, with Claude Code, Codex and Antigravity CLI.",
+      "Open a folder, run as many clean shells as you like, and keep code, issues and pull requests at hand.",
     /** Locked buttons; the primary reads "Get Oxide" while the state is `none`. */
     download: "Download Oxide",
     getOxide: "Get Oxide",
@@ -148,41 +146,36 @@ export const COPY = {
    * name (build-written, as the deck specifies it).
    */
   proofPath: {
-    heading: "From prompt to merge",
+    heading: "From Project to pull request",
     learnMore: "Learn more",
-    /**
-     * Steps 3 and 4 claim the in-app merge and Fix: they render only when the
-     * Snapshot's Features carry this README lead-in (oxide#416).
-     */
-    leadIn: "Pull requests, from review to merge.",
     steps: [
       {
-        heading: "Prompt",
+        heading: "Projects",
         sentence:
-          "Claude Code, Codex and Antigravity CLI side by side, each Thread a real session of the agent you already use, with the editor and terminal around it.",
-        href: "/features#multiple-providers",
+          "Open any local Git repository or clone from GitHub; each Project keeps its own Terminals, open files and split layout.",
+        href: "/features#open-projects",
+        icon: "repo",
+      },
+      {
+        heading: "Terminals",
+        sentence:
+          "Run a server, an agent CLI and a test watcher in plain shells owned by Core, with Warp-like Command blocks and Session restore.",
+        href: "/features#many-terminals",
         icon: "terminal",
       },
       {
-        heading: "Review",
+        heading: "Code",
         sentence:
-          "See what each Turn changed and which checks actually ran in the Verification Dossier, have a second Provider run a Blind review, and Restore what you don't want.",
-        href: "/features#diff-by-turn",
-        icon: "code-review",
+          "Browse a Project's Files view in the sidebar and open files in the Code workspace beside the Terminal, with on-demand language servers.",
+        href: "/features#files",
+        icon: "code",
       },
       {
-        heading: "Pull request",
+        heading: "GitHub",
         sentence:
-          "Open the pull request without a browser, send Line comments to GitHub as a review, and hand failing checks and review threads back to the agent.",
+          "Read and create Issues, open and review pull requests, check CI status and merge or enable auto-merge from the right dock Surfaces.",
         href: "/features#pull-requests",
         icon: "git-pull-request",
-      },
-      {
-        heading: "Merge",
-        sentence:
-          "Merge when GitHub says it's ready, or turn on auto-merge once the checks pass, with the Verification Dossier published in the pull request body.",
-        href: "/features#verification-dossier",
-        icon: "git-merge",
       },
     ],
   },
@@ -193,39 +186,65 @@ export const COPY = {
    * `` `x` `` is code and `**x**` is bold; `<DeckText>` renders them.
    */
   download: {
-    byoa: {
-      heading: "Bring your own agent",
+    requirements: {
+      heading: "What Oxide needs",
       sentence:
-        "Oxide doesn't ship an agent: it drives the one you already have. Install and log in to Claude Code, Codex or Antigravity CLI first; Oxide offers only the ones it finds.",
+        "`git` is required; the GitHub CLI (`gh`, logged in) is optional and enables Issues and pull requests. Anything else you run in a Terminal — Claude Code, Codex or any CLI — uses its own install and login.",
     },
     buttons: {
       macos: "Download for macOS",
       windows: "Download for Windows",
-      prerelease: (version: string) => `Download test pre-release ${version}`,
+      linux: "Download for Linux",
       followGithub: "Follow on GitHub",
       buildFromSource: "Build from source",
       /** Sublabel parts before the size token. */
-      sublabel: { macos: "Apple Silicon · .dmg", windows: "x64 · installer" },
+      sublabel: {
+        macos: "Apple Silicon · .dmg",
+        windows: "x64 · installer",
+        linux: "x64 · AppImage",
+      },
     },
     lines: {
       stable: (version: string, date: string) =>
         `Version ${version} · ${date} · [Release notes](/changelog)`,
-      prerelease:
-        "This is a test pre-release: it never reaches the in-app updater. [Build from source](README#build-from-source) for the latest code.",
+      prerelease: (version: string) =>
+        `Test pre-release ${version}: it never reaches the in-app updater or the APT and DNF repositories. [Build from source](README#build-from-source) for the latest code.`,
       none: "No release yet. Oxide is pre-release software; follow the repository to hear about the first one.",
     },
-    /** Under the buttons. True only until notarization (oxide#417). */
+    repos: {
+      heading: "Linux package repositories",
+      lead: "For `.deb` and `.rpm` installs on x64 and arm64, add the signed APT or DNF repository once and upgrade through your package manager:",
+      aptTitle: "APT (Debian, Ubuntu)",
+      aptSnippet: [
+        "```sh",
+        "sudo install -d -m 0755 /usr/share/keyrings",
+        "curl -fsSL https://updates.getoxide.dev/apt/oxide-repository.gpg | sudo tee /usr/share/keyrings/oxide.gpg > /dev/null",
+        'echo "deb [signed-by=/usr/share/keyrings/oxide.gpg] https://updates.getoxide.dev/apt/ ./" | sudo tee /etc/apt/sources.list.d/oxide.list',
+        "sudo apt update && sudo apt install oxide",
+        "```",
+      ].join("\n"),
+      dnfTitle: "DNF (Fedora, RHEL, openSUSE)",
+      dnfSnippet: [
+        "```sh",
+        "sudo curl -fsSL -o /etc/yum.repos.d/oxide.repo https://updates.getoxide.dev/rpm/oxide.repo",
+        "sudo dnf install oxide",
+        "```",
+      ].join("\n"),
+    },
+    /** Under the buttons. */
     signing: {
       macos:
         "macOS blocks the first launch because the build isn't notarized yet. Open it once, then choose **Open Anyway** in System Settings → Privacy & Security. [Full steps](README#opening-an-unsigned-build)",
       windows:
         "SmartScreen may warn on first run. Choose **More info → Run anyway** after verifying the file. [Full steps](README#opening-an-unsigned-build)",
+      linux:
+        "The `.rpm` is signed with the Oxide repository key and the `.deb` is covered by the signed APT `InRelease`; the AppImage is unsigned. Requires WebKitGTK 4.1. [Full steps](README#opening-an-unsigned-build)",
       verify:
-        "[Verify your download](README#verifying-a-download) with `SHA256SUMS.txt` and the build attestation.",
+        "[Verify your download](README#verifying-a-download) with SHA-256 checksums and the build attestation.",
     },
     /** Hand-written exception to the Copy deck's rule 5. */
     unsupported:
-      "Linux, Intel Macs and Windows on ARM aren't packaged yet. [Build from source](README#build-from-source).",
+      "Intel Macs aren't packaged yet. [Build from source](README#build-from-source).",
     /** Build-written: the H2 over the page FAQ, a draft for Lorenzo or Matteo. */
     faqHeading: "Questions",
     faq: [
@@ -239,19 +258,19 @@ export const COPY = {
         id: "verify-download",
         question: "How do I check that the download is genuine?",
         answer:
-          "Every release ships a `SHA256SUMS.txt` and a build-provenance attestation that ties each file to the workflow run and commit that built it. Check the hash, or run `gh attestation verify` on the file. [Commands for macOS and Windows](README#verifying-a-download).",
+          "Every release lists SHA-256 checksums in its release notes and ships a build-provenance attestation that ties each file to the workflow run and commit that built it. Check the hash, or run `gh attestation verify` on the file. [Commands for every platform](README#verifying-a-download).",
       },
       {
-        id: "which-agent",
-        question: "Which agent should I install first?",
+        id: "linux-packages",
+        question: "How do Linux packages and updates work?",
         answer:
-          "Any one of Claude Code, Codex or Antigravity CLI is enough, installed and logged in before you launch Oxide. Add the others whenever you like: Oxide offers every Provider it finds, and you choose one per Thread. [Requirements](/docs/quick-start#requirements).",
+          "Linux builds ship as AppImage, `.deb` and `.rpm` for both x64 and arm64. The AppImage uses In-app update, while a Package install updates through the signed APT and DNF repositories. [Linux installation guide](/guides/linux-packages-and-updates).",
       },
       {
         id: "updates",
         question: "How do I stay up to date?",
         answer:
-          "Oxide updates itself from Settings → Updates and offers only stable releases; test pre-releases never reach the updater. New versions and what changed are on the [changelog](/changelog). [How updates work](README#updates).",
+          "On macOS, Windows and the Linux AppImage, Oxide checks for updates automatically and installs them from the titlebar or Settings → Updates. Test pre-releases never reach the stable APT and DNF repositories. New versions and what changed are on the [changelog](/changelog). [How updates work](README#updates).",
       },
     ],
   },
@@ -261,9 +280,9 @@ export const COPY = {
    * The primary reads "Get Oxide" while the Release state is `none`.
    */
   closingCta: {
-    heading: "Take your next Turn all the way to the merge.",
+    heading: "Open a folder and start a clean shell.",
     sentence:
-      "Oxide drives the Claude Code, Codex or Antigravity CLI you already use. Open a Project, start a Thread and review what comes back.",
+      "Open a Project from the sidebar, run as many plain Terminals as you like, and keep your Files view, Issues and pull requests beside them.",
     download: "Download Oxide",
     getOxide: "Get Oxide",
     github: "View on GitHub",
@@ -291,7 +310,7 @@ export const COPY = {
     app: {
       heading: "The Oxide app",
       sentence: "The Oxide app has no telemetry.",
-      readmeLead: "Where your prompts and code go is answered in the",
+      readmeLead: "Where your code and GitHub requests go is answered in the",
       readmeLink: "Oxide README's FAQ",
     },
     site: {

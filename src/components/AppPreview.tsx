@@ -1,52 +1,33 @@
-import type { PreviewProvider } from "@/content/app-preview";
 import { AppPreviewApp, type PreviewIcons } from "./AppPreviewApp";
 import { Icon } from "./Icon";
 
 const NAMES = [
   "repo",
   "file-directory",
-  "bell",
   "sidebar-expand",
   "plus",
-  "search",
-  "chevron-down",
-  "chevron-right",
-  "git-branch",
+  "arrow-left",
   "gear",
-  "git-commit",
-  "person",
-  "file-diff",
-  "file",
   "terminal",
-  "git-pull-request",
+  "file",
   "issue-opened",
-  "x",
-  "eye",
-  "shield-check",
+  "git-pull-request",
   "git-merge",
+  "x",
+  "check-circle-fill",
+  "screen-full",
+  "screen-normal",
   "arrow-up",
-  "paperclip",
-  "check",
-  "comment",
-  "alert",
 ] as const;
 
 /**
  * The interactive app preview (Design system, App preview; ADR-0004). This
  * server part renders the Octicons once, so the icon package never reaches
- * the browser, and hands them to the client app with the Provider.
+ * the browser, and hands them to the client app.
  */
-export function AppPreview({
-  provider = "claude",
-  className,
-}: {
-  provider?: PreviewProvider;
-  className?: string;
-}) {
+export function AppPreview({ className }: { className?: string }) {
   const icons = Object.fromEntries(
     NAMES.map((name) => [name, <Icon key={name} name={name} />]),
   ) as PreviewIcons;
-  return (
-    <AppPreviewApp provider={provider} icons={icons} className={className} />
-  );
+  return <AppPreviewApp icons={icons} className={className} />;
 }

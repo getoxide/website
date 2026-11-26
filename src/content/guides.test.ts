@@ -5,23 +5,17 @@ import { featureSections } from "@/lib/features";
 import { GUIDE_INDEX, GUIDES, guideSources } from "./guides";
 import { PAGES } from "./pages";
 
-// The two guides (ticket #42): the Copy deck's outlines are binding, the
-// running text is build-written. The expectations below come from the deck,
-// an independent source, and from what `/features` actually renders.
-
 const DECK = readFileSync(
   new URL("../../docs/spec/copy.md", import.meta.url),
   "utf8",
 );
 
-/** A `## \`/path\` *(outline)*` section of the deck. */
 function outlineSection(path: string): string {
   return DECK.split("## `" + path + "` *(outline)*")[1].split("\n## ")[0];
 }
 
 type OutlineRow = { heading: string; keySentences: string };
 
-/** The outline table rows: heading and key sentences, in order. */
 function outline(path: string): OutlineRow[] {
   return outlineSection(path)
     .split("\n")
@@ -38,7 +32,6 @@ function outline(path: string): OutlineRow[] {
     });
 }
 
-/** The deck's `**Intro key sentence**`, verbatim. */
 function introOf(path: string): string {
   return outlineSection(path)
     .split("**Intro key sentence**: ")[1]
@@ -46,7 +39,6 @@ function introOf(path: string): string {
     .trim();
 }
 
-/** A whole-word, case-sensitive mention, as the concept-link gate matches. */
 const termPattern = (term: string) => new RegExp(`(?<!\\w)${term}s?(?!\\w)`);
 const mentioned = (text: string) =>
   SNAPSHOT.concepts
@@ -56,8 +48,8 @@ const mentioned = (text: string) =>
 describe("the guide pages", () => {
   it("covers exactly the two deck guides, in the deck's order", () => {
     expect(GUIDES.map((guide) => guide.page.path)).toEqual([
-      "/guides/review-ai-generated-code",
-      "/guides/claude-code-and-codex-together",
+      "/guides/running-agents-in-oxide",
+      "/guides/linux-packages-and-updates",
     ]);
   });
 
@@ -101,24 +93,8 @@ describe.each(GUIDES.map((guide) => [guide.page.path, guide] as const))(
       const rows = outline(path);
       guide.sections.forEach((section, i) => {
         const { keySentences } = rows[i];
-        // The closing section of a guide is described, not quoted.
-        if (keySentences.startsWith("One paragraph")) return;
         expect(section.body, section.heading).toContain(keySentences);
       });
-    });
-
-    it("does not restate the locked Blind review sentence", () => {
-      const section = guide.sections.find(
-        (s) => s.id === "why-the-reviewer-works-blind",
-      );
-      if (!section) return;
-      expect(
-        section.body.match(/That is a \[Blind review\]/g),
-        section.heading,
-      ).toHaveLength(1);
-      expect(section.body, section.heading).not.toMatch(
-        /that is a Blind review/,
-      );
     });
 
     it("gives every section an anchor id and running text", () => {
@@ -134,18 +110,6 @@ describe.each(GUIDES.map((guide) => [guide.page.path, guide] as const))(
 );
 
 describe("the guides link to each other and to /features", () => {
-  const [review, codex] = GUIDES;
-
-  it("ends the review guide with a pointer to the other guide", () => {
-    const last = review.sections.at(-1)!;
-    expect(last.heading).toBe("Going further: a second reviewer");
-    expect(last.body).toContain(`](${codex.page.path})`);
-  });
-
-  it("ends the second guide with a pointer to the review guide", () => {
-    expect(codex.closing).toContain(`](${review.page.path})`);
-  });
-
   it("links only /features anchors that /features renders", () => {
     const rendered = new Set(
       featureSections().flatMap((group) => group.features.map((f) => f.anchor)),
@@ -174,8 +138,6 @@ describe("the guides link to each other and to /features", () => {
 });
 
 describe("Concepts links in the guides", () => {
-  // `pnpm check:concept-links` scans headings too, and a heading is never a
-  // link: a term's first mention must be in the intro or in a section body.
   it("never introduces a Concepts term in a heading", () => {
     for (const guide of GUIDES) {
       const seen = new Set(mentioned(guide.intro));

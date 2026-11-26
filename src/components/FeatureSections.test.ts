@@ -6,74 +6,51 @@ import type { CaptureManifest } from "@/lib/captures";
 import { SNAPSHOT, type Snapshot } from "@/lib/snapshot";
 import { FeatureSections } from "./FeatureSections";
 
-const withoutPullRequests: Snapshot = {
-  ...SNAPSHOT,
-  readme: {
-    ...SNAPSHOT.readme,
-    features: SNAPSHOT.readme.features.map((group) => ({
-      ...group,
-      leadIns: group.leadIns.filter(
-        (l) => l !== "Pull requests, from review to merge",
-      ),
-    })),
-  },
-};
-
 const render = (snapshot: Snapshot, manifest: CaptureManifest = {}) =>
   renderToStaticMarkup(createElement(FeatureSections, { snapshot, manifest }));
 
 const ids = (html: string) =>
   [...html.matchAll(/<h3[^>]*id="([^"]+)"/g)].map(([, id]) => id);
 
-// Copy deck, `/features`; Design system, Feature section.
 describe("FeatureSections", () => {
-  it("renders one anchored h3 per Snapshot lead-in, under three group h2s", () => {
+  it("renders one anchored h3 per Snapshot lead-in, under two group h2s", () => {
     const html = render(SNAPSHOT);
-    expect(ids(html)).toHaveLength(17);
-    expect(ids(html)).toContain("verification-dossier");
+    expect(ids(html)).toEqual([
+      "open-projects",
+      "many-terminals",
+      "command-blocks",
+      "issues",
+      "pull-requests",
+      "files",
+    ]);
     expect(
       [...html.matchAll(/<h2[^>]*>(.*?)<\/h2>/g)].map(([, h]) => h),
-    ).toEqual([
-      "One app, every agent CLI",
-      "Review before you merge",
-      "A full workspace around the conversation",
-    ]);
+    ).toEqual(["Projects and plain terminals", "GitHub at hand"]);
   });
 
-  it("has #pull-requests only when the Snapshot carries the lead-in", () => {
+  it("links the running-agents guide from Many terminals", () => {
     const html = render(SNAPSHOT);
-    expect(ids(html)).toContain("pull-requests");
-    expect(html).toContain('href="#pull-requests"');
-    expect(html).toMatch(/auto-merge/);
-    const before = render(withoutPullRequests);
-    expect(before).not.toContain("pull-requests");
-    expect(before).not.toMatch(/auto-merge/);
-  });
-
-  it("links the Verification Dossier and Blind review guides", () => {
-    const html = render(SNAPSHOT);
-    expect(html).toContain('href="/guides/review-ai-generated-code"');
-    expect(html).toContain('href="/guides/claude-code-and-codex-together"');
+    expect(html).toContain('href="/guides/running-agents-in-oxide"');
   });
 
   it("renders no frame, no figure and no caption for an empty slot", () => {
-    const html = render(SNAPSHOT);
+    const html = render(SNAPSHOT, {});
     expect(html).not.toMatch(/<figure|<img|<picture|<figcaption/);
   });
 
   it("renders the frame and its caption for a slot that has a capture", () => {
     const manifest: CaptureManifest = {
-      [featureSlot("threads")]: {
+      [featureSlot("many-terminals")]: {
         kind: "image",
-        width: 2880,
-        height: 1800,
-        widths: [640, 960, 1280],
+        width: 1920,
+        height: 1200,
+        widths: [640, 960, 1280, 1920],
       },
     };
     const html = render(SNAPSHOT, manifest);
     expect(html.match(/<figure/g)).toHaveLength(1);
-    expect(html).toContain("feature-threads-640.avif");
-    expect(html).toMatch(/<figcaption[^>]*>The Threads of a Project/);
+    expect(html).toContain("feature-many-terminals-640.avif");
+    expect(html).toMatch(/<figcaption[^>]*>Multiple Terminals nested under/);
   });
 
   it("keeps all the text in the HTML, hidden by nothing", () => {

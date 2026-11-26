@@ -29,7 +29,7 @@ describe("share card", () => {
     expect(manifest.headline).toBe(PAGES.home.h1);
     expect(manifest.subline).toBe(COPY.hero.subheadline);
     expect(manifest.headline).toBe(
-      "The complete desktop app for agentic coding.",
+      "A terminal app that knows your GitHub projects.",
     );
   });
 

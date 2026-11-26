@@ -33,54 +33,21 @@ export type Page = {
 export const PAGES = {
   home: {
     path: "/",
-    h1: "The complete desktop app for agentic coding.",
-    title: "Oxide: the complete desktop app for Claude Code and Codex",
+    h1: "A terminal app that knows your GitHub projects.",
+    title: "Oxide: a desktop terminal app for your GitHub Projects",
     description:
-      "Oxide drives Claude Code, Codex and Antigravity CLI through the whole loop in one desktop app: prompt, review each Turn, open the pull request and merge.",
+      "Open a Project, run as many plain terminals as you like in its folder, and keep your files, GitHub Issues and pull requests in the same window.",
     budgetClass: "showcase",
     structuredData: "HomeGraph",
     indexable: true,
     llmsSection: "Pages",
   },
-  claudeCodeGui: {
-    path: "/claude-code-gui",
-    h1: "A Claude Code GUI from the first prompt to the merge",
-    title: "Claude Code GUI: an open-source desktop app · Oxide",
-    description:
-      "Oxide is an open-source desktop GUI for Claude Code: keep your claude login and sessions, review each Turn, then open the pull request and merge in one window.",
-    budgetClass: "showcase",
-    structuredData: "WebPage",
-    indexable: true,
-    llmsSection: "Pages",
-  },
-  codexGui: {
-    path: "/codex-gui",
-    h1: "A Codex GUI that takes each change all the way to the merge",
-    title: "Codex GUI: a desktop app for the Codex CLI · Oxide",
-    description:
-      "Is there a GUI for Codex? Oxide is an open-source desktop app that drives the codex CLI you already use, from the prompt to the pull request and the merge.",
-    budgetClass: "showcase",
-    structuredData: "WebPage",
-    indexable: true,
-    llmsSection: "Pages",
-  },
-  antigravityGui: {
-    path: "/antigravity-gui",
-    h1: "An Antigravity CLI GUI that takes each change all the way to the merge",
-    title: "Antigravity CLI GUI: a desktop app for agy · Oxide",
-    description:
-      "Is there a GUI for Antigravity CLI? Oxide is an open-source desktop app that drives the agy CLI you already use, from the prompt to the pull request and merge.",
-    budgetClass: "showcase",
-    structuredData: "WebPage",
-    indexable: true,
-    llmsSection: "Pages",
-  },
   features: {
     path: "/features",
-    h1: "Everything between the prompt and the merge",
-    title: "Features: from the prompt to the merge · Oxide",
+    h1: "Everything around your terminals and GitHub",
+    title: "Features: terminals, code and GitHub · Oxide",
     description:
-      "Every Oxide feature, from the prompt to the merge: drive three agent CLIs, review each Turn and what actually ran, then open the pull request and merge it.",
+      "Open Projects, run many plain terminals with Command blocks, edit files beside them, and handle GitHub Issues and pull requests without leaving Oxide.",
     budgetClass: "showcase",
     structuredData: "WebPage",
     indexable: true,
@@ -91,29 +58,29 @@ export const PAGES = {
     h1: "Guides",
     title: "Guides · Oxide",
     description:
-      "Practical guides to reviewing what coding agents write: a method for AI-generated code, and using Claude Code and Codex together as writer and reviewer.",
+      "Practical guides for Oxide: running coding agent CLIs side by side in plain terminals, and installing or updating Oxide on Linux with APT, DNF or AppImage.",
     budgetClass: "reading",
     structuredData: "WebPage",
     indexable: true,
     llmsSection: "Guides",
   },
-  guidesReview: {
-    path: "/guides/review-ai-generated-code",
-    h1: "How to review AI-generated code before you merge",
-    title: "How to review AI-generated code · Oxide",
+  guidesAgents: {
+    path: "/guides/running-agents-in-oxide",
+    h1: "Running Claude Code, Codex and any CLI in Oxide",
+    title: "Running Claude Code and Codex in Oxide · Oxide",
     description:
-      "A four-step method to review AI-generated code: read one Turn at a time, check what actually ran, send feedback where it belongs, undo what you don't want.",
+      "Use Claude Code, Codex, Antigravity CLI or any shell tool side by side in Oxide's plain terminals, with your own shell config, code editor and GitHub tools.",
     budgetClass: "reading",
     structuredData: "TechArticle",
     indexable: true,
     llmsSection: "Guides",
   },
-  guidesCodex: {
-    path: "/guides/claude-code-and-codex-together",
-    h1: "Claude Code and Codex together: one writes, the other reviews",
-    title: "Claude Code and Codex together, with Blind review · Oxide",
+  guidesLinux: {
+    path: "/guides/linux-packages-and-updates",
+    h1: "Installing and updating Oxide on Linux",
+    title: "Linux packages and updates · Oxide",
     description:
-      "Use Claude Code and Codex together: let one agent write the change and have the other review only the diff and the issue, never the original conversation.",
+      "Install Oxide on Linux with AppImage, .deb or .rpm for x64 and arm64, configure the signed APT and DNF repositories, and verify every download.",
     budgetClass: "reading",
     structuredData: "TechArticle",
     indexable: true,
@@ -124,7 +91,7 @@ export const PAGES = {
     h1: "Quick start",
     title: "Quick start · Oxide",
     description:
-      "Install a Provider, open a Project, start a Thread, review the Turn in the Diff Surface, then commit, push and open the pull request. Oxide in five steps.",
+      "Check what Oxide needs, open a Project, start as many plain terminals as you like, browse Files and open Issues or pull requests in four steps.",
     budgetClass: "reading",
     structuredData: "TechArticle",
     indexable: true,
@@ -135,7 +102,7 @@ export const PAGES = {
     h1: "Concepts",
     title: "Concepts · Oxide",
     description:
-      "The words Oxide uses and what they mean: Project, Thread, Turn, Provider, Surface, Checkpoint, Verification Dossier, Blind review and Restore.",
+      "The words Oxide uses and what they mean: Project, Terminal, Command block, Surface, Files view, Code workspace, Session restore and update channels.",
     budgetClass: "reading",
     structuredData: "TechArticle",
     indexable: true,
@@ -146,7 +113,7 @@ export const PAGES = {
     h1: "Download Oxide",
     title: "Download · Oxide",
     description:
-      "Download the Oxide desktop app from GitHub Releases, verify the file, and connect the Claude Code, Codex or Antigravity CLI you already have installed.",
+      "Download Oxide for macOS, Windows and Linux (x64 and arm64) from GitHub Releases, configure the signed APT or DNF repository, and verify the file.",
     budgetClass: "reading",
     structuredData: "WebPage",
     indexable: true,
@@ -157,7 +124,7 @@ export const PAGES = {
     h1: "Frequently asked questions",
     title: "FAQ · Oxide",
     description:
-      "Answers about Oxide, the open-source desktop app for Claude Code and Codex: what it is, what it is not, where your code goes and how it differs.",
+      "Answers about Oxide, the open-source desktop terminal app for GitHub Projects: what it is, running agent CLIs in it, supported platforms and privacy.",
     budgetClass: "reading",
     structuredData: "FAQPage",
     indexable: true,

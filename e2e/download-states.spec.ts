@@ -2,10 +2,6 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Browser, type Page } from "@playwright/test";
 import { fixtureOrigin, type Fixture } from "./ports";
 
-// `/download` in every Release state, from exports built with the fixture
-// Releases in e2e/fixtures/releases.json (Download experience #13; Copy
-// deck, `/download` → Buttons). User agents stand in for the platforms.
-
 const UA = {
   mac: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
   windows:
@@ -20,16 +16,20 @@ const ASSET = {
       "https://github.com/getoxide/oxide/releases/download/v1.1.0/Oxide_1.1.0_aarch64.dmg",
     windows:
       "https://github.com/getoxide/oxide/releases/download/v1.1.0/Oxide_1.1.0_x64-setup.exe",
+    linux:
+      "https://github.com/getoxide/oxide/releases/download/v1.1.0/Oxide_1.1.0_amd64.AppImage",
   },
   prerelease: {
     macos:
       "https://github.com/getoxide/oxide/releases/download/v1.2.0-rc.1/Oxide_1.2.0-rc.1_aarch64.dmg",
     windows:
       "https://github.com/getoxide/oxide/releases/download/v1.2.0-rc.1/Oxide_1.2.0-rc.1_x64-setup.exe",
+    linux:
+      "https://github.com/getoxide/oxide/releases/download/v1.2.0-rc.1/Oxide_1.2.0-rc.1_amd64.AppImage",
   },
 };
 
-const UNSUPPORTED = "Linux, Intel Macs and Windows on ARM aren't packaged yet.";
+const UNSUPPORTED = "Intel Macs aren't packaged yet.";
 
 async function open(
   browser: Browser,
@@ -52,11 +52,17 @@ async function open(
 
 type Shown = { name: string; href: string; primary: boolean };
 
-/** The platform buttons in visual order, with their look. */
+/** The three primary platform buttons in visual order, with their look. */
 async function platformButtons(page: Page): Promise<Shown[]> {
-  const buttons = page.locator('main a[data-goatcounter-click^="download-"]');
-  await expect(buttons).toHaveCount(2);
-  const shown = await buttons.evaluateAll((links) => {
+  const buttons = page.locator(
+    'main a[role!="none"][data-goatcounter-click^="download-"]',
+  );
+  // First 3 buttons are the main platform buttons inside `.buttons`
+  const mainButtons = page.locator(
+    'main div[class*="buttons"] a[data-goatcounter-click^="download-"]',
+  );
+  await expect(mainButtons).toHaveCount(3);
+  const shown = await mainButtons.evaluateAll((links) => {
     const probe = document.createElement("div");
     probe.style.background = "var(--ox-accent)";
     document.body.append(probe);
@@ -73,10 +79,11 @@ async function platformButtons(page: Page): Promise<Shown[]> {
     });
   });
   const names = await Promise.all(
-    (await buttons.all()).map(async (b) =>
+    (await mainButtons.all()).map(async (b) =>
       (await b.innerText()).replace(/\s+/g, " ").trim(),
     ),
   );
+  void buttons;
   return shown
     .map((s, i) => ({ ...s, name: names[i] }))
     .sort((a, b) => a.top - b.top || a.left - b.left)
@@ -84,24 +91,23 @@ async function platformButtons(page: Page): Promise<Shown[]> {
 }
 
 test.describe("stable", () => {
-  const mac = {
-    name: "Download for macOS",
-    href: ASSET.stable.macos,
-  };
-  const win = {
-    name: "Download for Windows",
-    href: ASSET.stable.windows,
-  };
+  const mac = { name: "Download for macOS", href: ASSET.stable.macos };
+  const win = { name: "Download for Windows", href: ASSET.stable.windows };
+  const lin = { name: "Download for Linux", href: ASSET.stable.linux };
 
-  test("macOS: macOS primary, Windows secondary", async ({ browser }) => {
+  test("macOS: macOS primary, Windows and Linux secondary", async ({
+    browser,
+  }) => {
     const page = await open(browser, "stable", { ua: UA.mac });
     expect(await platformButtons(page)).toEqual([
       { ...mac, primary: true },
       { ...win, primary: false },
+      { ...lin, primary: false },
     ]);
     const main = page.locator("main");
     await expect(main).toContainText("Apple Silicon · .dmg · 101.2 MB");
     await expect(main).toContainText("x64 · installer · 88.8 MB");
+    await expect(main).toContainText("x64 · AppImage · 94.3 MB");
     await expect(main).toContainText(
       "Version 1.1.0 · 10 December 2026 · Release notes",
     );
@@ -110,35 +116,34 @@ test.describe("stable", () => {
     ).toHaveAttribute("href", "/changelog");
   });
 
-  test("Windows: Windows primary and first, macOS secondary", async ({
-    browser,
-  }) => {
+  test("Windows: Windows primary and first", async ({ browser }) => {
     const page = await open(browser, "stable", { ua: UA.windows });
     expect(await platformButtons(page)).toEqual([
       { ...win, primary: true },
       { ...mac, primary: false },
+      { ...lin, primary: false },
     ]);
   });
 
-  test("Windows with JavaScript off: macOS stays primary, both links present", async ({
+  test("Linux: Linux primary and first", async ({ browser }) => {
+    const page = await open(browser, "stable", { ua: UA.linux });
+    expect(await platformButtons(page)).toEqual([
+      { ...lin, primary: true },
+      { ...mac, primary: false },
+      { ...win, primary: false },
+    ]);
+    await expect(page.locator("main").getByText(UNSUPPORTED)).toBeVisible();
+  });
+
+  test("Windows with JavaScript off: macOS stays primary, all links present", async ({
     browser,
   }) => {
     const page = await open(browser, "stable", { ua: UA.windows, js: false });
     expect(await platformButtons(page)).toEqual([
       { ...mac, primary: true },
       { ...win, primary: false },
+      { ...lin, primary: false },
     ]);
-  });
-
-  test("Linux: the no-JavaScript order and the build-from-source line", async ({
-    browser,
-  }) => {
-    const page = await open(browser, "stable", { ua: UA.linux });
-    expect(await platformButtons(page)).toEqual([
-      { ...mac, primary: true },
-      { ...win, primary: false },
-    ]);
-    await expect(page.locator("main").getByText(UNSUPPORTED)).toBeVisible();
   });
 
   for (const [platform, ua] of Object.entries(UA)) {
@@ -176,51 +181,51 @@ test.describe("stable", () => {
 });
 
 test.describe("prerelease-only", () => {
-  const LABEL = "Download test pre-release 1.2.0-rc.1";
-
-  test("macOS: the test pre-release is primary, Windows names its platform", async ({
+  test("macOS: macOS primary with test pre-release note", async ({
     browser,
   }) => {
     const page = await open(browser, "prerelease-only", { ua: UA.mac });
     expect(await platformButtons(page)).toEqual([
-      { name: LABEL, href: ASSET.prerelease.macos, primary: true },
+      {
+        name: "Download for macOS",
+        href: ASSET.prerelease.macos,
+        primary: true,
+      },
       {
         name: "Download for Windows",
         href: ASSET.prerelease.windows,
         primary: false,
       },
+      {
+        name: "Download for Linux",
+        href: ASSET.prerelease.linux,
+        primary: false,
+      },
     ]);
-    await expect(page.getByRole("link", { name: LABEL })).toHaveCount(1);
     await expect(page.locator("main")).toContainText(
-      "This is a test pre-release: it never reaches the in-app updater. Build from source for the latest code.",
+      "Test pre-release 1.2.0-rc.1: it never reaches the in-app updater or the APT and DNF repositories.",
     );
     await expect(page.locator("main")).not.toContainText("Release notes");
   });
 
-  test("Windows: the Windows test pre-release is primary", async ({
-    browser,
-  }) => {
-    const page = await open(browser, "prerelease-only", { ua: UA.windows });
+  test("Linux: Linux primary and first", async ({ browser }) => {
+    const page = await open(browser, "prerelease-only", { ua: UA.linux });
     expect(await platformButtons(page)).toEqual([
-      { name: LABEL, href: ASSET.prerelease.windows, primary: true },
+      {
+        name: "Download for Linux",
+        href: ASSET.prerelease.linux,
+        primary: true,
+      },
       {
         name: "Download for macOS",
         href: ASSET.prerelease.macos,
         primary: false,
       },
-    ]);
-  });
-
-  test("JavaScript off: the macOS test pre-release is primary", async ({
-    browser,
-  }) => {
-    const page = await open(browser, "prerelease-only", {
-      ua: UA.windows,
-      js: false,
-    });
-    expect((await platformButtons(page)).map((b) => b.name)).toEqual([
-      LABEL,
-      "Download for Windows",
+      {
+        name: "Download for Windows",
+        href: ASSET.prerelease.windows,
+        primary: false,
+      },
     ]);
   });
 });
@@ -240,8 +245,15 @@ test("an unresolved installer links the GitHub release page", async ({
       href: ASSET.stable.macos,
       primary: false,
     },
+    {
+      name: "Download for Linux",
+      href: ASSET.stable.linux,
+      primary: false,
+    },
   ]);
-  await expect(page.locator("main")).not.toContainText(/null|undefined/);
+  await expect(page.locator("main")).not.toContainText(
+    /(?<!\/dev\/)\b(null|undefined)\b/,
+  );
 });
 
 test.describe("none", () => {
@@ -274,9 +286,8 @@ test.describe("closing CTA primary", () => {
     test(`${fixture}: ${label}`, async ({ browser }) => {
       const page = await open(browser, fixture, { ua: UA.mac, path: "/" });
       const cta = page.getByRole("region", {
-        name: "Take your next Turn all the way to the merge.",
+        name: "Open a folder and start a clean shell.",
       });
-      // The first button; the block's copy also links its Concepts terms.
       await expect(
         cta.locator('a:not([href^="/docs/concepts#"])').first(),
       ).toHaveText(label);
@@ -284,11 +295,11 @@ test.describe("closing CTA primary", () => {
   }
 });
 
-// Budgets, Accessibility, in the states the committed Snapshot cannot show.
 for (const fixture of ["stable", "prerelease-only", "unresolved"] as const) {
   for (const [platform, ua] of [
     ["mac", UA.mac],
     ["windows", UA.windows],
+    ["linux", UA.linux],
   ] as const) {
     test(`axe: ${fixture} on ${platform} has no WCAG 2.2 A/AA violations`, async ({
       browser,

@@ -10,6 +10,17 @@ export type Installer =
   | { name: string; url: string; size: number }
   | { name: null; url: string; size: null };
 
+export type InstallerKey =
+  | "macos"
+  | "windows"
+  | "windowsArm64"
+  | "linux"
+  | "linuxDeb"
+  | "linuxRpm"
+  | "linuxArm64"
+  | "linuxArm64Deb"
+  | "linuxArm64Rpm";
+
 export type Release = {
   version: string;
   tag: string;
@@ -17,7 +28,7 @@ export type Release = {
   date: string;
   url: string;
   prerelease: boolean;
-  assets: { macos: Installer; windows: Installer };
+  assets: Record<InstallerKey, Installer>;
 };
 
 export type Concept = { term: string; id: string; definition: string };
@@ -87,8 +98,7 @@ export type TokenName =
   | "requirements"
   | "version"
   | "release-date"
-  | "asset-size:macos"
-  | "asset-size:windows";
+  | `asset-size:${InstallerKey}`;
 
 const DATE = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",
@@ -113,11 +123,14 @@ const megabytes = (bytes: number) => `${(bytes / 1_000_000).toFixed(1)} MB`;
 export function tokensOf(snapshot: Snapshot) {
   const { release, readme } = snapshot;
   const stable = release.state === "stable" ? release.latest : null;
-  const size = (key: "macos" | "windows") => {
-    const bytes = release.latest?.assets[key].size;
+  const size = (key: InstallerKey) => {
+    const bytes = release.latest?.assets[key]?.size;
     return bytes == null ? null : megabytes(bytes);
   };
   return function token(name: TokenName): string | null {
+    if (name.startsWith("asset-size:")) {
+      return size(name.slice("asset-size:".length) as InstallerKey);
+    }
     switch (name) {
       case "definition":
         return readme.definition;
@@ -133,41 +146,11 @@ export function tokensOf(snapshot: Snapshot) {
         return stable?.version ?? null;
       case "release-date":
         return stable ? formatDate(stable.date) : null;
-      case "asset-size:macos":
-        return size("macos");
-      case "asset-size:windows":
-        return size("windows");
+      default:
+        return null;
     }
   };
 }
 
 /** Renders a token from the committed Snapshot. */
 export const token = tokensOf(SNAPSHOT);
-
-/** One row of `⟨requirements⟩`: a Provider and its install cell (Markdown). */
-export type ProviderInstall = { provider: string; install: string };
-
-/**
- * The Provider install links beside "Bring your own agent" (Copy deck,
- * `/download`), read from the Requirements table: the first column and the
- * `Install` column of every body row, as the README writes them.
- */
-export function providerInstalls(requirements: string): ProviderInstall[] {
-  const rows = requirements
-    .split("\n")
-    .filter((line) => line.trim().startsWith("|"))
-    .map((line) =>
-      line
-        .trim()
-        .replace(/^\||\|$/g, "")
-        .split("|")
-        .map((cell) => cell.trim()),
-    );
-  const [header, , ...body] = rows;
-  if (!header) return [];
-  const install = header.indexOf("Install");
-  return body.map((cells) => ({
-    provider: cells[0],
-    install: cells[install],
-  }));
-}
